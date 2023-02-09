@@ -26,7 +26,7 @@ public class Film {
     /**
      * Дата релиза
      */
-    private int releaseDate;
+    private LocalDate releaseDate;
     /**
      * Продолжительность фильма
      */
