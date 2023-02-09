@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.controllers;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.utils.Identifier;
 import ru.yandex.practicum.filmorate.utils.ValidateService;
@@ -40,11 +39,11 @@ public class FilmController {
     public Film createFilm(@RequestBody Film film) {
         // валидация
         validate(film);
-
         // устанавливаем идентификатор
         film.setId(identifier.next());
         films.put(film.getId(), film);
         log.info("добавлен фильм с id=" + film.getId());
+
         return film;
     }
 
@@ -55,34 +54,29 @@ public class FilmController {
      */
     @PutMapping
     public Film updateFilm(@RequestBody Film film) {
-        if (!films.containsKey(film.getId())) {
-            // если объекта нет, то создаем идентификатор для него
-            film.setId(identifier.next());
-            validate(film);
-            films.put(film.getId(), film);
-            log.info("Добавлен при обновлении фильм с id={}", film.getId());
-        } else {
-            films.put(film.getId(), film);
-            log.info("Обновлен фильм с id={}", film.getId());
-        }
+        ValidateService.isEmpty(films.size(), "Фильмов не существует");
+        ValidateService.containsFilm(!films.containsKey(film.getId()),
+                "фильма с id=" + film.getId() + " не существует");
+        validate(film);
+        films.put(film.getId(), film);
+        log.info("Обновлен фильм с id={}", film.getId());
 
         return film;
     }
 
     private void validate(Film film) {
-        try {
-            ValidateService.isEmptyStringField(film.getName(),
-                    "Название фильма не может быть пустым.");
-            ValidateService.checkMaxSizeStringField(film.getDescription(), 200,
-                    "Длина описания не должна быть больше 200 символов.");
-            LocalDate lessThenDate = LocalDate.of(1895, 12, 28);
-            ValidateService.dateLessThen(film.getReleaseDate(), lessThenDate,
-                    String.format("Дата релиза не может быть раньше %s", lessThenDate));
-            ValidateService.durationMoreThenZero(film.getDuration(),
-                    "Продолжительность фильма должна быть положительной");
-        } catch (ValidationException e) {
-            log.warn(e.getMessage());
-            throw new RuntimeException(e);
-        }
+        ValidateService.isEmptyStringField(film.getName(),
+                "Название фильма не может быть пустым.");
+
+        int maxSizeDescription = 200;
+        ValidateService.checkMaxSizeStringField(film.getDescription(), maxSizeDescription,
+                "Длина описания не должна быть больше " + maxSizeDescription + " символов.");
+
+        LocalDate lessThenDate = LocalDate.of(1895, 12, 28);
+        ValidateService.dateLessThen(film.getReleaseDate(), lessThenDate,
+                String.format("Дата релиза не может быть раньше %s", lessThenDate));
+
+        ValidateService.durationMoreThenZero(film.getDuration(),
+                "Продолжительность фильма должна быть положительной");
     }
 }
