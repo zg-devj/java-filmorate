@@ -89,4 +89,46 @@ public class ValidateService {
             throw new ValidationException(message);
         }
     }
+
+    /**
+     * Является ли объект email
+     *
+     * @param param   объект проверки
+     * @param message текст ошибки
+     */
+    public static void isNotEmail(String param, String message) {
+        if (param == null || param.isBlank() || !param.contains("@") || (param.indexOf("@") != param.lastIndexOf("@"))) {
+            log.warn(message);
+            throw new ValidationException(message);
+        }
+    }
+
+    /**
+     * Является ли проверяемая дата поз текущего времени
+     *
+     * @param param   проверяемая дата
+     * @param message текст ошибки
+     */
+    public static void dateLaterThenNow(LocalDate param, String message) {
+        if (param.isAfter(LocalDate.now())) {
+            log.warn(message);
+            throw new ValidationException(message);
+        }
+    }
+
+    /**
+     * если param проверяемый параметр равен null или пустое значение,
+     * то заменить его на toParam
+     *
+     * @param param   проверяемый параметр
+     * @param toParam замещающее значение
+     * @return String param или toParam
+     */
+    public static String ifStringIsNullOrEmpty(String param, String toParam) {
+        if (param == null || param.isBlank()) {
+            // Если поле не существует или пустое
+            return toParam;
+        }
+        return param;
+    }
 }
