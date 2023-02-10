@@ -6,6 +6,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.utils.Identifier;
 import ru.yandex.practicum.filmorate.utils.ValidateService;
 
+import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashMap;
@@ -36,7 +37,7 @@ public class FilmController {
      * @return Film добавленный фильм
      */
     @PostMapping
-    public Film createFilm(@RequestBody Film film) {
+    public Film createFilm(@Valid @RequestBody Film film) {
         // валидация
         validate(film);
         // устанавливаем идентификатор
@@ -53,7 +54,7 @@ public class FilmController {
      * @param film фильм
      */
     @PutMapping
-    public Film updateFilm(@RequestBody Film film) {
+    public Film updateFilm(@Valid @RequestBody Film film) {
         ValidateService.isEmptyList(films.size(), "Фильмов не существует");
         ValidateService.containsFilm(!films.containsKey(film.getId()),
                 "фильма с id=" + film.getId() + " не существует");

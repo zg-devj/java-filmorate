@@ -6,6 +6,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.utils.Identifier;
 import ru.yandex.practicum.filmorate.utils.ValidateService;
 
+import javax.validation.Valid;
 import java.util.Collection;
 import java.util.HashMap;
 
@@ -35,7 +36,7 @@ public class UserController {
      * @return User добавленный пользователь
      */
     @PostMapping
-    public User createUser(@RequestBody User user) {
+    public User createUser(@Valid @RequestBody User user) {
         // валидация
         validate(user);
         // устанавливаем идентификатор
@@ -52,7 +53,7 @@ public class UserController {
      * @param user пользователь
      */
     @PutMapping
-    public User updateUser(@RequestBody User user) {
+    public User updateUser(@Valid @RequestBody User user) {
         ValidateService.isEmptyList(users.size(), "Пользователей не существует");
         ValidateService.containsFilm(!users.containsKey(user.getId()),
                 "Пользователя с id=" + user.getId() + " не существует");
@@ -64,6 +65,8 @@ public class UserController {
     }
 
     private void validate(User user) {
+        ValidateService.isEmptyStringField(user.getEmail(),
+                "Адрес электронной почты не может быть пустым.");
         ValidateService.isNotEmail(user.getEmail(),
                 "Не является адресом электронной почты.");
         ValidateService.isEmptyStringField(user.getLogin(),
