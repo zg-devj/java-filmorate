@@ -38,10 +38,6 @@ public class UserController {
     public User createUser(@RequestBody User user) {
         // валидация
         validate(user);
-//        if (user.getName()==null || user.getName().isBlank()) {
-//            // Если имя пользователя пустое
-//            user.setName(user.getLogin());
-//        }
         // устанавливаем идентификатор
         user.setId(identifier.next());
         users.put(user.getId(), user);
@@ -61,10 +57,6 @@ public class UserController {
         ValidateService.containsFilm(!users.containsKey(user.getId()),
                 "Пользователя с id=" + user.getId() + " не существует");
         validate(user);
-//        if (user.getName()==null || user.getName().isBlank()) {
-//            // Если имя пользователя пустое
-//            user.setName(user.getLogin());
-//        }
         users.put(user.getId(), user);
         log.info("Обновлен пользователь с id={}", user.getId());
 
@@ -73,11 +65,11 @@ public class UserController {
 
     private void validate(User user) {
         ValidateService.isNotEmail(user.getEmail(),
-                "Не является адресом электронной почты");
+                "Не является адресом электронной почты.");
         ValidateService.isEmptyStringField(user.getLogin(),
-                "Логин не может быть пустым");
+                "Логин не может быть пустым.");
         ValidateService.dateLaterThenNow(user.getBirthday(),
-                "День рождения не может быть в будущем ");
+                "День рождения не может быть в будущем.");
         user.setName(ValidateService.ifStringIsNullOrEmpty(user.getName(), user.getLogin()));
     }
 }

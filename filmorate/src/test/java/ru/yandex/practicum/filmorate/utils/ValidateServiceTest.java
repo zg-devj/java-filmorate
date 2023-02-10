@@ -3,8 +3,10 @@ package ru.yandex.practicum.filmorate.utils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.controllers.FilmController;
+import ru.yandex.practicum.filmorate.controllers.UserController;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
 
@@ -14,6 +16,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class ValidateServiceTest {
 
     static Film wrongFilm;
+    static User wrongUser;
+    static User normalUser;
+
     private FilmController filmController = new FilmController();
 
     @BeforeAll
@@ -24,6 +29,11 @@ class ValidateServiceTest {
         wrongFilm = new Film(1, " ", description,
                 LocalDate.of(1895, 12, 27), -1);
 
+        wrongUser = new User(1, "user@exa@mple.com", "login",
+                " ", LocalDate.of(2500, 01, 01));
+
+        normalUser = new User(2, "user@example.com", "login",
+                "User Name", LocalDate.of(2000, 01, 01));
 
     }
 
@@ -108,5 +118,47 @@ class ValidateServiceTest {
         );
 
         assertEquals(expected, ex.getMessage());
+    }
+
+    @Test
+    public void test_isNotEmail() {
+        final String expected = "Не является адресом электронной почты.";
+
+        final ValidationException ex = assertThrows(
+                ValidationException.class,
+                () -> ValidateService
+                        .isNotEmail(wrongUser.getEmail(), expected)
+        );
+
+        assertEquals(expected, ex.getMessage());
+    }
+
+    @Test
+    public void test_dateLaterThenNow() {
+        final String expected = "День рождения не может быть в будущем.";
+
+        final ValidationException ex = assertThrows(
+                ValidationException.class,
+                () -> ValidateService
+                        .dateLaterThenNow(wrongUser.getBirthday(), expected)
+        );
+
+        assertEquals(expected, ex.getMessage());
+    }
+
+    @Test
+    public void test_ifStringIsNullOrEmpty_WithWrongUserName() {
+        final String expected = wrongUser.getLogin();
+        final String actual = ValidateService.
+                ifStringIsNullOrEmpty(wrongUser.getName(), wrongUser.getLogin());
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void test_ifStringIsNullOrEmpty_WithNormalUserName() {
+        final String expected = normalUser.getName();
+        final String actual = ValidateService.
+                ifStringIsNullOrEmpty(normalUser.getName(), normalUser.getLogin());
+        assertEquals(expected, actual);
     }
 }
