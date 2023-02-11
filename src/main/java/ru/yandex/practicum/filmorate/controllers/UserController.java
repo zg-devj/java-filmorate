@@ -54,7 +54,6 @@ public class UserController {
      */
     @PutMapping
     public User updateUser(@Valid @RequestBody User user) {
-        ValidateService.isEmptyList(users.size(), "Пользователей не существует");
         ValidateService.containsFilm(!users.containsKey(user.getId()),
                 "Пользователя с id=" + user.getId() + " не существует");
         validate(user);

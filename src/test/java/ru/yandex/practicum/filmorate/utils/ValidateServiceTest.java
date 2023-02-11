@@ -93,19 +93,6 @@ class ValidateServiceTest {
     }
 
     @Test
-    public void test_isEmptyList() {
-        final String expected = "Фильмов не существует";
-
-        final ValidationException ex = assertThrows(
-                ValidationException.class,
-                () -> ValidateService
-                        .isEmptyList(filmController.allFilms().size(), expected)
-        );
-
-        assertEquals(expected, ex.getMessage());
-    }
-
-    @Test
     public void test_containsFilm() {
         Film filmNoAdded = new Film(999, "Film 1", "Desc",
                 LocalDate.of(2022, 01, 01), 100);

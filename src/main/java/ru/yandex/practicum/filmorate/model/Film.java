@@ -15,7 +15,7 @@ public class Film {
     /**
      * Идентификатор фильма
      */
-    private int id;
+    private Integer id;
     /**
      * Название фильма
      */
@@ -34,5 +34,5 @@ public class Film {
      * Продолжительность фильма
      */
     @Positive(message = "Продолжительность фильма должна быть положительной")
-    private int duration;
+    private Integer duration;
 }

@@ -57,25 +57,13 @@ public class ValidateService {
      * @param param   проверяемое значение
      * @param message текст ошибки
      */
-    public static void durationMoreThenZero(int param, String message) {
-        if (param <= 0) {
+    public static void durationMoreThenZero(Integer param, String message) {
+        if (param == null || param <= 0) {
             log.warn(message);
             throw new ValidationException(message);
         }
     }
 
-    /**
-     * Пустой ли список
-     *
-     * @param count   количество элементов в списке
-     * @param message текст ошибки
-     */
-    public static void isEmptyList(int count, String message) {
-        if (count <= 0) {
-            log.warn(message);
-            throw new ValidationException(message);
-        }
-    }
 
     /**
      * Существует ли фильм

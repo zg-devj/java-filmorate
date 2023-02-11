@@ -55,9 +55,8 @@ public class FilmController {
      */
     @PutMapping
     public Film updateFilm(@Valid @RequestBody Film film) {
-        ValidateService.isEmptyList(films.size(), "Фильмов не существует");
         ValidateService.containsFilm(!films.containsKey(film.getId()),
-                "фильма с id=" + film.getId() + " не существует");
+                "Фильма с id=" + film.getId() + " не существует");
         validate(film);
         films.put(film.getId(), film);
         log.info("Обновлен фильм с id={}", film.getId());
