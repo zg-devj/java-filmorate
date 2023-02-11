@@ -55,7 +55,7 @@ public class UserController {
     @PutMapping
     public User updateUser(@Valid @RequestBody User user) {
         ValidateService.containsFilm(!users.containsKey(user.getId()),
-                "Пользователя с id=" + user.getId() + " не существует");
+                "Пользователя с id=" + user.getId() + " не существует.");
         validate(user);
         users.put(user.getId(), user);
         log.info("Обновлен пользователь с id={}", user.getId());
