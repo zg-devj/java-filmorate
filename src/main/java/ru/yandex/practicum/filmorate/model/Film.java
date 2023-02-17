@@ -33,6 +33,6 @@ public class Film {
     /**
      * Продолжительность фильма
      */
-    @Positive(message = "Продолжительность фильма должна быть положительной")
+    @Positive(message = "Продолжительность фильма должна быть положительной.")
     private Integer duration;
 }
