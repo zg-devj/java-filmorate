@@ -88,6 +88,14 @@ class UserControllerTest {
     }
 
     @Test
+    public void createUser_WithWhitespaceLogin_ReturnException() {
+        user.setLogin("login name");
+        final String expected = "Логин не должен содержать пробелы.";
+
+        doTestCreate(user, expected);
+    }
+
+    @Test
     public void createUser_IfBirthdayInFuture_ReturnException() {
         LocalDate now = LocalDate.now();
         user.setBirthday(now.plusDays(1));
@@ -133,6 +141,16 @@ class UserControllerTest {
 
         user.setLogin(" ");
         final String expected = "Логин не может быть пустым.";
+
+        doTestUpdate(user, expected);
+    }
+
+    @Test
+    public void updateUser_WithWhitespaceLogin_ReturnException() {
+        userController.createUser(user);
+
+        user.setLogin("login name");
+        final String expected = "Логин не должен содержать пробелы.";
 
         doTestUpdate(user, expected);
     }

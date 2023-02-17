@@ -70,6 +70,8 @@ public class UserController {
                 "Не является адресом электронной почты.");
         ValidateService.isEmptyStringField(user.getLogin(),
                 "Логин не может быть пустым.");
+        ValidateService.isStringFieldWhiteSpace(user.getLogin(),
+                "Логин не должен содержать пробелы.");
         ValidateService.dateLaterThenNow(user.getBirthday(),
                 "День рождения не может быть в будущем.");
         user.setName(ValidateService.ifStringIsNullOrEmpty(user.getName(), user.getLogin()));

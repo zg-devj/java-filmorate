@@ -64,7 +64,6 @@ public class ValidateService {
         }
     }
 
-
     /**
      * Существует ли фильм
      *
@@ -118,5 +117,17 @@ public class ValidateService {
             return toParam;
         }
         return param;
+    }
+
+    /**
+     * Содержит ли строка пробелы
+     * @param param проверяемый параметр
+     * @param message текст ошибки
+     */
+    public static void isStringFieldWhiteSpace(String param, String message) {
+        if (param.chars().anyMatch(Character::isWhitespace)) {
+            log.warn(message);
+            throw new ValidationException(message);
+        }
     }
 }
