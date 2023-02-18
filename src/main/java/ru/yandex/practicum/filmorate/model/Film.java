@@ -1,16 +1,18 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.*;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
+import java.util.Objects;
 
 /**
  * Фильм
  */
-@Data
+
+@NoArgsConstructor
 @AllArgsConstructor
+@Data
 public class Film {
     /**
      * Идентификатор фильма
@@ -35,4 +37,17 @@ public class Film {
      */
     @Positive(message = "Продолжительность фильма должна быть положительной.")
     private Integer duration;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Film film = (Film) o;
+        return Objects.equals(id, film.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 }
