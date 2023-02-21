@@ -9,7 +9,7 @@ import java.time.LocalDate;
  * Сервис проверки значений
  */
 @Slf4j
-public class ValidateService {
+public class CustomValidate {
     /**
      * Строка равна null или пустая
      *

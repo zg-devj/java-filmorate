@@ -56,4 +56,16 @@ public class FilmControllerValidateTest {
         Assertions.assertEquals("Продолжительность фильма должна быть положительной."
                 , violations.iterator().next().getMessage());
     }
+
+    @Test
+    public void test_ReleaseDateLessThen1895_12_28() {
+        LocalDate lessDate = LocalDate.of(1895, 12, 28).minusDays(1);
+        Film film = new Film(null, "name", "description",
+                lessDate, 100);
+
+        Set<ConstraintViolation<Film>> violations = validator.validate(film);
+        Assertions.assertEquals(1, violations.size());
+        Assertions.assertEquals("Дата релиза не может быть раньше 1895-12-28"
+                , violations.iterator().next().getMessage());
+    }
 }
