@@ -4,7 +4,7 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import java.time.LocalDate;
 
-public class DateMinBoundaryValidator implements ConstraintValidator<MinBoundDate, LocalDate> {
+public class MinBoundaryDateValidator implements ConstraintValidator<MinBoundDate, LocalDate> {
 
     private LocalDate date;
 

@@ -60,11 +60,23 @@ class UserControllerValidateTest {
     public void test_BlankLogin() {
         LocalDate birthday = LocalDate.now().minusDays(1);
         User user = new User(null, "name@example.com",
-                " ", "name", birthday);
+                "name", "", birthday);
 
         Set<ConstraintViolation<User>> violations = validator.validate(user);
         Assertions.assertEquals(1, violations.size());
         Assertions.assertEquals("Логин не может быть пустым."
+                , violations.iterator().next().getMessage());
+    }
+
+    @Test
+    public void test_WhiteSpaceLogin() {
+        LocalDate birthday = LocalDate.now().minusDays(1);
+        User user = new User(null, "name@example.com",
+                "name", " ", birthday);
+
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        Assertions.assertEquals(1, violations.size());
+        Assertions.assertEquals("Логин не должен содержать пробелы."
                 , violations.iterator().next().getMessage());
     }
 }

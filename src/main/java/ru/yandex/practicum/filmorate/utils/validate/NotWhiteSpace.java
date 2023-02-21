@@ -6,20 +6,12 @@ import java.lang.annotation.*;
 
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = MinBoundaryDateValidator.class)
+@Constraint(validatedBy = NotWhiteSpaceValidator.class)
 @Documented
-public @interface MinBoundDate {
+public @interface NotWhiteSpace {
     String message() default "{MinBoundDate.invalid}";
 
     Class<?>[] groups() default {};
 
     Class<? extends Payload>[] payload() default {};
-
-    String date();
-
-    @Target({ElementType.FIELD})
-    @Retention(RetentionPolicy.RUNTIME)
-    @interface List {
-        MinBoundDate[] value();
-    }
 }
