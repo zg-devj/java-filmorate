@@ -1,8 +1,13 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import ru.yandex.practicum.filmorate.utils.validate.MinBoundDate;
 
-import javax.validation.constraints.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.Objects;
 
@@ -26,11 +31,13 @@ public class Film {
     /**
      * Описание фильма
      */
-    @Size(max = 200,message = "Длина описания не должна быть больше 200 символов.")
+    @Size(max = 200, message = "Длина описания не должна быть больше 200 символов.")
     private String description;
     /**
      * Дата релиза
+     * Дата релиза не может быть раньше 1895-12-28
      */
+    @MinBoundDate(date = "1895-12-28")
     private LocalDate releaseDate;
     /**
      * Продолжительность фильма
