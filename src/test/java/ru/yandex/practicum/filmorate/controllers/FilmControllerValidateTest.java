@@ -21,7 +21,7 @@ public class FilmControllerValidateTest {
     }
 
     @Test
-    public void test_BlankName() {
+    public void testValidateUser_BlankName() {
         LocalDate now = LocalDate.now().minusYears(1);
         Film film = new Film(null, " ", "description",
                 now, 100);
@@ -33,7 +33,7 @@ public class FilmControllerValidateTest {
     }
 
     @Test
-    public void test_DescriptionMoreThen200Chars() {
+    public void testValidateUser_DescriptionMoreThen200Chars() {
         LocalDate now = LocalDate.now().minusYears(1);
         String description = "a".repeat(201);
         Film film = new Film(null, "name", description,
@@ -46,7 +46,19 @@ public class FilmControllerValidateTest {
     }
 
     @Test
-    public void test_PositiveDuration() {
+    public void testValidateUser_ReleaseDateLessThen1895_12_28() {
+        LocalDate lessDate = LocalDate.of(1895, 12, 28).minusDays(1);
+        Film film = new Film(null, "name", "description",
+                lessDate, 100);
+
+        Set<ConstraintViolation<Film>> violations = validator.validate(film);
+        Assertions.assertEquals(1, violations.size());
+        Assertions.assertEquals("Дата релиза не может быть раньше 1895-12-28"
+                , violations.iterator().next().getMessage());
+    }
+
+    @Test
+    public void testValidateUser_PositiveDuration() {
         LocalDate now = LocalDate.now().minusYears(1);
         Film film = new Film(null, "name", "description",
                 now, -1);
@@ -57,15 +69,5 @@ public class FilmControllerValidateTest {
                 , violations.iterator().next().getMessage());
     }
 
-    @Test
-    public void test_ReleaseDateLessThen1895_12_28() {
-        LocalDate lessDate = LocalDate.of(1895, 12, 28).minusDays(1);
-        Film film = new Film(null, "name", "description",
-                lessDate, 100);
 
-        Set<ConstraintViolation<Film>> violations = validator.validate(film);
-        Assertions.assertEquals(1, violations.size());
-        Assertions.assertEquals("Дата релиза не может быть раньше 1895-12-28"
-                , violations.iterator().next().getMessage());
-    }
 }

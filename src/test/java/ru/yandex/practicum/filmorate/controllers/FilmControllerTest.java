@@ -62,7 +62,7 @@ class FilmControllerTest {
     }
 
     @Test
-    public void updateFilm_IfFilmListEmpty_ReturnException() {
+    public void updateFilm_WithWrongId_ReturnException() {
         assertEquals(0, filmController.allFilms().size(),
                 "Не верное количество фильмом");
         final String expected = "Фильма с id=" + film.getId() + " не существует";

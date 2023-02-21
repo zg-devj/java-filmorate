@@ -3,7 +3,7 @@ package ru.yandex.practicum.filmorate.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.yandex.practicum.filmorate.utils.validate.NotWhiteSpace;
+import ru.yandex.practicum.filmorate.utils.validators.NotWhiteSpace;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;

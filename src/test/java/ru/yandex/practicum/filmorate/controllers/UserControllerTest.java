@@ -2,12 +2,14 @@ package ru.yandex.practicum.filmorate.controllers;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class UserControllerTest {
 
@@ -57,5 +59,24 @@ class UserControllerTest {
         userController.updateUser(updatedUser);
 
         assertEquals(1, userController.allUsers().size());
+    }
+
+    @Test
+    public void updateUser_WithWrongID_ReturnException() {
+        assertEquals(0, userController.allUsers().size(),
+                "Не верное количество фильмом");
+        final String expected = "Пользователя с id=" + user.getId() + " не существует.";
+
+        doTestUpdate(user, expected);
+
+    }
+
+    private void doTestUpdate(User user, String expected) {
+        final ValidationException ex = assertThrows(
+                ValidationException.class,
+                () -> userController.updateUser(user)
+        );
+
+        assertEquals(expected, ex.getMessage());
     }
 }

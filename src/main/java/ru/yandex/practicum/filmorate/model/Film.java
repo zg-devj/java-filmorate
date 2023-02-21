@@ -3,7 +3,7 @@ package ru.yandex.practicum.filmorate.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.yandex.practicum.filmorate.utils.validate.MinBoundDate;
+import ru.yandex.practicum.filmorate.utils.validators.MinBoundDate;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
