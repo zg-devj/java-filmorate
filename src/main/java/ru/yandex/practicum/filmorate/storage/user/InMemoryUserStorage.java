@@ -13,7 +13,7 @@ import java.util.HashMap;
 @Component
 public class InMemoryUserStorage implements UserStorage {
     // пользователи
-    private final HashMap<Integer, User> users = new HashMap<>();
+    private final HashMap<Long, User> users = new HashMap<>();
     // для возврата идентификатора
     private Identifier identifier = new Identifier();
 

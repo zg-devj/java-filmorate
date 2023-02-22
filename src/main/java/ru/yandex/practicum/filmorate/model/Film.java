@@ -22,7 +22,7 @@ public class Film {
     /**
      * Идентификатор фильма
      */
-    private Integer id;
+    private Long id;
     /**
      * Название фильма
      */

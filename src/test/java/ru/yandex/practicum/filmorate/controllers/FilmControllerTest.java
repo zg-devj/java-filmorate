@@ -19,7 +19,7 @@ class FilmControllerTest {
     @BeforeEach
     void setUp() {
         filmController = new FilmController(new InMemoryFilmStorage());
-        film = new Film(1, "Film", "Desc",
+        film = new Film(1L, "Film", "Desc",
                 LocalDate.of(2022, 01, 01), 100);
     }
 
@@ -31,7 +31,7 @@ class FilmControllerTest {
 
     @Test
     public void getAllFilms_Return1_GETMethod() {
-        Film film1 = new Film(1, "Film 1", "Desc",
+        Film film1 = new Film(1L, "Film 1", "Desc",
                 LocalDate.of(2022, 01, 01), 100);
         filmController.createFilm(film1);
 
@@ -41,7 +41,7 @@ class FilmControllerTest {
 
     @Test
     public void createFilm_WithNormalFilm() {
-        Film film = new Film(1, "Film 1", "Desc",
+        Film film = new Film(1L, "Film 1", "Desc",
                 LocalDate.of(2022, 01, 01), 100);
         filmController.createFilm(film);
 
@@ -50,11 +50,11 @@ class FilmControllerTest {
 
     @Test
     public void updateFilm_WithNormalBehavior() {
-        Film film = new Film(1, "Film 1", "Desc",
+        Film film = new Film(1L, "Film 1", "Desc",
                 LocalDate.of(2022, 01, 01), 100);
         filmController.createFilm(film);
 
-        Film updatedFilm = new Film(1, "Film 2", "Desc 2",
+        Film updatedFilm = new Film(1L, "Film 2", "Desc 2",
                 LocalDate.of(2000, 11, 11), 200);
         filmController.updateFilm(updatedFilm);
 

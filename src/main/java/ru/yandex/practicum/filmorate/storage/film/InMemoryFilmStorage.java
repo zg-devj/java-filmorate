@@ -13,7 +13,7 @@ import java.util.HashMap;
 @Slf4j
 public class InMemoryFilmStorage implements FilmStorage {
     // фильмы
-    private final HashMap<Integer, Film> films = new HashMap<>();
+    private final HashMap<Long, Film> films = new HashMap<>();
     // для возврата идентификатора
     private Identifier identifier = new Identifier();
 

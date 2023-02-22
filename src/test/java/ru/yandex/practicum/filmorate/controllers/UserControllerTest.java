@@ -19,7 +19,7 @@ class UserControllerTest {
     @BeforeEach
     void setUp() {
         userController = new UserController(new InMemoryUserStorage());
-        user = new User(1, "user@example.com", "userlogin", "user name",
+        user = new User(1L, "user@example.com", "userlogin", "user name",
                 LocalDate.of(2000, 01, 01));
     }
 
@@ -31,7 +31,7 @@ class UserControllerTest {
 
     @Test
     public void getAllUsers_Return1_GETMethod() {
-        User user = new User(1, "user@example.com", "login", "User Name",
+        User user = new User(1L, "user@example.com", "login", "User Name",
                 LocalDate.of(2000, 01, 01));
         userController.createUser(user);
 
@@ -41,7 +41,7 @@ class UserControllerTest {
 
     @Test
     public void createUser_WithNormalUser() {
-        User user = new User(1, "user@example.com", "login", "User Name",
+        User user = new User(1L, "user@example.com", "login", "User Name",
                 LocalDate.of(2000, 01, 01));
         userController.createUser(user);
 
@@ -50,11 +50,11 @@ class UserControllerTest {
 
     @Test
     public void updateUser_WithNormalBehavior() {
-        User user = new User(1, "user@example.com", "login", "User Name",
+        User user = new User(1L, "user@example.com", "login", "User Name",
                 LocalDate.of(2000, 01, 01));
         userController.createUser(user);
 
-        User updatedUser = new User(1, "user2@example.com", "newlogin", "New UserName",
+        User updatedUser = new User(1L, "user2@example.com", "newlogin", "New UserName",
                 LocalDate.of(2010, 01, 01));
         userController.updateUser(updatedUser);
 

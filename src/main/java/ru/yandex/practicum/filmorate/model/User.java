@@ -21,7 +21,7 @@ public class User {
     /**
      * Идентификатор пользователя
      */
-    private Integer id;
+    private Long id;
     /**
      * Адрес электронной почты пользователя
      */
