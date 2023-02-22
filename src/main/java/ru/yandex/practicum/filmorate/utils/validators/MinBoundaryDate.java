@@ -8,7 +8,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = MinBoundaryDateValidator.class)
 @Documented
-public @interface MinBoundDate {
+public @interface MinBoundaryDate {
     String message() default "{MinBoundDate.invalid}";
 
     Class<?>[] groups() default {};
@@ -20,6 +20,6 @@ public @interface MinBoundDate {
     @Target({ElementType.FIELD})
     @Retention(RetentionPolicy.RUNTIME)
     @interface List {
-        MinBoundDate[] value();
+        MinBoundaryDate[] value();
     }
 }

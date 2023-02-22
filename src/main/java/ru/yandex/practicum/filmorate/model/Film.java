@@ -3,7 +3,7 @@ package ru.yandex.practicum.filmorate.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.yandex.practicum.filmorate.utils.validators.MinBoundDate;
+import ru.yandex.practicum.filmorate.utils.validators.MinBoundaryDate;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
@@ -37,7 +37,7 @@ public class Film {
      * Дата релиза
      * Дата релиза не может быть раньше 1895-12-28
      */
-    @MinBoundDate(date = "1895-12-28")
+    @MinBoundaryDate(date = "1895-12-28")
     private LocalDate releaseDate;
     /**
      * Продолжительность фильма

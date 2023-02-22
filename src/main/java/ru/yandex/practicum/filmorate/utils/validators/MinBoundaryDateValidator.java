@@ -4,12 +4,12 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import java.time.LocalDate;
 
-public class MinBoundaryDateValidator implements ConstraintValidator<MinBoundDate, LocalDate> {
+public class MinBoundaryDateValidator implements ConstraintValidator<MinBoundaryDate, LocalDate> {
 
     private LocalDate date;
 
     @Override
-    public void initialize(final MinBoundDate constraintAnnotation) {
+    public void initialize(final MinBoundaryDate constraintAnnotation) {
         this.date = LocalDate.parse(constraintAnnotation.date());
     }
 

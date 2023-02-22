@@ -60,11 +60,6 @@ public class InMemoryUserStorage implements UserStorage {
         return user;
     }
 
-    @Override
-    public void deleteUser(int id) {
-
-    }
-
     public static String ifStringIsNullOrEmpty(String param, String toParam) {
         if (param == null || param.isBlank()) {
             // Если поле не существует или пустое
