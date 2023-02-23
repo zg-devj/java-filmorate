@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.services.UserService;
 import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 
 import java.time.LocalDate;
@@ -18,14 +19,14 @@ class UserControllerTest {
 
     @BeforeEach
     void setUp() {
-        userController = new UserController(new InMemoryUserStorage());
+        userController = new UserController(new UserService(new InMemoryUserStorage()));
         user = new User(1L, "user@example.com", "userlogin", "user name",
                 LocalDate.of(2000, 01, 01));
     }
 
     @Test
     public void getAllUsers_ReturnEmptyList_GETMethod() {
-        assertEquals(0, userController.allUsers().size(),
+        assertEquals(0, userController.findAllUsers().size(),
                 "Не верное количество фильмом");
     }
 
@@ -35,7 +36,7 @@ class UserControllerTest {
                 LocalDate.of(2000, 01, 01));
         userController.createUser(user);
 
-        assertEquals(1, userController.allUsers().size(),
+        assertEquals(1, userController.findAllUsers().size(),
                 "Не верное количество фильмом");
     }
 
@@ -45,7 +46,7 @@ class UserControllerTest {
                 LocalDate.of(2000, 01, 01));
         userController.createUser(user);
 
-        assertEquals(1, userController.allUsers().size());
+        assertEquals(1, userController.findAllUsers().size());
     }
 
     @Test
@@ -58,12 +59,12 @@ class UserControllerTest {
                 LocalDate.of(2010, 01, 01));
         userController.updateUser(updatedUser);
 
-        assertEquals(1, userController.allUsers().size());
+        assertEquals(1, userController.findAllUsers().size());
     }
 
     @Test
     public void updateUser_WithWrongID_ReturnException() {
-        assertEquals(0, userController.allUsers().size(),
+        assertEquals(0, userController.findAllUsers().size(),
                 "Не верное количество фильмом");
         final String expected = "Пользователя с id=" + user.getId() + " не существует.";
 
