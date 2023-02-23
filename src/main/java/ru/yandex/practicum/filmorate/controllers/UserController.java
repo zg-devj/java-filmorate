@@ -6,10 +6,10 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.MessageResponse;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.services.UserService;
-import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import javax.validation.Valid;
 import java.util.Collection;
+import java.util.List;
 
 @RestController
 @RequestMapping("/users")
@@ -53,5 +53,31 @@ public class UserController {
     ) {
         userService.addFriend(id, friendId);
         return ResponseEntity.ok(new MessageResponse("Друг добавлен"));
+    }
+
+    // удаление из друзей
+    @DeleteMapping("/{id}/friends/{friendId}")
+    public ResponseEntity removeFriend(
+            @PathVariable Long id,
+            @PathVariable Long friendId
+
+    ) {
+        userService.removeFriend(id, friendId);
+        return ResponseEntity.ok(new MessageResponse("Друг удален"));
+    }
+
+    // список друзей, общих с другим пользователем.
+    @GetMapping("/{id}/friends/common/{otherId}")
+    public List<User> findCommonFriend(
+            @PathVariable Long id,
+            @PathVariable Long otherId
+    ) {
+        return userService.commonFriend(id, otherId);
+    }
+
+    // возвращаем список пользователей, являющихся его друзьями.
+    @GetMapping("/{id}/friends")
+    public List<User> findFriends(@PathVariable Long id) {
+        return userService.findFriends(id);
     }
 }

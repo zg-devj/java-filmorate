@@ -67,6 +67,4 @@ public class InMemoryUserStorage implements UserStorage {
         log.debug("Обновлен пользователь с id={}", user.getId());
         return user;
     }
-
-
 }
