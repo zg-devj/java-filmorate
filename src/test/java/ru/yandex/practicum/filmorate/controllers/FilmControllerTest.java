@@ -9,6 +9,7 @@ import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -42,6 +43,16 @@ class FilmControllerTest {
     }
 
     @Test
+    public void getFilmById_WithNormalBehavior() {
+        Film film1 = new Film(1L, "Film 1", "Desc",
+                LocalDate.of(2022, 01, 01), 100);
+        filmController.createFilm(film1);
+
+        assertEquals(film1, filmController.findFilmById(1L),
+                "Разные объекты");
+    }
+
+    @Test
     public void createFilm_WithNormalFilm() {
         Film film = new Film(1L, "Film 1", "Desc",
                 LocalDate.of(2022, 01, 01), 100);
@@ -70,6 +81,22 @@ class FilmControllerTest {
         final String expected = "Фильма с id=" + film.getId() + " не существует";
 
         doTestUpdateNotFound(film, expected);
+    }
+
+    @Test
+    public void findPopularFilm_Return1MostPopular() {
+        Film film1 = new Film(1L, "Film 1", "Desc",
+                LocalDate.of(2022, 01, 01), 100, 1L);
+        Film film2 = new Film(2L, "Film 2", "Desc",
+                LocalDate.of(2021, 01, 01), 120, 2L);
+        filmController.createFilm(film1);
+        filmController.createFilm(film2);
+
+        final List<Film> films = filmController.findPopularFilms(1);
+
+        assertEquals(1, films.size(),
+                "Не верное количество фильмом");
+        assertEquals(film2, films.get(0));
     }
 
     private void doTestUpdateNotFound(Film film, String expected) {

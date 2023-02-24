@@ -41,6 +41,16 @@ class UserControllerTest {
     }
 
     @Test
+    public void getUserById_WithNormalBehavior() {
+        User user = new User(1L, "user@example.com", "login", "User Name",
+                LocalDate.of(2000, 01, 01));
+        userController.createUser(user);
+
+        assertEquals(user, userController.findUserById(1L),
+                "Разные объекты");
+    }
+
+    @Test
     public void createUser_WithNormalUser() {
         User user = new User(1L, "user@example.com", "login", "User Name",
                 LocalDate.of(2000, 01, 01));

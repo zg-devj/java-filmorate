@@ -68,6 +68,4 @@ public class FilmControllerValidateTest {
         Assertions.assertEquals("Продолжительность фильма должна быть положительной."
                 , violations.iterator().next().getMessage());
     }
-
-
 }
