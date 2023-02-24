@@ -61,10 +61,7 @@ public class UserService {
 
         user.getFriends().add(friendId);
         friend.getFriends().add(userId);
-
-//        userStorage.updateUser(user);
-//        userStorage.updateUser(friend);
-
+        
         log.debug("Добавил к userId={} друга friendId={}.", userId, friendId);
     }
 
@@ -81,9 +78,6 @@ public class UserService {
 
         user.getFriends().remove(friendId);
         friend.getFriends().remove(userId);
-
-//        userStorage.updateUser(user);
-//        userStorage.updateUser(friend);
 
         log.debug("У пользователя userId={} удален друга friendId={}.", userId, friendId);
     }
