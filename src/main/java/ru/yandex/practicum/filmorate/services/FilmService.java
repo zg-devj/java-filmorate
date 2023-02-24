@@ -8,6 +8,9 @@ import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.utils.ValidateUtil;
 
 import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -40,5 +43,13 @@ public class FilmService {
     // обновить фильм
     public Film updateFilm(Film film) {
         return filmStorage.updateFilm(film);
+    }
+
+    // вернуть популярные фильмы
+    public List<Film> findPopularFilms(int count) {
+        return filmStorage.findAllFilms().stream()
+                .sorted(Comparator.comparing(Film::getRate))
+                .limit(count)
+                .collect(Collectors.toList());
     }
 }

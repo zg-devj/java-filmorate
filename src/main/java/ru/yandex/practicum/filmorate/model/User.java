@@ -48,6 +48,9 @@ public class User {
     @Setter(AccessLevel.NONE)
     private Set<Long> friends = new HashSet<>();
 
+    @Setter(AccessLevel.NONE)
+    private Set<Long> filmsLike = new HashSet<>();
+
     public User(Long id, String email, String name, String login, LocalDate birthday) {
         this.id = id;
         this.email = email;

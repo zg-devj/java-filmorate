@@ -45,6 +45,8 @@ public class Film {
     @Positive(message = "Продолжительность фильма должна быть положительной.")
     private Integer duration;
 
+    private Long rate;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
