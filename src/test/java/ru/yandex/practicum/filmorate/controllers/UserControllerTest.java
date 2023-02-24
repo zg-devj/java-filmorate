@@ -2,7 +2,7 @@ package ru.yandex.practicum.filmorate.controllers;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.services.UserService;
 import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
@@ -68,13 +68,13 @@ class UserControllerTest {
                 "Не верное количество фильмом");
         final String expected = "Пользователя с id=" + user.getId() + " не существует.";
 
-        doTestUpdate(user, expected);
+        doTestUpdateNotFound(user, expected);
 
     }
 
-    private void doTestUpdate(User user, String expected) {
-        final ValidationException ex = assertThrows(
-                ValidationException.class,
+    private void doTestUpdateNotFound(User user, String expected) {
+        final NotFoundException ex = assertThrows(
+                NotFoundException.class,
                 () -> userController.updateUser(user)
         );
 
