@@ -3,12 +3,14 @@ package ru.yandex.practicum.filmorate.services;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import ru.yandex.practicum.filmorate.utils.ValidateUtil;
 
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -16,10 +18,12 @@ import java.util.stream.Collectors;
 @Service
 public class FilmService {
     private final FilmStorage filmStorage;
+    private final UserStorage userStorage;
 
     @Autowired
-    public FilmService(FilmStorage filmStorage) {
+    public FilmService(FilmStorage filmStorage, UserStorage userStorage) {
         this.filmStorage = filmStorage;
+        this.userStorage = userStorage;
     }
 
     // вернуть все фильмы
@@ -47,9 +51,45 @@ public class FilmService {
 
     // вернуть популярные фильмы
     public List<Film> findPopularFilms(int count) {
+        if (count <= 0) {
+            throw new ValidationException("Значение count не может быть <=0");
+        }
         return filmStorage.findAllFilms().stream()
-                .sorted(Comparator.comparing(Film::getRate))
-                .limit(count)
+                .sorted((o1, o2) -> o2.getRate().compareTo(o1.getRate())).limit(count)
                 .collect(Collectors.toList());
+    }
+
+    // пользователь ставит лайк фильму
+    public void likeFilm(Long id, Long userId) {
+        ValidateUtil.validLongNotNull(id, "id фильма не должно быть null.");
+        ValidateUtil.validLongNotNull(userId, "id пользователя не должно быть null.");
+
+        Film film = filmStorage.findFilmById(id);
+        User user = userStorage.findUserById(userId);
+
+        ValidateUtil.validUserNotNull(user, String.format("Пользователь с %d не найден.", userId));
+        ValidateUtil.validFilmNotNull(film, String.format("Фильм с %d не найден.", id));
+
+        film.setRate(film.getRate() + 1);
+        user.getFilmsLike().add(id);
+
+        log.debug("Пользователь id={} поставил лайк фильму id={}", userId, id);
+    }
+
+    // пользователь удаляет лайк.
+    public void dislikeFilm(Long id, Long userId) {
+        ValidateUtil.validLongNotNull(id, "id фильма не должно быть null.");
+        ValidateUtil.validLongNotNull(userId, "id пользователя не должно быть null.");
+
+        Film film = filmStorage.findFilmById(id);
+        User user = userStorage.findUserById(userId);
+
+        ValidateUtil.validUserNotNull(user, String.format("Пользователь с %d не найден.", userId));
+        ValidateUtil.validFilmNotNull(film, String.format("Фильм с %d не найден.", id));
+
+        film.setRate(film.getRate() - 1);
+        user.getFilmsLike().remove(id);
+
+        log.debug("Пользователь id={} удалил лайк у фильма id={}", userId, id);
     }
 }

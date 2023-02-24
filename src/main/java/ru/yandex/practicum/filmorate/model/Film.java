@@ -1,8 +1,9 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import ru.yandex.practicum.filmorate.utils.validators.MinBoundaryDate;
 
 import javax.validation.constraints.NotBlank;
@@ -15,9 +16,10 @@ import java.util.Objects;
  * Фильм
  */
 
+@Setter
+@Getter
+@ToString
 @NoArgsConstructor
-@AllArgsConstructor
-@Data
 public class Film {
     /**
      * Идентификатор фильма
@@ -46,6 +48,23 @@ public class Film {
     private Integer duration;
 
     private Long rate;
+
+    public Film(Long id, String name, String description, LocalDate releaseDate, Integer duration) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.releaseDate = releaseDate;
+        this.duration = duration;
+    }
+
+    public Film(Long id, String name, String description, LocalDate releaseDate, Integer duration, Long rate) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.releaseDate = releaseDate;
+        this.duration = duration;
+        this.rate = rate;
+    }
 
     @Override
     public boolean equals(Object o) {

@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.controllers;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.services.FilmService;
@@ -42,5 +43,23 @@ public class FilmController {
     @GetMapping("/popular")
     public List<Film> findPopularFilms(@RequestParam(defaultValue = "10") int count) {
         return filmService.findPopularFilms(count);
+    }
+
+    @PutMapping("/{id}/like/{userId}")
+    public ResponseEntity likeFilm(
+            @PathVariable Long id,
+            @PathVariable Long userId
+    ) {
+        filmService.likeFilm(id, userId);
+        return ResponseEntity.ok("Поставлен лайк!");
+    }
+
+    @DeleteMapping("/{id}/like/{userId}")
+    public ResponseEntity dislikeFilm(
+            @PathVariable Long id,
+            @PathVariable Long userId
+    ) {
+        filmService.dislikeFilm(id, userId);
+        return ResponseEntity.ok("Лайк удален!");
     }
 }
