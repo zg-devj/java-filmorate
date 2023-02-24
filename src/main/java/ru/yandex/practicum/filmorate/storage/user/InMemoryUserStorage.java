@@ -28,7 +28,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     /**
-     * Веруть пользователя по is
+     * Веруть пользователя по id
      * @param id идентификатор пользователя
      * @return пользователя
      */

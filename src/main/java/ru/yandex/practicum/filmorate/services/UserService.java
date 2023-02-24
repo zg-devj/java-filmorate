@@ -29,10 +29,9 @@ public class UserService {
 
     // вернуть пользователя по id
     public User findUserById(Long id) {
+        ValidateUtil.validLongNotNull(id, "id пользователя не должно быть null.");
         User user = userStorage.findUserById(id);
-        if (user == null) {
-            throw new NotFoundException(String.format("Пользователя с id=%d не существует.", id));
-        }
+        ValidateUtil.validUserNotNull(user, String.format("Пользователя с %d не существует.", id));
         return user;
     }
 
@@ -61,7 +60,7 @@ public class UserService {
 
         user.getFriends().add(friendId);
         friend.getFriends().add(userId);
-        
+
         log.debug("Добавил к userId={} друга friendId={}.", userId, friendId);
     }
 

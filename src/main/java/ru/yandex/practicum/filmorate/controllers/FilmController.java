@@ -1,9 +1,8 @@
 package ru.yandex.practicum.filmorate.controllers;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+import ru.yandex.practicum.filmorate.services.FilmService;
 
 import javax.validation.Valid;
 import java.util.Collection;
@@ -11,28 +10,24 @@ import java.util.Collection;
 @RestController
 @RequestMapping("/films")
 public class FilmController {
+    private final FilmService filmService;
 
-    private final FilmStorage filmStorage;
-
-    @Autowired
-    public FilmController(FilmStorage filmStorage) {
-        this.filmStorage = filmStorage;
+    public FilmController(FilmService filmService) {
+        this.filmService = filmService;
     }
 
     @GetMapping
     public Collection<Film> allFilms() {
-        return filmStorage.findAllFilms();
+        return filmService.findAllFilms();
     }
-
 
     @PostMapping
     public Film createFilm(@Valid @RequestBody Film film) {
-        return filmStorage.createFilm(film);
+        return filmService.createFilm(film);
     }
-
 
     @PutMapping
     public Film updateFilm(@Valid @RequestBody Film film) {
-        return filmStorage.updateFilm(film);
+        return filmService.updateFilm(film);
     }
 }
