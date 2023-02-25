@@ -4,7 +4,7 @@ package ru.yandex.practicum.filmorate.utils;
  * Получение идентификатора
  */
 public class Identifier {
-    private int id;
+    private long id;
 
     public Identifier() {
         this.id = 0;
@@ -14,7 +14,7 @@ public class Identifier {
      * увеличить и вернуть id
      * @return int идентификатор
      */
-    public int next() {
+    public long next() {
         return ++id;
     }
 
@@ -22,7 +22,7 @@ public class Identifier {
      * Устанавливаем начальное значение идентификатора
      * @param newId начальное значение
      */
-    public void setStartId(int newId) {
+    public void setStartId(long newId) {
         if (this.id < newId) {
             this.id = newId;
         }

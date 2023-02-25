@@ -1,77 +1,89 @@
 package ru.yandex.practicum.filmorate.controllers;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.model.MessageResponse;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.utils.Identifier;
-import ru.yandex.practicum.filmorate.utils.ValidateService;
+import ru.yandex.practicum.filmorate.services.UserService;
 
 import javax.validation.Valid;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.List;
 
+@Slf4j
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/users")
-@Slf4j
 public class UserController {
-    // пользователи
-    private final HashMap<Integer, User> users = new HashMap<>();
-    // для возврата идентификатора
-    private Identifier identifier = new Identifier();
+    private final UserService userService;
 
-    /**
-     * Вернуть список всех пользователей
-     *
-     * @return Collection&lt;Film&gt; Коллекция пользователей
-     */
     @GetMapping
-    public Collection<User> allUsers() {
-        return users.values();
+    public Collection<User> findAllUsers() {
+        Collection<User> allUsers = userService.findAllUsers();
+        log.info("Запрос всех пользователей.");
+        return allUsers;
     }
 
-    /**
-     * Добавить пользователя
-     *
-     * @param user пользователь
-     * @return User добавленный пользователь
-     */
+    @GetMapping("/{id}")
+    public User findUserById(
+            @PathVariable Long id
+    ) {
+        log.debug("Запрос пользователя.");
+        return userService.findUserById(id);
+    }
+
     @PostMapping
     public User createUser(@Valid @RequestBody User user) {
-        // валидация
-        validate(user);
-        // устанавливаем идентификатор
-        user.setId(identifier.next());
-        users.put(user.getId(), user);
-        log.info("добавлен пользователь с id=" + user.getId());
-
-        return user;
+        log.debug("Запрос на создание пользователя.");
+        return userService.createUser(user);
     }
 
-    /**
-     * Обновить пользователя
-     *
-     * @param user пользователь
-     */
     @PutMapping
     public User updateUser(@Valid @RequestBody User user) {
-        ValidateService.containsFilm(!users.containsKey(user.getId()),
-                "Пользователя с id=" + user.getId() + " не существует.");
-        validate(user);
-        users.put(user.getId(), user);
-        log.info("Обновлен пользователь с id={}", user.getId());
-
-        return user;
+        log.debug("Запрос на обновление пользователя.");
+        return userService.updateUser(user);
     }
 
-    private void validate(User user) {
-        ValidateService.isEmptyStringField(user.getEmail(),
-                "Адрес электронной почты не может быть пустым.");
-        ValidateService.isNotEmail(user.getEmail(),
-                "Не является адресом электронной почты.");
-        ValidateService.isEmptyStringField(user.getLogin(),
-                "Логин не может быть пустым.");
-        ValidateService.dateLaterThenNow(user.getBirthday(),
-                "День рождения не может быть в будущем.");
-        user.setName(ValidateService.ifStringIsNullOrEmpty(user.getName(), user.getLogin()));
+    // добавление в друзья
+    @PutMapping("/{id}/friends/{friendId}")
+    public ResponseEntity addFriend(
+            @PathVariable Long id,
+            @PathVariable Long friendId
+
+    ) {
+        log.info("Запрос на добавление друга.");
+        userService.addFriend(id, friendId);
+        return ResponseEntity.ok(new MessageResponse("Друг добавлен."));
+    }
+
+    // удаление из друзей
+    @DeleteMapping("/{id}/friends/{friendId}")
+    public ResponseEntity removeFriend(
+            @PathVariable Long id,
+            @PathVariable Long friendId
+
+    ) {
+        log.info("Запрос на удаление друга.");
+        userService.removeFriend(id, friendId);
+        return ResponseEntity.ok(new MessageResponse("Друг удален."));
+    }
+
+    // список друзей, общих с другим пользователем.
+    @GetMapping("/{id}/friends/common/{otherId}")
+    public List<User> findCommonFriend(
+            @PathVariable Long id,
+            @PathVariable Long otherId
+    ) {
+        log.info("Запрос общих друзей пользователей.");
+        return userService.commonFriend(id, otherId);
+    }
+
+    // возвращаем список пользователей, являющихся его друзьями.
+    @GetMapping("/{id}/friends")
+    public List<User> findFriends(@PathVariable Long id) {
+        log.info("Запрос друзей пользователя.");
+        return userService.findFriends(id);
     }
 }

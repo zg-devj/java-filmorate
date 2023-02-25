@@ -2,24 +2,40 @@ package ru.yandex.practicum.filmorate.controllers;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.services.FilmService;
+import ru.yandex.practicum.filmorate.services.UserService;
+import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class FilmControllerTest {
 
+    private UserController userController;
     private FilmController filmController;
+    private User user;
     private Film film;
 
     @BeforeEach
     void setUp() {
-        filmController = new FilmController();
-        film = new Film(1, "Film", "Desc",
+        UserStorage userStorage = new InMemoryUserStorage();
+        FilmStorage filmStorage = new InMemoryFilmStorage();
+        filmController = new FilmController(new FilmService(filmStorage, userStorage));
+        userController = new UserController(new UserService(userStorage));
+        film = new Film(1L, "Film", "Desc",
                 LocalDate.of(2022, 01, 01), 100);
+        user = new User(1L, "user@example.com", "name", "login",
+                LocalDate.of(2000, 01, 01));
     }
 
     @Test
@@ -30,7 +46,7 @@ class FilmControllerTest {
 
     @Test
     public void getAllFilms_Return1_GETMethod() {
-        Film film1 = new Film(1, "Film 1", "Desc",
+        Film film1 = new Film(1L, "Film 1", "Desc",
                 LocalDate.of(2022, 01, 01), 100);
         filmController.createFilm(film1);
 
@@ -39,8 +55,18 @@ class FilmControllerTest {
     }
 
     @Test
+    public void getFilmById_WithNormalBehavior() {
+        Film film1 = new Film(1L, "Film 1", "Desc",
+                LocalDate.of(2022, 01, 01), 100);
+        filmController.createFilm(film1);
+
+        assertEquals(film1, filmController.findFilmById(1L),
+                "Разные объекты");
+    }
+
+    @Test
     public void createFilm_WithNormalFilm() {
-        Film film = new Film(1, "Film 1", "Desc",
+        Film film = new Film(1L, "Film 1", "Desc",
                 LocalDate.of(2022, 01, 01), 100);
         filmController.createFilm(film);
 
@@ -49,11 +75,11 @@ class FilmControllerTest {
 
     @Test
     public void updateFilm_WithNormalBehavior() {
-        Film film = new Film(1, "Film 1", "Desc",
+        Film film = new Film(1L, "Film 1", "Desc",
                 LocalDate.of(2022, 01, 01), 100);
         filmController.createFilm(film);
 
-        Film updatedFilm = new Film(1, "Film 2", "Desc 2",
+        Film updatedFilm = new Film(1L, "Film 2", "Desc 2",
                 LocalDate.of(2000, 11, 11), 200);
         filmController.updateFilm(updatedFilm);
 
@@ -61,111 +87,85 @@ class FilmControllerTest {
     }
 
     @Test
-    public void createFilm_withBlankName_ReturnException() {
-        film.setName(" ");
-        final String expected = "Название фильма не может быть пустым.";
-
-        doTestCreate(film, expected);
-    }
-
-    @Test
-    public void createFilm_withDescriptionMoreThen200_ReturnException() {
-        film.setDescription("a".repeat(201));
-        final int maxSize = 200;
-        final String expected = "Длина описания не должна быть больше " + maxSize + " символов.";
-
-        doTestCreate(film, expected);
-    }
-
-    @Test
-    public void createFilm_withIncorrectReleaseDate_ReturnException() {
-        final LocalDate lessThenDate = LocalDate.of(1895, 12, 28);
-        film.setReleaseDate(lessThenDate.minusDays(1));
-        final String expected = "Дата релиза не может быть раньше " + lessThenDate;
-
-        doTestCreate(film, expected);
-    }
-
-    @Test
-    public void createFilm_WithIncorrectDuration_ReturnException() {
-        final String expected = "Продолжительность фильма должна быть положительной";
-        // меньше нуля
-        film.setDuration(-1);
-        doTestCreate(film, expected);
-        // ноль
-        film.setDuration(0);
-        doTestCreate(film, expected);
-    }
-
-    @Test
-    public void updateFilm_IfFilmListEmpty_ReturnException() {
+    public void updateFilm_WithWrongId_ReturnException() {
         assertEquals(0, filmController.allFilms().size(),
                 "Не верное количество фильмом");
         final String expected = "Фильма с id=" + film.getId() + " не существует";
 
-        doTestUpdate(film, expected);
+        doTestUpdateNotFound(film, expected);
     }
 
     @Test
-    public void updateFilm_withBlankName_ReturnException() {
-        filmController.createFilm(film);
+    public void findPopularFilm_Return1MostPopular() {
+        Film film1 = new Film(1L, "Film 1", "Desc",
+                LocalDate.of(2022, 01, 01), 100, 1L);
+        Film film2 = new Film(2L, "Film 2", "Desc",
+                LocalDate.of(2021, 01, 01), 120, 2L);
+        filmController.createFilm(film1);
+        filmController.createFilm(film2);
 
-        film.setName(" ");
-        final String expected = "Название фильма не может быть пустым.";
+        final List<Film> films = filmController.findPopularFilms(1);
 
-        doTestUpdate(film, expected);
+        assertEquals(1, films.size(),
+                "Не верное количество фильмом");
+        assertEquals(film2, films.get(0));
     }
 
     @Test
-    public void updateFilm_withDescriptionMoreThen200_ReturnException() {
-        filmController.createFilm(film);
+    public void likeFilm_OneLike() {
+        Film film1 = filmController.createFilm(film);
+        User user1 = userController.createUser(user);
 
-        film.setDescription("a".repeat(201));
-        final int maxSize = 200;
-        final String expected = "Длина описания не должна быть больше " + maxSize + " символов.";
+        filmController.likeFilm(film1.getId(), user1.getId());
 
-        doTestUpdate(film, expected);
+        assertEquals(1, film1.getRate(), "Не верный рейтинг");
+        assertEquals(1, user1.getFilmsLike().size(), "Не верное кол-во понравившихся фильмов");
     }
 
     @Test
-    public void updateFilm_withIncorrectReleaseDate_ReturnException() {
-        filmController.createFilm(film);
+    public void likeFilm_OneLikeAndTwoDislike_ReturnValidationException() {
+        Film film1 = filmController.createFilm(film);
+        User user1 = userController.createUser(user);
 
-        final LocalDate lessThenDate = LocalDate.of(1895, 12, 28);
-        film.setReleaseDate(lessThenDate.minusDays(1));
-        final String expected = "Дата релиза не может быть раньше " + lessThenDate;
+        Long filmId = film1.getId();
+        Long userId = user1.getId();
 
-        doTestUpdate(film, expected);
-    }
+        filmController.likeFilm(filmId, userId);
+        filmController.dislikeFilm(filmId, userId);
 
-    @Test
-    public void updateFilm_WithIncorrectDuration_ReturnException() {
-        filmController.createFilm(film);
-
-        final String expected = "Продолжительность фильма должна быть положительной";
-        // меньше нуля
-        film.setDuration(-1);
-        doTestUpdate(film, expected);
-        // ноль
-        film.setDuration(0);
-        doTestUpdate(film, expected);
-        // null
-        film.setDuration(null);
-        doTestUpdate(film, expected);
-    }
-
-    private void doTestCreate(Film film, String expected) {
         final ValidationException ex = assertThrows(
                 ValidationException.class,
-                () -> filmController.createFilm(film)
+                () -> filmController.dislikeFilm(filmId, userId)
         );
+
+        String expected = "Пользователь уже отменил лайк к фильму.";
 
         assertEquals(expected, ex.getMessage());
     }
 
-    private void doTestUpdate(Film film, String expected) {
+    @Test
+    public void likeFilm_TwoLikeOneFilm_ReturnValidationException() {
+        Film film1 = filmController.createFilm(film);
+        User user1 = userController.createUser(user);
+
+        Long filmId = film1.getId();
+        Long userId = user1.getId();
+
+        filmController.likeFilm(filmId, userId);
+
         final ValidationException ex = assertThrows(
                 ValidationException.class,
+                () -> filmController.likeFilm(filmId, userId)
+        );
+
+        String expected = "Пользователь уже поставил лайк к фильму.";
+
+        assertEquals(expected, ex.getMessage());
+    }
+
+    private void doTestUpdateNotFound(Film film, String expected) {
+        final NotFoundException ex = assertThrows(
+                NotFoundException.class,
                 () -> filmController.updateFilm(film)
         );
 

@@ -1,82 +1,72 @@
 package ru.yandex.practicum.filmorate.controllers;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.utils.Identifier;
-import ru.yandex.practicum.filmorate.utils.ValidateService;
+import ru.yandex.practicum.filmorate.services.FilmService;
 
 import javax.validation.Valid;
-import java.time.LocalDate;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.List;
 
+@Slf4j
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/films")
-@Slf4j
 public class FilmController {
-    // фильмы
-    private final HashMap<Integer, Film> films = new HashMap<>();
-    // для возврата идентификатора
-    private Identifier identifier = new Identifier();
+    private final FilmService filmService;
 
-    /**
-     * Вернуть список всех фильмов
-     *
-     * @return Collection&lt;Film&gt; Коллекция фильмов
-     */
     @GetMapping
     public Collection<Film> allFilms() {
-        return films.values();
+        log.info("Запрос всех фильмов.");
+        return filmService.findAllFilms();
     }
 
-    /**
-     * Добавить фильм
-     *
-     * @param film фильм
-     * @return Film добавленный фильм
-     */
+    @GetMapping("/{id}")
+    public Film findFilmById(
+            @PathVariable Long id
+    ) {
+        log.info("Запрос фильма.");
+        return filmService.findFilmById(id);
+    }
+
     @PostMapping
     public Film createFilm(@Valid @RequestBody Film film) {
-        // валидация
-        validate(film);
-        // устанавливаем идентификатор
-        film.setId(identifier.next());
-        films.put(film.getId(), film);
-        log.info("добавлен фильм с id=" + film.getId());
-
-        return film;
+        log.debug("Запрос на создание нового фильма.");
+        return filmService.createFilm(film);
     }
 
-    /**
-     * Обновить фильм
-     *
-     * @param film фильм
-     */
     @PutMapping
     public Film updateFilm(@Valid @RequestBody Film film) {
-        ValidateService.containsFilm(!films.containsKey(film.getId()),
-                "Фильма с id=" + film.getId() + " не существует");
-        validate(film);
-        films.put(film.getId(), film);
-        log.info("Обновлен фильм с id={}", film.getId());
-
-        return film;
+        log.info("Запрос на обновление фильма.");
+        return filmService.updateFilm(film);
     }
 
-    private void validate(Film film) {
-        ValidateService.isEmptyStringField(film.getName(),
-                "Название фильма не может быть пустым.");
+    @GetMapping("/popular")
+    public List<Film> findPopularFilms(@RequestParam(defaultValue = "10") int count) {
+        log.info("Запрос популярных фильмов");
+        return filmService.findPopularFilms(count);
+    }
 
-        int maxSizeDescription = 200;
-        ValidateService.checkMaxSizeStringField(film.getDescription(), maxSizeDescription,
-                "Длина описания не должна быть больше " + maxSizeDescription + " символов.");
+    @PutMapping("/{id}/like/{userId}")
+    public ResponseEntity likeFilm(
+            @PathVariable Long id,
+            @PathVariable Long userId
+    ) {
+        log.info("Запрос на добавление лайка.");
+        filmService.likeFilm(id, userId);
+        return ResponseEntity.ok("Поставлен лайк!");
+    }
 
-        LocalDate lessThenDate = LocalDate.of(1895, 12, 28);
-        ValidateService.dateLessThen(film.getReleaseDate(), lessThenDate,
-                String.format("Дата релиза не может быть раньше %s", lessThenDate));
-
-        ValidateService.durationMoreThenZero(film.getDuration(),
-                "Продолжительность фильма должна быть положительной");
+    @DeleteMapping("/{id}/like/{userId}")
+    public ResponseEntity dislikeFilm(
+            @PathVariable Long id,
+            @PathVariable Long userId
+    ) {
+        log.info("Запрос на удаление лайка.");
+        filmService.dislikeFilm(id, userId);
+        return ResponseEntity.ok("Лайк удален!");
     }
 }
