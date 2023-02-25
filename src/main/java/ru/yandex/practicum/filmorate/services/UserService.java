@@ -2,9 +2,7 @@ package ru.yandex.practicum.filmorate.services;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import ru.yandex.practicum.filmorate.utils.ValidateUtil;
@@ -21,7 +19,9 @@ public class UserService {
 
     // вернуть всех пользователей
     public Collection<User> findAllUsers() {
-        return userStorage.findAllUsers();
+        Collection<User> allUsers = userStorage.findAllUsers();
+        log.debug("Запрошены все пользователи в количестве {}.", allUsers.size());
+        return allUsers;
     }
 
     // вернуть пользователя по id
@@ -29,6 +29,7 @@ public class UserService {
         ValidateUtil.validLongNotNull(id, "id пользователя не должно быть null.");
         User user = userStorage.findUserById(id);
         ValidateUtil.validUserNotNull(user, String.format("Пользователя с %d не существует.", id));
+        log.debug("Запрошен пользователь c id={}.", id);
         return user;
     }
 
@@ -57,8 +58,7 @@ public class UserService {
 
         user.getFriends().add(friendId);
         friend.getFriends().add(userId);
-
-        log.debug("Добавил к userId={} друга friendId={}.", userId, friendId);
+        log.debug("Пользователь с id={} добавил друга с id={}.", userId, friendId);
     }
 
     // удаление из друзей
@@ -74,8 +74,7 @@ public class UserService {
 
         user.getFriends().remove(friendId);
         friend.getFriends().remove(userId);
-
-        log.debug("У пользователя userId={} удален друга friendId={}.", userId, friendId);
+        log.debug("Пользователь с id={} удалил из друзей пользователя с id={}.", userId, friendId);
     }
 
     // список друзей, общих с другим пользователем.
@@ -94,8 +93,8 @@ public class UserService {
                 .filter(otherUser.getFriends()::contains)
                 .map(userStorage::findUserById)
                 .collect(Collectors.toList());
-
-        log.debug("Запрошен список общих друзей у userId={} и otherId={}.", userId, otherId);
+        log.debug("У пользователей с id={} и id={}, {} общих друзей.",
+                userId, otherId, commons.size());
         return commons;
     }
 
@@ -104,12 +103,12 @@ public class UserService {
         ValidateUtil.validLongNotNull(userId, "id пользователя не должно быть null.");
         User user = userStorage.findUserById(userId);
         ValidateUtil.validUserNotNull(user, String.format("Пользователь с %d не найден.", userId));
-        List<User> collect = user.getFriends()
+        List<User> friends = user.getFriends()
                 .stream()
                 .map(userStorage::findUserById)
                 .collect(Collectors.toList());
-        log.debug("Список друзей пользователя userId={}.", userId);
-        return collect;
+        log.debug("У пользователя с id={} : {} друзей.", userId, friends.size());
+        return friends;
     }
 
     private String ifStringIsNullOrEmpty(String param, String toParam) {

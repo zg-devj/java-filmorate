@@ -3,10 +3,15 @@ package ru.yandex.practicum.filmorate.controllers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
+import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.services.FilmService;
+import ru.yandex.practicum.filmorate.services.UserService;
+import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -16,14 +21,21 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class FilmControllerTest {
 
+    private UserController userController;
     private FilmController filmController;
+    private User user;
     private Film film;
 
     @BeforeEach
     void setUp() {
-        filmController = new FilmController(new FilmService(new InMemoryFilmStorage(), new InMemoryUserStorage()));
+        UserStorage userStorage = new InMemoryUserStorage();
+        FilmStorage filmStorage = new InMemoryFilmStorage();
+        filmController = new FilmController(new FilmService(filmStorage, userStorage));
+        userController = new UserController(new UserService(userStorage));
         film = new Film(1L, "Film", "Desc",
                 LocalDate.of(2022, 01, 01), 100);
+        user = new User(1L, "user@example.com", "name", "login",
+                LocalDate.of(2000, 01, 01));
     }
 
     @Test
@@ -97,6 +109,58 @@ class FilmControllerTest {
         assertEquals(1, films.size(),
                 "Не верное количество фильмом");
         assertEquals(film2, films.get(0));
+    }
+
+    @Test
+    public void likeFilm_OneLike() {
+        Film film1 = filmController.createFilm(film);
+        User user1 = userController.createUser(user);
+
+        filmController.likeFilm(film1.getId(), user1.getId());
+
+        assertEquals(1, film1.getRate(), "Не верный рейтинг");
+        assertEquals(1, user1.getFilmsLike().size(), "Не верное кол-во понравившихся фильмов");
+    }
+
+    @Test
+    public void likeFilm_OneLikeAndTwoDislike_ReturnValidationException() {
+        Film film1 = filmController.createFilm(film);
+        User user1 = userController.createUser(user);
+
+        Long filmId = film1.getId();
+        Long userId = user1.getId();
+
+        filmController.likeFilm(filmId, userId);
+        filmController.dislikeFilm(filmId, userId);
+
+        final ValidationException ex = assertThrows(
+                ValidationException.class,
+                () -> filmController.dislikeFilm(filmId, userId)
+        );
+
+        String expected = "Пользователь уже отменил лайк к фильму.";
+
+        assertEquals(expected, ex.getMessage());
+    }
+
+    @Test
+    public void likeFilm_TwoLikeOneFilm_ReturnValidationException() {
+        Film film1 = filmController.createFilm(film);
+        User user1 = userController.createUser(user);
+
+        Long filmId = film1.getId();
+        Long userId = user1.getId();
+
+        filmController.likeFilm(filmId, userId);
+
+        final ValidationException ex = assertThrows(
+                ValidationException.class,
+                () -> filmController.likeFilm(filmId, userId)
+        );
+
+        String expected = "Пользователь уже поставил лайк к фильму.";
+
+        assertEquals(expected, ex.getMessage());
     }
 
     private void doTestUpdateNotFound(Film film, String expected) {

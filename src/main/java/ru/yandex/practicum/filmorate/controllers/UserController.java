@@ -22,7 +22,7 @@ public class UserController {
     @GetMapping
     public Collection<User> findAllUsers() {
         Collection<User> allUsers = userService.findAllUsers();
-        log.debug("Запрошены все пользователи в количестве {}.", allUsers.size());
+        log.info("Запрос всех пользователей.");
         return allUsers;
     }
 
@@ -30,19 +30,19 @@ public class UserController {
     public User findUserById(
             @PathVariable Long id
     ) {
-        log.debug("Запрошен пользователь по id={}.", id);
+        log.debug("Запрос пользователя.");
         return userService.findUserById(id);
     }
 
     @PostMapping
     public User createUser(@Valid @RequestBody User user) {
-        log.debug("Создание нового пользователя.");
+        log.debug("Запрос на создание пользователя.");
         return userService.createUser(user);
     }
 
     @PutMapping
     public User updateUser(@Valid @RequestBody User user) {
-        log.debug("Обновление пользователя с id={}.", user.getId());
+        log.debug("Запрос на обновление пользователя.");
         return userService.updateUser(user);
     }
 
@@ -53,7 +53,7 @@ public class UserController {
             @PathVariable Long friendId
 
     ) {
-        log.debug("Пользователь с id={} добавил друга с id={}.", id, friendId);
+        log.info("Запрос на добавление друга.");
         userService.addFriend(id, friendId);
         return ResponseEntity.ok(new MessageResponse("Друг добавлен."));
     }
@@ -65,7 +65,7 @@ public class UserController {
             @PathVariable Long friendId
 
     ) {
-        log.debug("Пользователь с id={} удалил из друзей пользователя с id={}.", id, friendId);
+        log.info("Запрос на удаление друга.");
         userService.removeFriend(id, friendId);
         return ResponseEntity.ok(new MessageResponse("Друг удален."));
     }
@@ -76,17 +76,14 @@ public class UserController {
             @PathVariable Long id,
             @PathVariable Long otherId
     ) {
-        List<User> users = userService.commonFriend(id, otherId);
-        log.debug("У пользователей с id={} и id={}, {} общих друзей.",
-                id, otherId, users.size());
-        return users;
+        log.info("Запрос общих друзей пользователей.");
+        return userService.commonFriend(id, otherId);
     }
 
     // возвращаем список пользователей, являющихся его друзьями.
     @GetMapping("/{id}/friends")
     public List<User> findFriends(@PathVariable Long id) {
-        List<User> friends = userService.findFriends(id);
-        log.debug("У пользователя с id={} : {} друзей.", friends.size());
-        return friends;
+        log.info("Запрос друзей пользователя.");
+        return userService.findFriends(id);
     }
 }

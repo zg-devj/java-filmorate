@@ -20,34 +20,33 @@ public class FilmController {
 
     @GetMapping
     public Collection<Film> allFilms() {
-        Collection<Film> allFilms = filmService.findAllFilms();
-        log.debug("Запрошены все фильмы в количестве {}.", allFilms.size());
-        return allFilms;
+        log.info("Запрос всех фильмов.");
+        return filmService.findAllFilms();
     }
 
     @GetMapping("/{id}")
     public Film findFilmById(
             @PathVariable Long id
     ) {
-        log.debug("Запрошен фильм по id={}.", id);
+        log.info("Запрос фильма.");
         return filmService.findFilmById(id);
     }
 
     @PostMapping
     public Film createFilm(@Valid @RequestBody Film film) {
-        log.debug("Создание нового фильма.");
+        log.debug("Запрос на создание нового фильма.");
         return filmService.createFilm(film);
     }
 
     @PutMapping
     public Film updateFilm(@Valid @RequestBody Film film) {
-        log.debug("Обновление фильма с id={}.", film.getId());
+        log.info("Запрос на обновление фильма.");
         return filmService.updateFilm(film);
     }
 
     @GetMapping("/popular")
     public List<Film> findPopularFilms(@RequestParam(defaultValue = "10") int count) {
-        log.debug("Запрошены {} популярных фильмов.", count);
+        log.info("Запрос популярных фильмов");
         return filmService.findPopularFilms(count);
     }
 
@@ -56,8 +55,8 @@ public class FilmController {
             @PathVariable Long id,
             @PathVariable Long userId
     ) {
+        log.info("Запрос на добавление лайка.");
         filmService.likeFilm(id, userId);
-        log.debug("Пользователь с id={} поставил лайк фильму с id={}.", userId, id);
         return ResponseEntity.ok("Поставлен лайк!");
     }
 
@@ -66,8 +65,8 @@ public class FilmController {
             @PathVariable Long id,
             @PathVariable Long userId
     ) {
+        log.info("Запрос на удаление лайка.");
         filmService.dislikeFilm(id, userId);
-        log.debug("Пользователь с id={} отменил лайк фильму с id={}.", userId, id);
         return ResponseEntity.ok("Лайк удален!");
     }
 }
