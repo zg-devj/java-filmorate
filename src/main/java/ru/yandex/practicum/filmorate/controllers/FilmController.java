@@ -20,28 +20,34 @@ public class FilmController {
 
     @GetMapping
     public Collection<Film> allFilms() {
-        return filmService.findAllFilms();
+        Collection<Film> allFilms = filmService.findAllFilms();
+        log.debug("Запрошены все фильмы в количестве {}.", allFilms.size());
+        return allFilms;
     }
 
     @GetMapping("/{id}")
     public Film findFilmById(
             @PathVariable Long id
     ) {
+        log.debug("Запрошен фильм по id={}.", id);
         return filmService.findFilmById(id);
     }
 
     @PostMapping
     public Film createFilm(@Valid @RequestBody Film film) {
+        log.debug("Создание нового фильма.");
         return filmService.createFilm(film);
     }
 
     @PutMapping
     public Film updateFilm(@Valid @RequestBody Film film) {
+        log.debug("Обновление фильма с id={}.", film.getId());
         return filmService.updateFilm(film);
     }
 
     @GetMapping("/popular")
     public List<Film> findPopularFilms(@RequestParam(defaultValue = "10") int count) {
+        log.debug("Запрошены {} популярных фильмов.", count);
         return filmService.findPopularFilms(count);
     }
 
@@ -51,6 +57,7 @@ public class FilmController {
             @PathVariable Long userId
     ) {
         filmService.likeFilm(id, userId);
+        log.debug("Пользователь с id={} поставил лайк фильму с id={}.", userId, id);
         return ResponseEntity.ok("Поставлен лайк!");
     }
 
@@ -60,6 +67,7 @@ public class FilmController {
             @PathVariable Long userId
     ) {
         filmService.dislikeFilm(id, userId);
+        log.debug("Пользователь с id={} отменил лайк фильму с id={}.", userId, id);
         return ResponseEntity.ok("Лайк удален!");
     }
 }

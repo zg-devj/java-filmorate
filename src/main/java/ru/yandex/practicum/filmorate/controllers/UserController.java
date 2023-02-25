@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.controllers;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.MessageResponse;
@@ -22,23 +21,28 @@ public class UserController {
 
     @GetMapping
     public Collection<User> findAllUsers() {
-        return userService.findAllUsers();
+        Collection<User> allUsers = userService.findAllUsers();
+        log.debug("Запрошены все пользователи в количестве {}.", allUsers.size());
+        return allUsers;
     }
 
     @GetMapping("/{id}")
     public User findUserById(
             @PathVariable Long id
     ) {
+        log.debug("Запрошен пользователь по id={}.", id);
         return userService.findUserById(id);
     }
 
     @PostMapping
     public User createUser(@Valid @RequestBody User user) {
+        log.debug("Создание нового пользователя.");
         return userService.createUser(user);
     }
 
     @PutMapping
     public User updateUser(@Valid @RequestBody User user) {
+        log.debug("Обновление пользователя с id={}.", user.getId());
         return userService.updateUser(user);
     }
 
@@ -49,8 +53,9 @@ public class UserController {
             @PathVariable Long friendId
 
     ) {
+        log.debug("Пользователь с id={} добавил друга с id={}.", id, friendId);
         userService.addFriend(id, friendId);
-        return ResponseEntity.ok(new MessageResponse("Друг добавлен"));
+        return ResponseEntity.ok(new MessageResponse("Друг добавлен."));
     }
 
     // удаление из друзей
@@ -60,8 +65,9 @@ public class UserController {
             @PathVariable Long friendId
 
     ) {
+        log.debug("Пользователь с id={} удалил из друзей пользователя с id={}.", id, friendId);
         userService.removeFriend(id, friendId);
-        return ResponseEntity.ok(new MessageResponse("Друг удален"));
+        return ResponseEntity.ok(new MessageResponse("Друг удален."));
     }
 
     // список друзей, общих с другим пользователем.
@@ -70,12 +76,17 @@ public class UserController {
             @PathVariable Long id,
             @PathVariable Long otherId
     ) {
-        return userService.commonFriend(id, otherId);
+        List<User> users = userService.commonFriend(id, otherId);
+        log.debug("У пользователей с id={} и id={}, {} общих друзей.",
+                id, otherId, users.size());
+        return users;
     }
 
     // возвращаем список пользователей, являющихся его друзьями.
     @GetMapping("/{id}/friends")
     public List<User> findFriends(@PathVariable Long id) {
-        return userService.findFriends(id);
+        List<User> friends = userService.findFriends(id);
+        log.debug("У пользователя с id={} : {} друзей.", friends.size());
+        return friends;
     }
 }
