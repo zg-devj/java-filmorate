@@ -98,9 +98,11 @@ class FilmControllerTest {
     @Test
     public void findPopularFilm_Return1MostPopular() {
         Film film1 = new Film(1L, "Film 1", "Desc",
-                LocalDate.of(2022, 01, 01), 100, 1L);
+                LocalDate.of(2022, 01, 01), 100);
+        film1.setRate(1L);
         Film film2 = new Film(2L, "Film 2", "Desc",
-                LocalDate.of(2021, 01, 01), 120, 2L);
+                LocalDate.of(2021, 01, 01), 120);
+        film2.setRate(2L);
         filmController.createFilm(film1);
         filmController.createFilm(film2);
 
