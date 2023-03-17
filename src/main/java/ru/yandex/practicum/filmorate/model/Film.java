@@ -57,15 +57,6 @@ public class Film {
         this.duration = duration;
     }
 
-    public Film(Long id, String name, String description, LocalDate releaseDate, Integer duration, Long rate) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.releaseDate = releaseDate;
-        this.duration = duration;
-        this.rate = rate;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
