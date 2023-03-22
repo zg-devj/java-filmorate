@@ -15,12 +15,12 @@ public class ValidateUtil {
         }
     }
 
-    public static void validUserNotNull(User user, String message) {
-        if (user == null) {
-            log.debug(message);
-            throw new NotFoundException(message);
-        }
-    }
+//    public static void validUserNotNull(User user, String message) {
+//        if (user == null) {
+//            log.debug(message);
+//            throw new NotFoundException(message);
+//        }
+//    }
 
     public static void validFilmNotNull(Film film, String message) {
         if (film == null) {

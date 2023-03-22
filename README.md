@@ -35,14 +35,18 @@ LIMIT 10;
 ### Запросы для пользователей
 - список друзей пользователя
 ```roomsql
-SELECT friend_id
-FROM friends WHERE user_id=2 AND approve=true
+SELECT * FROM users
+WHERE user_id IN
+(SELECT friend_id
+FROM friends WHERE user_id=1)
 ```
 - список общих друзей
 ```roomsql
-SELECT friend_id
-FROM friends WHERE user_id=1 AND approve=true
+SELECT * FROM users
+WHERE user_id IN 
+(SELECT friend_id
+FROM friends WHERE user_id=1 
 INTERSECT
 SELECT friend_id
-FROM friends WHERE user_id=2 AND approve=true
+FROM friends WHERE user_id=2)
 ```

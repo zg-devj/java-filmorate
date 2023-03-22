@@ -13,7 +13,7 @@ import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.*;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.Optional;
 
 @Slf4j
 @Component
@@ -30,12 +30,25 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public User findUserById(Long id) {
+    public Collection<User> findBothUserFriends(Long user1, Long user2) {
+        String sql = "SELECT * FROM users " +
+                "WHERE user_id IN " +
+                "(SELECT friend_id " +
+                "FROM friends WHERE user_id=? " +
+                "INTERSECT " +
+                "SELECT friend_id " +
+                "FROM friends WHERE user_id=?)";
+        return jdbcTemplate.query(sql, this::makeUser, user1, user2);
+    }
+
+
+    @Override
+    public Optional<User> findUserById(Long userId) {
         String sql = "SELECT * FROM users WHERE user_id=?";
         try {
-            return jdbcTemplate.queryForObject(sql, this::makeUser, id);
+            return Optional.of(jdbcTemplate.queryForObject(sql, this::makeUser, userId));
         } catch (EmptyResultDataAccessException e) {
-            return null;
+            return Optional.empty();
         }
     }
 
@@ -70,14 +83,40 @@ public class UserDbStorage implements UserStorage {
         }
     }
 
+    @Override
+    public void addFriend(Long userId, Long friendId) {
+        String sql = "INSERT INTO friends (user_id, friend_id) " +
+                "VALUES (?, ?)";
+        int res = jdbcTemplate.update(sql, userId, friendId);
+        if (res != 1) {
+            throw new NotFoundException(String.format("Пользователя с id=%d не существует.", friendId));
+        }
+    }
+
+    @Override
+    public void removeFriend(Long userId, Long friendId) {
+        String sql = "DELETE FROM friends WHERE user_id=? AND friend_id=?";
+        int res = jdbcTemplate.update(sql, userId, friendId);
+        if (res != 1) {
+            throw new NotFoundException(String.format("Пользователя с id=%d не существует.", friendId));
+        }
+    }
+
+    @Override
+    public Collection<User> findFriends(Long userId) {
+        String sql = "SELECT * FROM users " +
+                "WHERE user_id IN " +
+                "(SELECT friend_id " +
+                "FROM friends WHERE user_id=?)";
+        return jdbcTemplate.query(sql, this::makeUser, userId);
+    }
+
     private User makeUser(ResultSet rs, int rowNum) throws SQLException {
         User user = User.builder()
                 .id(rs.getLong("user_id"))
                 .login(rs.getString("login"))
                 .name(rs.getString("user_name"))
                 .email(rs.getString("email"))
-                .friends(new HashSet<>())
-                .filmsLike(new HashSet<>())
                 .birthday(rs.getDate("birthday").toLocalDate())
                 .build();
         return user;

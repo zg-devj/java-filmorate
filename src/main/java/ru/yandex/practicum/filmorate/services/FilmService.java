@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.services;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
@@ -64,20 +65,22 @@ public class FilmService {
         ValidateUtil.validLongNotNull(userId, "id пользователя не должно быть null.");
 
         Film film = filmStorage.findFilmById(id);
-        User user = userStorage.findUserById(userId);
+        User user = userStorage.findUserById(userId).orElseThrow(
+                ()-> new NotFoundException(String.format("Пользователь с %d не найден.", userId))
+        );
 
-        ValidateUtil.validUserNotNull(user, String.format("Пользователь с %d не найден.", userId));
+        //ValidateUtil.validUserNotNull(user, String.format("Пользователь с %d не найден.", userId));
         ValidateUtil.validFilmNotNull(film, String.format("Фильм с %d не найден.", id));
 
-        if(!user.getFilmsLike().contains(id)) {
-            // если пользователь не ставил лайк
-            film.setRate(film.getRate() + 1);
-            user.getFilmsLike().add(id);
-            log.debug("Пользователь с id={} поставил лайк фильму с id={}.", userId, id);
-        } else{
-            log.debug("Пользователь с id={} уже ставил лайк фильму с id={}.", userId, id);
-            throw new ValidationException("Пользователь уже поставил лайк к фильму.");
-        }
+//        if(!user.getFilmsLike().contains(id)) {
+//            // если пользователь не ставил лайк
+//            film.setRate(film.getRate() + 1);
+//            user.getFilmsLike().add(id);
+//            log.debug("Пользователь с id={} поставил лайк фильму с id={}.", userId, id);
+//        } else{
+//            log.debug("Пользователь с id={} уже ставил лайк фильму с id={}.", userId, id);
+//            throw new ValidationException("Пользователь уже поставил лайк к фильму.");
+//        }
     }
 
     // пользователь удаляет лайк.
@@ -86,19 +89,21 @@ public class FilmService {
         ValidateUtil.validLongNotNull(userId, "id пользователя не должно быть null.");
 
         Film film = filmStorage.findFilmById(id);
-        User user = userStorage.findUserById(userId);
+        User user = userStorage.findUserById(userId).orElseThrow(
+                ()-> new NotFoundException(String.format("Пользователь с %d не найден.", userId))
+        );
 
-        ValidateUtil.validUserNotNull(user, String.format("Пользователь с %d не найден.", userId));
+        //ValidateUtil.validUserNotNull(user, );
         ValidateUtil.validFilmNotNull(film, String.format("Фильм с %d не найден.", id));
 
-        if(user.getFilmsLike().contains(id)) {
-            // Если пользователь ставил лайк
-            film.setRate(film.getRate() - 1);
-            user.getFilmsLike().remove(id);
-            log.debug("Пользователь с id={} отменил лайк фильму с id={}.", userId, id);
-        } else{
-            log.debug("У пользователя с id={} нет лайка к фильму с id={}. Нельзя отменить лайк.", userId, id);
-            throw new ValidationException("Пользователь уже отменил лайк к фильму.");
-        }
+//        if(user.getFilmsLike().contains(id)) {
+//            // Если пользователь ставил лайк
+//            film.setRate(film.getRate() - 1);
+//            user.getFilmsLike().remove(id);
+//            log.debug("Пользователь с id={} отменил лайк фильму с id={}.", userId, id);
+//        } else{
+//            log.debug("У пользователя с id={} нет лайка к фильму с id={}. Нельзя отменить лайк.", userId, id);
+//            throw new ValidationException("Пользователь уже отменил лайк к фильму.");
+//        }
     }
 }
