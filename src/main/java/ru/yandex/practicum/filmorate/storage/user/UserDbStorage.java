@@ -3,16 +3,17 @@ package ru.yandex.practicum.filmorate.storage.user;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.Collection;
+import java.util.HashSet;
 
 @Slf4j
 @Component
@@ -24,12 +25,18 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public Collection<User> findAllUsers() {
-        return null;
+        String sql = "SELECT * FROM users";
+        return jdbcTemplate.query(sql, this::makeUser);
     }
 
     @Override
     public User findUserById(Long id) {
-        return null;
+        String sql = "SELECT * FROM users WHERE user_id=?";
+        try {
+            return jdbcTemplate.queryForObject(sql, this::makeUser, id);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
     }
 
     @Override
@@ -53,8 +60,26 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User updateUser(User user) {
-        //String sql = "UPDATE users login=?, user_name=?, email=?, birthday=? WHERE id=? ";
-        //int id = jdbcTemplate
-        return null;
+        String sql = "UPDATE users SET login=?, user_name=?, email=?, birthday=? WHERE user_id=?";
+        int id = jdbcTemplate.update(sql, user.getLogin(), user.getName(), user.getEmail(),
+                user.getBirthday(), user.getId());
+        if (id == 1) {
+            return user;
+        } else {
+            throw new NotFoundException(String.format("Пользователя с id=%d не существует.", user.getId()));
+        }
+    }
+
+    private User makeUser(ResultSet rs, int rowNum) throws SQLException {
+        User user = User.builder()
+                .id(rs.getLong("user_id"))
+                .login(rs.getString("login"))
+                .name(rs.getString("user_name"))
+                .email(rs.getString("email"))
+                .friends(new HashSet<>())
+                .filmsLike(new HashSet<>())
+                .birthday(rs.getDate("birthday").toLocalDate())
+                .build();
+        return user;
     }
 }
