@@ -1,16 +1,15 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import ru.yandex.practicum.filmorate.utils.validators.MinBoundaryDate;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Фильм
@@ -18,8 +17,10 @@ import java.util.Objects;
 
 @Setter
 @Getter
+@Builder
 @ToString
 @NoArgsConstructor
+@AllArgsConstructor
 public class Film {
     /**
      * Идентификатор фильма
@@ -49,13 +50,17 @@ public class Film {
 
     private Long rate = Long.valueOf(0);
 
-    public Film(Long id, String name, String description, LocalDate releaseDate, Integer duration) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.releaseDate = releaseDate;
-        this.duration = duration;
-    }
+    private Mpa mpa;
+
+    private Set<Genre> genres;
+
+//    public Film(Long id, String name, String description, LocalDate releaseDate, Integer duration) {
+//        this.id = id;
+//        this.name = name;
+//        this.description = description;
+//        this.releaseDate = releaseDate;
+//        this.duration = duration;
+//    }
 
     @Override
     public boolean equals(Object o) {

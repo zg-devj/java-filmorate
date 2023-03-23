@@ -6,14 +6,16 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.mpa.MpaStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import ru.yandex.practicum.filmorate.utils.ValidateUtil;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -21,6 +23,7 @@ import java.util.stream.Collectors;
 public class FilmService {
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
+    private final MpaStorage mpaStorage;
 
     // вернуть все фильмы
     public Collection<Film> findAllFilms() {
@@ -32,14 +35,22 @@ public class FilmService {
     // вернуть фильм по id
     public Film findFilmById(Long id) {
         ValidateUtil.validLongNotNull(id, "id фильма не должно быть null.");
-        Film film = filmStorage.findFilmById(id);
-        ValidateUtil.validFilmNotNull(film, String.format("Фильма с id=%d не существует.", id));
+        Film film = filmStorage.findFilmById(id).orElseThrow(
+                () -> {
+                    ValidateUtil.throwNotFound(String.format("Фильма с id=%d не существует.", id));
+                    return null;
+                }
+        );
         log.debug("Запрошен фильм c id={}.", id);
         return film;
     }
 
     // добавить фильм
     public Film createFilm(Film film) {
+        Mpa mpa = mpaStorage.findMpaById(film.getMpa().getId()).orElseThrow(
+                () -> new NotFoundException(String.format("MPA рейтинга с id={}", film.getMpa().getId()))
+        );
+        film.setMpa(mpa);
         return filmStorage.createFilm(film);
     }
 
@@ -54,9 +65,10 @@ public class FilmService {
             throw new ValidationException("Значение count не может быть <=0");
         }
         log.debug("Запрошены {} популярных фильмов.", count);
-        return filmStorage.findAllFilms().stream()
-                .sorted((o1, o2) -> o2.getRate().compareTo(o1.getRate())).limit(count)
-                .collect(Collectors.toList());
+//        return filmStorage.findAllFilms().stream()
+//                .sorted((o1, o2) -> o2.getRate().compareTo(o1.getRate())).limit(count)
+//                .collect(Collectors.toList());
+        return new ArrayList<>();
     }
 
     // пользователь ставит лайк фильму
@@ -64,13 +76,20 @@ public class FilmService {
         ValidateUtil.validLongNotNull(id, "id фильма не должно быть null.");
         ValidateUtil.validLongNotNull(userId, "id пользователя не должно быть null.");
 
-        Film film = filmStorage.findFilmById(id);
-        User user = userStorage.findUserById(userId).orElseThrow(
-                ()-> new NotFoundException(String.format("Пользователь с %d не найден.", userId))
+        Film film = filmStorage.findFilmById(id).orElseThrow(
+                () -> {
+                    ValidateUtil.throwNotFound(String.format("Фильм с %d не найден.", id));
+                    return null;
+                }
         );
 
-        //ValidateUtil.validUserNotNull(user, String.format("Пользователь с %d не найден.", userId));
-        ValidateUtil.validFilmNotNull(film, String.format("Фильм с %d не найден.", id));
+        User user = userStorage.findUserById(userId).orElseThrow(
+                () -> {
+                    ValidateUtil.throwNotFound(String.format("Пользователь с %d не найден.", userId));
+                    return null;
+                }
+        );
+
 
 //        if(!user.getFilmsLike().contains(id)) {
 //            // если пользователь не ставил лайк
@@ -88,13 +107,18 @@ public class FilmService {
         ValidateUtil.validLongNotNull(id, "id фильма не должно быть null.");
         ValidateUtil.validLongNotNull(userId, "id пользователя не должно быть null.");
 
-        Film film = filmStorage.findFilmById(id);
-        User user = userStorage.findUserById(userId).orElseThrow(
-                ()-> new NotFoundException(String.format("Пользователь с %d не найден.", userId))
+        Film film = filmStorage.findFilmById(id).orElseThrow(
+                () -> {
+                    ValidateUtil.throwNotFound(String.format("Фильм с %d не найден.", id));
+                    return null;
+                }
         );
-
-        //ValidateUtil.validUserNotNull(user, );
-        ValidateUtil.validFilmNotNull(film, String.format("Фильм с %d не найден.", id));
+        User user = userStorage.findUserById(userId).orElseThrow(
+                () -> {
+                    ValidateUtil.throwNotFound(String.format("Пользователь с %d не найден.", userId));
+                    return null;
+                }
+        );
 
 //        if(user.getFilmsLike().contains(id)) {
 //            // Если пользователь ставил лайк

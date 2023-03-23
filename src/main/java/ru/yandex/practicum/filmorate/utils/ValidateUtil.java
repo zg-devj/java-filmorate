@@ -3,8 +3,6 @@ package ru.yandex.practicum.filmorate.utils;
 import lombok.extern.slf4j.Slf4j;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
 
 @Slf4j
 public class ValidateUtil {
@@ -15,17 +13,8 @@ public class ValidateUtil {
         }
     }
 
-//    public static void validUserNotNull(User user, String message) {
-//        if (user == null) {
-//            log.debug(message);
-//            throw new NotFoundException(message);
-//        }
-//    }
-
-    public static void validFilmNotNull(Film film, String message) {
-        if (film == null) {
-            log.debug(message);
-            throw new NotFoundException(message);
-        }
+    public static Object throwNotFound(String message) {
+        log.debug(message);
+        return new NotFoundException(message);
     }
 }

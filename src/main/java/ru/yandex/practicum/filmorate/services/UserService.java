@@ -27,7 +27,10 @@ public class UserService {
     public User findUserById(Long id) {
         ValidateUtil.validLongNotNull(id, "id пользователя не должно быть null.");
         User user = userStorage.findUserById(id).orElseThrow(
-                () -> new NotFoundException(String.format("Пользователь с %d не найден.", id))
+                () -> {
+                    ValidateUtil.throwNotFound(String.format("Пользователь с %d не найден.", id));
+                    return null;
+                }
         );
         log.debug("Запрошен пользователь c id={}.", id);
         return user;
@@ -51,10 +54,16 @@ public class UserService {
         ValidateUtil.validLongNotNull(friendId, "id друга пользователя не должно быть null.");
 
         userStorage.findUserById(userId).orElseThrow(
-                () -> new NotFoundException(String.format("Пользователь с %d не найден.", userId))
+                () -> {
+                    ValidateUtil.throwNotFound(String.format("Пользователь с %d не найден.", userId));
+                    return null;
+                }
         );
         userStorage.findUserById(friendId).orElseThrow(
-                () -> new NotFoundException(String.format("Друг с %d не найден.", friendId))
+                () -> {
+                    ValidateUtil.throwNotFound(String.format("Друг с %d не найден.", friendId));
+                    return null;
+                }
         );
 
         userStorage.addFriend(userId, friendId);
@@ -67,10 +76,16 @@ public class UserService {
         ValidateUtil.validLongNotNull(friendId, "id друга пользователя не должно быть null.");
 
         userStorage.findUserById(userId).orElseThrow(
-                () -> new NotFoundException(String.format("Пользователь с %d не найден.", userId))
+                () -> {
+                    ValidateUtil.throwNotFound(String.format("Пользователь с %d не найден.", userId));
+                    return null;
+                }
         );
         userStorage.findUserById(friendId).orElseThrow(
-                () -> new NotFoundException(String.format("Друг с %d не найден.", friendId))
+                () -> {
+                    ValidateUtil.throwNotFound(String.format("Друг с %d не найден.", friendId));
+                    return null;
+                }
         );
 
         userStorage.removeFriend(userId, friendId);
@@ -83,10 +98,16 @@ public class UserService {
         ValidateUtil.validLongNotNull(otherId, "id другого пользователя не должно быть null.");
 
         userStorage.findUserById(userId).orElseThrow(
-                () -> new NotFoundException(String.format("Пользователь с %d не найден.", userId))
+                () -> {
+                    ValidateUtil.throwNotFound(String.format("Пользователь с %d не найден.", userId));
+                    return null;
+                }
         );
         userStorage.findUserById(otherId).orElseThrow(
-                () -> new NotFoundException(String.format("Другой пользователь с %d не найден.", userId))
+                () -> {
+                    ValidateUtil.throwNotFound(String.format("Другой пользователь с %d не найден.", userId));
+                    return null;
+                }
         );
 
         Collection<User> commons = userStorage.findBothUserFriends(userId, otherId);
@@ -98,10 +119,12 @@ public class UserService {
     // возвращаем список пользователей, являющихся его друзьями.
     public Collection<User> findFriends(Long userId) {
         ValidateUtil.validLongNotNull(userId, "id пользователя не должно быть null.");
-        User user = userStorage.findUserById(userId).orElseThrow(
-                () -> new NotFoundException(String.format("Пользователь с %d не найден.", userId))
+        userStorage.findUserById(userId).orElseThrow(
+                () -> {
+                    ValidateUtil.throwNotFound(String.format("Пользователь с %d не найден.", userId));
+                    return null;
+                }
         );
-
         return userStorage.findFriends(userId);
     }
 
