@@ -2,21 +2,36 @@ package ru.yandex.practicum.filmorate.storage.genre;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class GenreDbStorage implements GenreStorage {
     private final JdbcTemplate jdbcTemplate;
+
+    @Override
+    public Collection<Genre> findAllGenres() {
+        String sql = "SELECT * FROM genres";
+        return jdbcTemplate.query(sql, this::makeGenre);
+    }
+
+    @Override
+    public Optional<Genre> findGenreById(Integer genreId) {
+        String sql = "SELECT * FROM genres WHERE genre_id=?";
+        try {
+            return Optional.of(jdbcTemplate.queryForObject(sql, this::makeGenre, genreId));
+        } catch (EmptyResultDataAccessException e) {
+            return Optional.empty();
+        }
+    }
 
     @Override
     public List<Genre> findGenresByFilmId(Long filmId) {

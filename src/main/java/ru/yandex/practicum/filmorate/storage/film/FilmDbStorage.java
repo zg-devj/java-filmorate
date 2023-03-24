@@ -9,14 +9,14 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.filmganre.FilmGenreStorage;
 import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.mpa.MpaStorage;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Optional;
+import java.sql.Date;
+import java.util.*;
 
 @Slf4j
 @Component
@@ -89,7 +89,15 @@ public class FilmDbStorage implements FilmStorage {
             int mpa_id = film.getMpa().getId();
             // TODO: 24.03.2023 Переделать
             film.setMpa(mpaStorage.findMpaById(mpa_id).get());
-            film.setGenres(new ArrayList<>());
+            Long key = film.getId();
+            if (film.getGenres() != null && film.getGenres().size() >= 0) {
+                filmGenreStorage.deleteGenresByFilmId(key);
+                filmGenreStorage.create(key, film.getGenres());
+                film.getGenres().clear();
+                film.setGenres(genreStorage.findGenresByFilmId(key));
+            } else {
+                film.setGenres(new ArrayList<>());
+            }
             return film;
         } else {
             throw new NotFoundException(String.format("Фильм с id=%d не существует.", film.getId()));

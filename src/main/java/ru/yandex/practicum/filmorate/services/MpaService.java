@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Mpa;
-import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.mpa.MpaStorage;
 import ru.yandex.practicum.filmorate.utils.ValidateUtil;
 
@@ -30,7 +29,7 @@ public class MpaService {
                     return null;
                 }
         );
-        log.debug("Запрошен пользователь c id={}.", mpaId);
+        log.debug("Запрошен рейтинг c id={}.", mpaId);
         return mpa;
     }
 }

@@ -9,6 +9,8 @@ import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 @Slf4j
@@ -23,18 +25,28 @@ public class FilmGenreDbStorage implements FilmGenreStorage {
                 + "(film_id, genre_id) "
                 + "VALUES (?, ?)";
 
+        List<Genre> deDuplicates =
+                new ArrayList<>(new LinkedHashSet<>(genres));
+
         jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
             @Override
             public void setValues(PreparedStatement ps, int i) throws SQLException {
-                Genre genre = genres.get(i);
+                Genre genre = deDuplicates.get(i);
                 ps.setLong(1, filmId);
                 ps.setInt(2, genre.getId());
             }
 
             @Override
             public int getBatchSize() {
-                return genres.size();
+                return deDuplicates.size();
             }
         });
+    }
+
+    @Override
+    public void deleteGenresByFilmId(Long filmId) {
+        String sql = "DELETE FROM film_genre "
+                + "WHERE film_id=?";
+        jdbcTemplate.update(sql, filmId);
     }
 }
