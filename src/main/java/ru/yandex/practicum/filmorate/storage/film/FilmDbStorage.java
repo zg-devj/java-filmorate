@@ -9,14 +9,14 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.filmganre.FilmGenreStorage;
 import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.mpa.MpaStorage;
 
 import java.sql.*;
-import java.sql.Date;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Optional;
 
 @Slf4j
 @Component
@@ -52,8 +52,8 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film createFilm(Film film) {
-        String sql = "INSERT INTO films (film_name, description, release_date, duration, mpa_id, rate) " +
-                "VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO films (film_name, description, release_date, duration, mpa_id) " +
+                "VALUES (?, ?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(con -> {
             PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
@@ -62,7 +62,6 @@ public class FilmDbStorage implements FilmStorage {
             ps.setDate(3, Date.valueOf(film.getReleaseDate()));
             ps.setInt(4, film.getDuration());
             ps.setInt(5, film.getMpa().getId());
-            ps.setLong(6, film.getRate());
             return ps;
         }, keyHolder);
         Long key = keyHolder.getKey().longValue();
@@ -87,7 +86,6 @@ public class FilmDbStorage implements FilmStorage {
                 film.getId());
         if (id == 1) {
             int mpa_id = film.getMpa().getId();
-            // TODO: 24.03.2023 Переделать
             film.setMpa(mpaStorage.findMpaById(mpa_id).get());
             Long key = film.getId();
             if (film.getGenres() != null && film.getGenres().size() >= 0) {
@@ -116,6 +114,12 @@ public class FilmDbStorage implements FilmStorage {
         jdbcTemplate.update(sql, filmId);
     }
 
+    @Override
+    public Boolean checkFilm(Long filmId) {
+        String sql = "SELECT EXISTS(SELECT 1 FROM films WHERE film_id=?)";
+        return jdbcTemplate.queryForObject(sql, new Object[]{filmId}, Boolean.class);
+    }
+
     private Film makeFilm(ResultSet rs, int rowNum) throws SQLException {
         Long filmId = rs.getLong("film_id");
         Film film = Film.builder()
@@ -124,7 +128,7 @@ public class FilmDbStorage implements FilmStorage {
                 .description(rs.getString("description"))
                 .releaseDate(rs.getDate("release_date").toLocalDate())
                 .duration(rs.getInt("duration"))
-                .rate(rs.getLong("rate"))
+                //.rate(rs.getLong("rate"))
                 .mpa(mpaStorage.findMpaById(rs.getInt("mpa_id")).get())
                 .genres(genreStorage.findGenresByFilmId(filmId))
                 .build();

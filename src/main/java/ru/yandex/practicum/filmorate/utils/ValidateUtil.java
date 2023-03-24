@@ -8,13 +8,13 @@ import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 public class ValidateUtil {
     public static void validNumberNotNull(Number id, String message) {
         if (id == null) {
-            log.debug(message);
+            log.info(message);
             throw new ValidationException(message);
         }
     }
 
     public static void throwNotFound(String message) {
-        log.debug(message);
+        log.info(message);
         throw new NotFoundException(message);
     }
 }

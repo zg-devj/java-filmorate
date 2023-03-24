@@ -13,4 +13,5 @@ public interface FilmStorage {
     Film updateFilm(Film film);
     void increaseFilmRate(Long filmId);
     void decreaseFilmRate(Long filmId);
+    Boolean checkFilm(Long filmId);
 }

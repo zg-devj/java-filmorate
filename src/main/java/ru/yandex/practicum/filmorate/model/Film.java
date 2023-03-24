@@ -53,14 +53,6 @@ public class Film {
 
     private List<Genre> genres;
 
-//    public Film(Long id, String name, String description, LocalDate releaseDate, Integer duration) {
-//        this.id = id;
-//        this.name = name;
-//        this.description = description;
-//        this.releaseDate = releaseDate;
-//        this.duration = duration;
-//    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -27,7 +27,7 @@ public class FilmService {
     // вернуть все фильмы
     public Collection<Film> findAllFilms() {
         Collection<Film> allFilms = filmStorage.findAllFilms();
-        log.debug("Запрошены все фильмы в количестве {}.", allFilms.size());
+        log.info("Запрошены все фильмы в количестве {}.", allFilms.size());
         return allFilms;
     }
 
@@ -40,22 +40,26 @@ public class FilmService {
                     return null;
                 }
         );
-        log.debug("Запрошен фильм c id={}.", id);
+        log.info("Запрошен фильм c id={}.", id);
         return film;
     }
 
     // добавить фильм
     public Film createFilm(Film film) {
         Mpa mpa = mpaStorage.findMpaById(film.getMpa().getId()).orElseThrow(
-                () -> new NotFoundException(String.format("MPA рейтинга с id={}", film.getMpa().getId()))
+                () -> new NotFoundException(String.format("Рейтинга с id={} не существует", film.getMpa().getId()))
         );
         film.setMpa(mpa);
-        return filmStorage.createFilm(film);
+        Film created = filmStorage.createFilm(film);
+        log.info("Фильм с id={} добавлен.",created.getId());
+        return created;
     }
 
     // обновить фильм
     public Film updateFilm(Film film) {
-        return filmStorage.updateFilm(film);
+        Film updated = filmStorage.updateFilm(film);
+        log.info("Фильм с id={} обновлен.",updated.getId());
+        return updated;
     }
 
     // вернуть популярные фильмы
@@ -63,7 +67,7 @@ public class FilmService {
         if (count <= 0) {
             throw new ValidationException("Значение count не может быть <=0");
         }
-        log.debug("Запрошены {} популярных фильмов.", count);
+        log.info("Запрошены {} популярных фильмов.", count);
         return filmStorage.findPopularFilms(count);
     }
 
@@ -72,26 +76,20 @@ public class FilmService {
         ValidateUtil.validNumberNotNull(id, "id фильма не должно быть null.");
         ValidateUtil.validNumberNotNull(userId, "id пользователя не должно быть null.");
 
-        filmStorage.findFilmById(id).orElseThrow(
-                () -> {
-                    ValidateUtil.throwNotFound(String.format("Фильм с %d не найден.", id));
-                    return null;
-                }
-        );
+        if(!filmStorage.checkFilm(id)) {
+            ValidateUtil.throwNotFound(String.format("Фильм с %d не найден.", id));
+        }
 
-        userStorage.findUserById(userId).orElseThrow(
-                () -> {
-                    ValidateUtil.throwNotFound(String.format("Пользователь с %d не найден.", userId));
-                    return null;
-                }
-        );
+        if(!userStorage.checkUser(userId)){
+            ValidateUtil.throwNotFound(String.format("Пользователь с %d не найден.", userId));
+        }
 
         if (likeStorage.create(userId, id)) {
             // пользователь ставит лайк
             filmStorage.increaseFilmRate(id);
-            log.debug("Пользователь с id={} поставил лайк фильму с id={}.", userId, id);
+            log.info("Пользователь с id={} поставил лайк фильму с id={}.", userId, id);
         } else {
-            log.debug("Пользователь с id={} уже ставил лайк фильму с id={}.", userId, id);
+            log.info("Пользователь с id={} уже ставил лайк фильму с id={}.", userId, id);
             throw new ValidationException("Пользователь уже поставил лайк к фильму.");
         }
     }
@@ -101,25 +99,20 @@ public class FilmService {
         ValidateUtil.validNumberNotNull(id, "id фильма не должно быть null.");
         ValidateUtil.validNumberNotNull(userId, "id пользователя не должно быть null.");
 
-        filmStorage.findFilmById(id).orElseThrow(
-                () -> {
-                    ValidateUtil.throwNotFound(String.format("Фильм с %d не найден.", id));
-                    return null;
-                }
-        );
-        userStorage.findUserById(userId).orElseThrow(
-                () -> {
-                    ValidateUtil.throwNotFound(String.format("Пользователь с %d не найден.", userId));
-                    return null;
-                }
-        );
+        if(!filmStorage.checkFilm(id)) {
+            ValidateUtil.throwNotFound(String.format("Фильм с %d не найден.", id));
+        }
+
+        if(!userStorage.checkUser(userId)){
+            ValidateUtil.throwNotFound(String.format("Пользователь с %d не найден.", userId));
+        }
 
         if (likeStorage.delete(userId, id)) {
             // пользователь удаляет лайк
             filmStorage.decreaseFilmRate(id);
-            log.debug("Пользователь с id={} отменил лайк фильму с id={}.", userId, id);
+            log.info("Пользователь с id={} отменил лайк фильму с id={}.", userId, id);
         } else {
-            log.debug("У пользователя с id={} нет лайка к фильму с id={}. Нельзя отменить лайк.", userId, id);
+            log.info("У пользователя с id={} нет лайка к фильму с id={}. Нельзя отменить лайк.", userId, id);
             throw new ValidationException("Пользователь уже отменил лайк к фильму.");
         }
     }

@@ -20,7 +20,7 @@ public class GenreController {
 
     @GetMapping
     public Collection<Genre> findAllGenres() {
-        log.info("Запрос всех жанров.");
+        log.info("GET /genres - запрос всех жанров.");
         return genreService.findAllGenres();
     }
 
@@ -28,7 +28,7 @@ public class GenreController {
     public Genre findGenreById(
             @PathVariable Integer id
     ) {
-        log.info("Запрос жанра.");
+        log.info("GET /genres/{} - запрос жанра.", id);
         return genreService.findGenreById(id);
     }
 }

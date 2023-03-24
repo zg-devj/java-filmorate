@@ -25,20 +25,20 @@ public class FilmGenreDbStorage implements FilmGenreStorage {
                 + "(film_id, genre_id) "
                 + "VALUES (?, ?)";
 
-        List<Genre> deDuplicates =
+        List<Genre> noDublicateList =
                 new ArrayList<>(new LinkedHashSet<>(genres));
 
         jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
             @Override
             public void setValues(PreparedStatement ps, int i) throws SQLException {
-                Genre genre = deDuplicates.get(i);
+                Genre genre = noDublicateList.get(i);
                 ps.setLong(1, filmId);
                 ps.setInt(2, genre.getId());
             }
 
             @Override
             public int getBatchSize() {
-                return deDuplicates.size();
+                return noDublicateList.size();
             }
         });
     }

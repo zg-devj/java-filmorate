@@ -18,7 +18,7 @@ public class UserService {
     // вернуть всех пользователей
     public Collection<User> findAllUsers() {
         Collection<User> allUsers = userStorage.findAllUsers();
-        log.debug("Запрошены все пользователи в количестве {}.", allUsers.size());
+        log.info("Запрошены все пользователи в количестве {}.", allUsers.size());
         return allUsers;
     }
 
@@ -30,22 +30,25 @@ public class UserService {
                     ValidateUtil.throwNotFound(String.format("Пользователь с %d не найден.", id));
                     return null;
                 }
-
         );
-        log.debug("Запрошен пользователь c id={}.", id);
+        log.info("Запрошен пользователь c id={}.", id);
         return user;
     }
 
     // добавить пользователя
     public User createUser(User user) {
         user.setName(ifStringIsNullOrEmpty(user.getName(), user.getLogin()));
-        return userStorage.createUser(user);
+        User created = userStorage.createUser(user);
+        log.info("Пользователь с id={} добавлен.", created.getId());
+        return created;
     }
 
     // обновить пользователя
     public User updateUser(User user) {
         user.setName(ifStringIsNullOrEmpty(user.getName(), user.getLogin()));
-        return userStorage.updateUser(user);
+        User updated = userStorage.updateUser(user);
+        log.info("Пользователь с id={} обновлен.", updated.getId());
+        return updated;
     }
 
     // добавление в друзья
@@ -53,21 +56,15 @@ public class UserService {
         ValidateUtil.validNumberNotNull(userId, "id пользователя не должно быть null.");
         ValidateUtil.validNumberNotNull(friendId, "id друга пользователя не должно быть null.");
 
-        userStorage.findUserById(userId).orElseThrow(
-                () -> {
-                    ValidateUtil.throwNotFound(String.format("Пользователь с %d не найден.", userId));
-                    return null;
-                }
-        );
-        userStorage.findUserById(friendId).orElseThrow(
-                () -> {
-                    ValidateUtil.throwNotFound(String.format("Друг с %d не найден.", friendId));
-                    return null;
-                }
-        );
+        if (!userStorage.checkUser(userId)) {
+            ValidateUtil.throwNotFound(String.format("Пользователь с %d не найден.", userId));
+        }
+        if (!userStorage.checkUser(friendId)) {
+            ValidateUtil.throwNotFound(String.format("Друг с %d не найден.", friendId));
+        }
 
         userStorage.addFriend(userId, friendId);
-        log.debug("Пользователь с id={} добавил друга с id={}.", userId, friendId);
+        log.info("Пользователь с id={} добавил друга с id={}.", userId, friendId);
     }
 
     // удаление из друзей
@@ -75,21 +72,15 @@ public class UserService {
         ValidateUtil.validNumberNotNull(userId, "id пользователя не должно быть null.");
         ValidateUtil.validNumberNotNull(friendId, "id друга пользователя не должно быть null.");
 
-        userStorage.findUserById(userId).orElseThrow(
-                () -> {
-                    ValidateUtil.throwNotFound(String.format("Пользователь с %d не найден.", userId));
-                    return null;
-                }
-        );
-        userStorage.findUserById(friendId).orElseThrow(
-                () -> {
-                    ValidateUtil.throwNotFound(String.format("Друг с %d не найден.", friendId));
-                    return null;
-                }
-        );
+        if (!userStorage.checkUser(userId)) {
+            ValidateUtil.throwNotFound(String.format("Пользователь с %d не найден.", userId));
+        }
+        if (!userStorage.checkUser(friendId)) {
+            ValidateUtil.throwNotFound(String.format("Друг с %d не найден.", friendId));
+        }
 
         userStorage.removeFriend(userId, friendId);
-        log.debug("Пользователь с id={} удалил из друзей пользователя с id={}.", userId, friendId);
+        log.info("Пользователь с id={} удалил из друзей пользователя с id={}.", userId, friendId);
     }
 
     // список друзей, общих с другим пользователем.
@@ -97,21 +88,15 @@ public class UserService {
         ValidateUtil.validNumberNotNull(userId, "id пользователя не должно быть null.");
         ValidateUtil.validNumberNotNull(otherId, "id другого пользователя не должно быть null.");
 
-        userStorage.findUserById(userId).orElseThrow(
-                () -> {
-                    ValidateUtil.throwNotFound(String.format("Пользователь с %d не найден.", userId));
-                    return null;
-                }
-        );
-        userStorage.findUserById(otherId).orElseThrow(
-                () -> {
-                    ValidateUtil.throwNotFound(String.format("Другой пользователь с %d не найден.", userId));
-                    return null;
-                }
-        );
+        if (!userStorage.checkUser(userId)) {
+            ValidateUtil.throwNotFound(String.format("Пользователь с %d не найден.", userId));
+        }
+        if (!userStorage.checkUser(otherId)) {
+            ValidateUtil.throwNotFound(String.format("Другой пользователь с %d не найден.", otherId));
+        }
 
         Collection<User> commons = userStorage.findBothUserFriends(userId, otherId);
-        log.debug("У пользователей с id={} и id={}, {} общих друзей.",
+        log.info("У пользователей с id={} и id={}, {} общих друзей.",
                 userId, otherId, commons.size());
         return commons;
     }
@@ -119,12 +104,9 @@ public class UserService {
     // возвращаем список пользователей, являющихся его друзьями.
     public Collection<User> findFriends(Long userId) {
         ValidateUtil.validNumberNotNull(userId, "id пользователя не должно быть null.");
-        userStorage.findUserById(userId).orElseThrow(
-                () -> {
-                    ValidateUtil.throwNotFound(String.format("Пользователь с %d не найден.", userId));
-                    return null;
-                }
-        );
+        if (!userStorage.checkUser(userId)) {
+            ValidateUtil.throwNotFound(String.format("Пользователь с %d не найден.", userId));
+        }
         return userStorage.findFriends(userId);
     }
 

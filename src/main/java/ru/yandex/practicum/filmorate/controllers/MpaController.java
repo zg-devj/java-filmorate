@@ -20,7 +20,7 @@ public class MpaController {
 
     @GetMapping
     public Collection<Mpa> findAllMpas() {
-        log.info("Запрос всех рейтингов mpa.");
+        log.info("GET /mpa/ - запрос всех рейтингов.");
         return mpaService.findAllMpas();
     }
 
@@ -28,7 +28,7 @@ public class MpaController {
     public Mpa findMpaById(
             @PathVariable Integer id
     ) {
-        log.info("Запрос рейтинга mpa.");
+        log.info("GET /mpa/{} - запрос рейтинга.", id);
         return mpaService.findMpaById(id);
     }
 }

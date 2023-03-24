@@ -17,7 +17,7 @@ public class GenreService {
 
     public Collection<Genre> findAllGenres() {
         Collection<Genre> allGenres = genreStorage.findAllGenres();
-        log.debug("Запрошены жанры в количестве {}.", allGenres.size());
+        log.info("Запрошены жанры в количестве {}.", allGenres.size());
         return allGenres;
     }
 
@@ -25,11 +25,11 @@ public class GenreService {
         ValidateUtil.validNumberNotNull(genreId, "id жанра не должно быть null.");
         Genre genre = genreStorage.findGenreById(genreId).orElseThrow(
                 () -> {
-                    ValidateUtil.throwNotFound(String.format(":Жанр с %d не найден.", genreId));
+                    ValidateUtil.throwNotFound(String.format("Жанр с %d не найден.", genreId));
                     return null;
                 }
         );
-        log.debug("Запрошен жанр c id={}.", genreId);
+        log.info("Запрошен жанр c id={}.", genreId);
         return genre;
     }
 }

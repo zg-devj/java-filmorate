@@ -111,6 +111,12 @@ public class UserDbStorage implements UserStorage {
         return jdbcTemplate.query(sql, this::makeUser, userId);
     }
 
+    @Override
+    public Boolean checkUser(Long userId) {
+        String sql = "SELECT EXISTS(SELECT 1 FROM users WHERE user_id=?)";
+        return jdbcTemplate.queryForObject(sql, new Object[]{userId}, Boolean.class);
+    }
+
     private User makeUser(ResultSet rs, int rowNum) throws SQLException {
         User user = User.builder()
                 .id(rs.getLong("user_id"))
