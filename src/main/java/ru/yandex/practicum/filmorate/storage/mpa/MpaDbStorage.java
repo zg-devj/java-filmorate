@@ -9,6 +9,7 @@ import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.Optional;
 
 @Slf4j
@@ -18,7 +19,13 @@ public class MpaDbStorage implements MpaStorage {
     private final JdbcTemplate jdbcTemplate;
 
     @Override
-    public Optional<Mpa> findMpaById(int id) {
+    public Collection<Mpa> findAllMpas() {
+        String sql = "SELECT * FROM mpas";
+        return jdbcTemplate.query(sql, this::makeMpa);
+    }
+
+    @Override
+    public Optional<Mpa> findMpaById(Integer id) {
         String sql = "SELECT * FROM mpas WHERE mpa_id=?";
         try {
             return Optional.of(jdbcTemplate.queryForObject(sql, this::makeMpa, id));

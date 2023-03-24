@@ -34,7 +34,7 @@ public class FilmService {
 
     // вернуть фильм по id
     public Film findFilmById(Long id) {
-        ValidateUtil.validLongNotNull(id, "id фильма не должно быть null.");
+        ValidateUtil.validNumberNotNull(id, "id фильма не должно быть null.");
         Film film = filmStorage.findFilmById(id).orElseThrow(
                 () -> {
                     ValidateUtil.throwNotFound(String.format("Фильма с id=%d не существует.", id));
@@ -70,8 +70,8 @@ public class FilmService {
 
     // пользователь ставит лайк фильму
     public void likeFilm(Long id, Long userId) {
-        ValidateUtil.validLongNotNull(id, "id фильма не должно быть null.");
-        ValidateUtil.validLongNotNull(userId, "id пользователя не должно быть null.");
+        ValidateUtil.validNumberNotNull(id, "id фильма не должно быть null.");
+        ValidateUtil.validNumberNotNull(userId, "id пользователя не должно быть null.");
 
         filmStorage.findFilmById(id).orElseThrow(
                 () -> {
@@ -99,8 +99,8 @@ public class FilmService {
 
     // пользователь удаляет лайк.
     public void dislikeFilm(Long id, Long userId) {
-        ValidateUtil.validLongNotNull(id, "id фильма не должно быть null.");
-        ValidateUtil.validLongNotNull(userId, "id пользователя не должно быть null.");
+        ValidateUtil.validNumberNotNull(id, "id фильма не должно быть null.");
+        ValidateUtil.validNumberNotNull(userId, "id пользователя не должно быть null.");
 
         filmStorage.findFilmById(id).orElseThrow(
                 () -> {

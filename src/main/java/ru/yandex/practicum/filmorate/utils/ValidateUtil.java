@@ -6,7 +6,7 @@ import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 
 @Slf4j
 public class ValidateUtil {
-    public static void validLongNotNull(Long id, String message) {
+    public static void validNumberNotNull(Number id, String message) {
         if (id == null) {
             log.debug(message);
             throw new ValidationException(message);

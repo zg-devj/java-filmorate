@@ -25,7 +25,7 @@ public class UserService {
 
     // вернуть пользователя по id
     public User findUserById(Long id) {
-        ValidateUtil.validLongNotNull(id, "id пользователя не должно быть null.");
+        ValidateUtil.validNumberNotNull(id, "id пользователя не должно быть null.");
         User user = userStorage.findUserById(id).orElseThrow(
                 () -> {
                     ValidateUtil.throwNotFound(String.format("Пользователь с %d не найден.", id));
@@ -51,8 +51,8 @@ public class UserService {
 
     // добавление в друзья
     public void addFriend(Long userId, Long friendId) {
-        ValidateUtil.validLongNotNull(userId, "id пользователя не должно быть null.");
-        ValidateUtil.validLongNotNull(friendId, "id друга пользователя не должно быть null.");
+        ValidateUtil.validNumberNotNull(userId, "id пользователя не должно быть null.");
+        ValidateUtil.validNumberNotNull(friendId, "id друга пользователя не должно быть null.");
 
         userStorage.findUserById(userId).orElseThrow(
                 () -> {
@@ -73,8 +73,8 @@ public class UserService {
 
     // удаление из друзей
     public void removeFriend(Long userId, Long friendId) {
-        ValidateUtil.validLongNotNull(userId, "id пользователя не должно быть null.");
-        ValidateUtil.validLongNotNull(friendId, "id друга пользователя не должно быть null.");
+        ValidateUtil.validNumberNotNull(userId, "id пользователя не должно быть null.");
+        ValidateUtil.validNumberNotNull(friendId, "id друга пользователя не должно быть null.");
 
         userStorage.findUserById(userId).orElseThrow(
                 () -> {
@@ -95,8 +95,8 @@ public class UserService {
 
     // список друзей, общих с другим пользователем.
     public Collection<User> commonFriend(Long userId, Long otherId) {
-        ValidateUtil.validLongNotNull(userId, "id пользователя не должно быть null.");
-        ValidateUtil.validLongNotNull(otherId, "id другого пользователя не должно быть null.");
+        ValidateUtil.validNumberNotNull(userId, "id пользователя не должно быть null.");
+        ValidateUtil.validNumberNotNull(otherId, "id другого пользователя не должно быть null.");
 
         userStorage.findUserById(userId).orElseThrow(
                 () -> {
@@ -119,7 +119,7 @@ public class UserService {
 
     // возвращаем список пользователей, являющихся его друзьями.
     public Collection<User> findFriends(Long userId) {
-        ValidateUtil.validLongNotNull(userId, "id пользователя не должно быть null.");
+        ValidateUtil.validNumberNotNull(userId, "id пользователя не должно быть null.");
         userStorage.findUserById(userId).orElseThrow(
                 () -> {
                     ValidateUtil.throwNotFound(String.format("Пользователь с %d не найден.", userId));
