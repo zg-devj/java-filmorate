@@ -7,9 +7,8 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 /**
  * Фильм
@@ -52,7 +51,7 @@ public class Film {
 
     private Mpa mpa;
 
-    private Set<Genre> genres;
+    private List<Genre> genres;
 
 //    public Film(Long id, String name, String description, LocalDate releaseDate, Integer duration) {
 //        this.id = id;

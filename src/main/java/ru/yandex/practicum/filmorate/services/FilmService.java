@@ -60,15 +60,12 @@ public class FilmService {
     }
 
     // вернуть популярные фильмы
-    public List<Film> findPopularFilms(int count) {
+    public Collection<Film> findPopularFilms(int count) {
         if (count <= 0) {
             throw new ValidationException("Значение count не может быть <=0");
         }
         log.debug("Запрошены {} популярных фильмов.", count);
-//        return filmStorage.findAllFilms().stream()
-//                .sorted((o1, o2) -> o2.getRate().compareTo(o1.getRate())).limit(count)
-//                .collect(Collectors.toList());
-        return new ArrayList<>();
+        return filmStorage.findPopularFilms(count);
     }
 
     // пользователь ставит лайк фильму
@@ -76,14 +73,14 @@ public class FilmService {
         ValidateUtil.validLongNotNull(id, "id фильма не должно быть null.");
         ValidateUtil.validLongNotNull(userId, "id пользователя не должно быть null.");
 
-        Film film = filmStorage.findFilmById(id).orElseThrow(
+        filmStorage.findFilmById(id).orElseThrow(
                 () -> {
                     ValidateUtil.throwNotFound(String.format("Фильм с %d не найден.", id));
                     return null;
                 }
         );
 
-        User user = userStorage.findUserById(userId).orElseThrow(
+        userStorage.findUserById(userId).orElseThrow(
                 () -> {
                     ValidateUtil.throwNotFound(String.format("Пользователь с %d не найден.", userId));
                     return null;

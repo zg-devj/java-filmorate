@@ -13,8 +13,8 @@ public class ValidateUtil {
         }
     }
 
-    public static Object throwNotFound(String message) {
+    public static void throwNotFound(String message) {
         log.debug(message);
-        return new NotFoundException(message);
+        throw new NotFoundException(message);
     }
 }

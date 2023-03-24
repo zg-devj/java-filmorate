@@ -31,6 +31,7 @@ public class UserService {
                     ValidateUtil.throwNotFound(String.format("Пользователь с %d не найден.", id));
                     return null;
                 }
+
         );
         log.debug("Запрошен пользователь c id={}.", id);
         return user;
