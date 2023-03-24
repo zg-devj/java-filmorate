@@ -1,0 +1,36 @@
+package ru.yandex.practicum.filmorate.storage.filmlike;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Component;
+
+@Slf4j
+@Component
+@RequiredArgsConstructor
+public class FilmLikeDbStorage implements FilmLikeStorage {
+    private final JdbcTemplate jdbcTemplate;
+
+    @Override
+    public boolean create(Long userId, Long filmId) {
+        String sql = "INSERT INTO film_like "
+                + "(user_id, film_id) "
+                + "VALUES (?,?)";
+        if (jdbcTemplate.update(sql, userId, filmId) == 1) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public boolean delete(Long userId, Long filmId) {
+        String sql = "DELETE FROM film_like "
+                + "WHERE user_id=? AND film_id=?";
+        if (jdbcTemplate.update(sql, userId, filmId) == 1) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+}

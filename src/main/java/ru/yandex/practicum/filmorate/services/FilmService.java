@@ -9,13 +9,12 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.filmlike.FilmLikeStorage;
 import ru.yandex.practicum.filmorate.storage.mpa.MpaStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import ru.yandex.practicum.filmorate.utils.ValidateUtil;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -24,6 +23,7 @@ public class FilmService {
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
     private final MpaStorage mpaStorage;
+    private final FilmLikeStorage likeStorage;
 
     // вернуть все фильмы
     public Collection<Film> findAllFilms() {
@@ -87,16 +87,14 @@ public class FilmService {
                 }
         );
 
-
-//        if(!user.getFilmsLike().contains(id)) {
-//            // если пользователь не ставил лайк
-//            film.setRate(film.getRate() + 1);
-//            user.getFilmsLike().add(id);
-//            log.debug("Пользователь с id={} поставил лайк фильму с id={}.", userId, id);
-//        } else{
-//            log.debug("Пользователь с id={} уже ставил лайк фильму с id={}.", userId, id);
-//            throw new ValidationException("Пользователь уже поставил лайк к фильму.");
-//        }
+        if (likeStorage.create(userId, id)) {
+            // пользователь ставит лайк
+            filmStorage.increaseFilmRate(id);
+            log.debug("Пользователь с id={} поставил лайк фильму с id={}.", userId, id);
+        } else {
+            log.debug("Пользователь с id={} уже ставил лайк фильму с id={}.", userId, id);
+            throw new ValidationException("Пользователь уже поставил лайк к фильму.");
+        }
     }
 
     // пользователь удаляет лайк.
@@ -104,27 +102,26 @@ public class FilmService {
         ValidateUtil.validLongNotNull(id, "id фильма не должно быть null.");
         ValidateUtil.validLongNotNull(userId, "id пользователя не должно быть null.");
 
-        Film film = filmStorage.findFilmById(id).orElseThrow(
+        filmStorage.findFilmById(id).orElseThrow(
                 () -> {
                     ValidateUtil.throwNotFound(String.format("Фильм с %d не найден.", id));
                     return null;
                 }
         );
-        User user = userStorage.findUserById(userId).orElseThrow(
+        userStorage.findUserById(userId).orElseThrow(
                 () -> {
                     ValidateUtil.throwNotFound(String.format("Пользователь с %d не найден.", userId));
                     return null;
                 }
         );
 
-//        if(user.getFilmsLike().contains(id)) {
-//            // Если пользователь ставил лайк
-//            film.setRate(film.getRate() - 1);
-//            user.getFilmsLike().remove(id);
-//            log.debug("Пользователь с id={} отменил лайк фильму с id={}.", userId, id);
-//        } else{
-//            log.debug("У пользователя с id={} нет лайка к фильму с id={}. Нельзя отменить лайк.", userId, id);
-//            throw new ValidationException("Пользователь уже отменил лайк к фильму.");
-//        }
+        if (likeStorage.delete(userId, id)) {
+            // пользователь удаляет лайк
+            filmStorage.decreaseFilmRate(id);
+            log.debug("Пользователь с id={} отменил лайк фильму с id={}.", userId, id);
+        } else {
+            log.debug("У пользователя с id={} нет лайка к фильму с id={}. Нельзя отменить лайк.", userId, id);
+            throw new ValidationException("Пользователь уже отменил лайк к фильму.");
+        }
     }
 }

@@ -96,6 +96,18 @@ public class FilmDbStorage implements FilmStorage {
         }
     }
 
+    @Override
+    public void increaseFilmRate(Long filmId) {
+        String sql = "UPDATE films SET rate=rate+1 WHERE film_id=?";
+        jdbcTemplate.update(sql, filmId);
+    }
+
+    @Override
+    public void decreaseFilmRate(Long filmId) {
+        String sql = "UPDATE films SET rate=rate-1 WHERE film_id=?";
+        jdbcTemplate.update(sql, filmId);
+    }
+
     private Film makeFilm(ResultSet rs, int rowNum) throws SQLException {
         Long filmId = rs.getLong("film_id");
         Film film = Film.builder()

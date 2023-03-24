@@ -11,4 +11,6 @@ public interface FilmStorage {
     Optional<Film> findFilmById(Long filmId);
     Film createFilm(Film film);
     Film updateFilm(Film film);
+    void increaseFilmRate(Long filmId);
+    void decreaseFilmRate(Long filmId);
 }
