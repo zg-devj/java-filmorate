@@ -68,7 +68,6 @@ public class FilmDbStorage implements FilmStorage {
         film.setId(key);
         if (film.getGenres() != null && film.getGenres().size() > 0) {
             filmGenreStorage.create(key, film.getGenres());
-            film.getGenres().clear();
             film.setGenres(genreStorage.findGenresByFilmId(key));
         } else {
             film.setGenres(new ArrayList<>());
@@ -91,7 +90,6 @@ public class FilmDbStorage implements FilmStorage {
             if (film.getGenres() != null && film.getGenres().size() >= 0) {
                 filmGenreStorage.deleteGenresByFilmId(key);
                 filmGenreStorage.create(key, film.getGenres());
-                film.getGenres().clear();
                 film.setGenres(genreStorage.findGenresByFilmId(key));
             } else {
                 film.setGenres(new ArrayList<>());
@@ -128,7 +126,7 @@ public class FilmDbStorage implements FilmStorage {
                 .description(rs.getString("description"))
                 .releaseDate(rs.getDate("release_date").toLocalDate())
                 .duration(rs.getInt("duration"))
-                //.rate(rs.getLong("rate"))
+                .rate(rs.getLong("rate"))
                 .mpa(mpaStorage.findMpaById(rs.getInt("mpa_id")).get())
                 .genres(genreStorage.findGenresByFilmId(filmId))
                 .build();

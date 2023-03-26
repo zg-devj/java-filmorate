@@ -3,12 +3,15 @@ package ru.yandex.practicum.filmorate.storage.user;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.InvalidResultSetAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
+import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.*;
@@ -87,9 +90,10 @@ public class UserDbStorage implements UserStorage {
     public void addFriend(Long userId, Long friendId) {
         String sql = "INSERT INTO friends (user_id, friend_id) " +
                 "VALUES (?, ?)";
-        int res = jdbcTemplate.update(sql, userId, friendId);
-        if (res != 1) {
-            throw new NotFoundException(String.format("Пользователя с id=%d не существует.", friendId));
+        try {
+            jdbcTemplate.update(sql, userId, friendId);
+        } catch (DataIntegrityViolationException e) {
+            throw new ValidationException("Нарушение ссылочной целостности");
         }
     }
 
