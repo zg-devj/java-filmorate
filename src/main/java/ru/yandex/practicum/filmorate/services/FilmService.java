@@ -91,7 +91,7 @@ public class FilmService {
         }
     }
 
-    // пользователь удаляет лайк.
+    // пользователь удаляет лайк
     public void dislikeFilm(Long id, Long userId) {
         ValidateUtil.validNumberNotNull(id, "id фильма не должно быть null.");
         ValidateUtil.validNumberNotNull(userId, "id пользователя не должно быть null.");
