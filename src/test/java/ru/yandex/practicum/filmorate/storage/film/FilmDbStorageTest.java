@@ -156,11 +156,11 @@ class FilmDbStorageTest {
                 .id(999L)
                 .name("name")
                 .description("description")
-                .releaseDate(LocalDate.of(2000,1,1))
+                .releaseDate(LocalDate.of(2000, 1, 1))
                 .duration(100)
                 .mpa(mpaStorage.findMpaById(1).get())
                 .build();
-        Throwable thrown = catchException(()-> filmDbStorage.updateFilm(filmUpdated));
+        Throwable thrown = catchException(() -> filmDbStorage.updateFilm(filmUpdated));
 
         assertThat(thrown)
                 .isInstanceOf(NotFoundException.class)
