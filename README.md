@@ -32,6 +32,10 @@ LEFT JOIN (SELECT fl.film_id,
 ORDER BY count_of_likes DESC
 LIMIT 10;
 ```
+- ТОП фильмов по рейтингу (вариант 2)
+```roomsql
+SELECT * FROM films ORDER BY rate DESC LIMIT 10;
+```
 ### Запросы для пользователей
 - список друзей пользователя
 ```roomsql
