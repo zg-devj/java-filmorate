@@ -13,7 +13,7 @@ import java.util.Set;
 
 class UserControllerValidateTest {
 
-    private static Validator validator;
+    private static final Validator validator;
 
     static {
         ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();

@@ -13,7 +13,7 @@ import java.util.Set;
 
 public class FilmControllerValidateTest {
 
-    private static Validator validator;
+    private static final Validator validator;
 
     static {
         ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
