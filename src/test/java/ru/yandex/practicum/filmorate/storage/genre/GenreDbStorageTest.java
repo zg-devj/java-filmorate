@@ -38,7 +38,7 @@ class GenreDbStorageTest {
     }
 
     @Test
-    void  findAllGenres_Normal() {
+    void findAllGenres_Normal() {
         Collection<Genre> genres = genreDbStorage.findAllGenres();
 
         assertThat(genres)

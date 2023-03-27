@@ -71,7 +71,7 @@ class FilmServiceTest {
                 .hasValueSatisfying(film ->
                         assertThat(film)
                                 .hasFieldOrPropertyWithValue("id", 5L)
-                                .hasFieldOrPropertyWithValue("rate",1L)
+                                .hasFieldOrPropertyWithValue("rate", 1L)
                 );
     }
 
@@ -84,9 +84,9 @@ class FilmServiceTest {
                 .hasValueSatisfying(film ->
                         assertThat(film)
                                 .hasFieldOrPropertyWithValue("id", 5L)
-                                .hasFieldOrPropertyWithValue("rate",1L)
+                                .hasFieldOrPropertyWithValue("rate", 1L)
                 );
-        Throwable thrown = catchException(()->filmService.likeFilm(5L, 1L));
+        Throwable thrown = catchException(() -> filmService.likeFilm(5L, 1L));
 
         assertThat(thrown)
                 .isInstanceOf(ValidationException.class)
@@ -94,8 +94,8 @@ class FilmServiceTest {
     }
 
     @Test
-    void dislikeFilm_Normal(){
-        filmService.dislikeFilm(4L,3L);
+    void dislikeFilm_Normal() {
+        filmService.dislikeFilm(4L, 3L);
 
         Optional<Film> filmOptional = filmDbStorage.findFilmById(4L);
 
@@ -104,13 +104,13 @@ class FilmServiceTest {
                 .hasValueSatisfying(film ->
                         assertThat(film)
                                 .hasFieldOrPropertyWithValue("id", 4L)
-                                .hasFieldOrPropertyWithValue("rate",0L)
+                                .hasFieldOrPropertyWithValue("rate", 0L)
                 );
     }
 
     @Test
-    void dislikeFilm_Exception_TwoDislike(){
-        filmService.dislikeFilm(4L,3L);
+    void dislikeFilm_Exception_TwoDislike() {
+        filmService.dislikeFilm(4L, 3L);
 
         Optional<Film> filmOptional = filmDbStorage.findFilmById(4L);
 
@@ -119,10 +119,10 @@ class FilmServiceTest {
                 .hasValueSatisfying(film ->
                         assertThat(film)
                                 .hasFieldOrPropertyWithValue("id", 4L)
-                                .hasFieldOrPropertyWithValue("rate",0L)
+                                .hasFieldOrPropertyWithValue("rate", 0L)
                 );
 
-        Throwable thrown = catchException(()->filmService.dislikeFilm(4L, 1L));
+        Throwable thrown = catchException(() -> filmService.dislikeFilm(4L, 1L));
 
         assertThat(thrown)
                 .isInstanceOf(ValidationException.class)
