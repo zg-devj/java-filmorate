@@ -28,8 +28,8 @@ class UserControllerValidateTest {
 
         Set<ConstraintViolation<User>> violations = validator.validate(user);
         Assertions.assertEquals(1, violations.size());
-        Assertions.assertEquals("Адрес электронной почты не может быть пустым."
-                , violations.iterator().next().getMessage());
+        Assertions.assertEquals("Адрес электронной почты не может быть пустым.",
+                violations.iterator().next().getMessage());
     }
 
     @Test
@@ -40,8 +40,8 @@ class UserControllerValidateTest {
 
         Set<ConstraintViolation<User>> violations = validator.validate(user);
         Assertions.assertEquals(1, violations.size());
-        Assertions.assertEquals("Не является адресом электронной почты."
-                , violations.iterator().next().getMessage());
+        Assertions.assertEquals("Не является адресом электронной почты.",
+                violations.iterator().next().getMessage());
     }
 
     @Test
@@ -52,8 +52,8 @@ class UserControllerValidateTest {
 
         Set<ConstraintViolation<User>> violations = validator.validate(user);
         Assertions.assertEquals(1, violations.size());
-        Assertions.assertEquals("Логин не может быть пустым."
-                , violations.iterator().next().getMessage());
+        Assertions.assertEquals("Логин не может быть пустым.",
+                violations.iterator().next().getMessage());
     }
 
     @Test
@@ -64,8 +64,8 @@ class UserControllerValidateTest {
 
         Set<ConstraintViolation<User>> violations = validator.validate(user);
         Assertions.assertEquals(1, violations.size());
-        Assertions.assertEquals("Логин не должен содержать пробелы."
-                , violations.iterator().next().getMessage());
+        Assertions.assertEquals("Логин не должен содержать пробелы.",
+                violations.iterator().next().getMessage());
     }
 
     @Test
@@ -76,8 +76,8 @@ class UserControllerValidateTest {
 
         Set<ConstraintViolation<User>> violations = validator.validate(user);
         Assertions.assertEquals(1, violations.size());
-        Assertions.assertEquals("Логин не должен содержать пробелы."
-                , violations.iterator().next().getMessage());
+        Assertions.assertEquals("Логин не должен содержать пробелы.",
+                violations.iterator().next().getMessage());
     }
 
     @Test
@@ -88,7 +88,7 @@ class UserControllerValidateTest {
 
         Set<ConstraintViolation<User>> violations = validator.validate(user);
         Assertions.assertEquals(1, violations.size());
-        Assertions.assertEquals("День рождения не может быть в будущем."
-                , violations.iterator().next().getMessage());
+        Assertions.assertEquals("День рождения не может быть в будущем.",
+                violations.iterator().next().getMessage());
     }
 }
