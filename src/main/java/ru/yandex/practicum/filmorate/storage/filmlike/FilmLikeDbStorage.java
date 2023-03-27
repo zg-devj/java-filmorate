@@ -21,7 +21,7 @@ public class FilmLikeDbStorage implements FilmLikeStorage {
             if (jdbcTemplate.update(sql, userId, filmId) == 1) {
                 return true;
             }
-        } catch (DuplicateKeyException e){
+        } catch (DuplicateKeyException e) {
             return false;
         }
         return false;
