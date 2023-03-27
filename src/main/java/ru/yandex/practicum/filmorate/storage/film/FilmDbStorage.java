@@ -84,8 +84,8 @@ public class FilmDbStorage implements FilmStorage {
                 film.getReleaseDate(), film.getDuration(), film.getMpa().getId(),
                 film.getId());
         if (id == 1) {
-            int mpa_id = film.getMpa().getId();
-            film.setMpa(mpaStorage.findMpaById(mpa_id).get());
+            int mpaId = film.getMpa().getId();
+            film.setMpa(mpaStorage.findMpaById(mpaId).get());
             Long key = film.getId();
             if (film.getGenres() != null && film.getGenres().size() >= 0) {
                 filmGenreStorage.deleteGenresByFilmId(key);
