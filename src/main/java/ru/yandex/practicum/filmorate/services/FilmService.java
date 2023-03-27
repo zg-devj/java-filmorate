@@ -51,14 +51,14 @@ public class FilmService {
         );
         film.setMpa(mpa);
         Film created = filmStorage.createFilm(film);
-        log.info("Фильм с id={} добавлен.",created.getId());
+        log.info("Фильм с id={} добавлен.", created.getId());
         return created;
     }
 
     // обновить фильм
     public Film updateFilm(Film film) {
         Film updated = filmStorage.updateFilm(film);
-        log.info("Фильм с id={} обновлен.",updated.getId());
+        log.info("Фильм с id={} обновлен.", updated.getId());
         return updated;
     }
 
@@ -75,15 +75,12 @@ public class FilmService {
     public void likeFilm(Long id, Long userId) {
         ValidateUtil.validNumberNotNull(id, "id фильма не должно быть null.");
         ValidateUtil.validNumberNotNull(userId, "id пользователя не должно быть null.");
-
-        if(!filmStorage.checkFilm(id)) {
+        if (!filmStorage.checkFilm(id)) {
             ValidateUtil.throwNotFound(String.format("Фильм с %d не найден.", id));
         }
-
-        if(!userStorage.checkUser(userId)){
+        if (!userStorage.checkUser(userId)) {
             ValidateUtil.throwNotFound(String.format("Пользователь с %d не найден.", userId));
         }
-
         if (likeStorage.create(userId, id)) {
             // пользователь ставит лайк
             filmStorage.increaseFilmRate(id);
@@ -98,15 +95,12 @@ public class FilmService {
     public void dislikeFilm(Long id, Long userId) {
         ValidateUtil.validNumberNotNull(id, "id фильма не должно быть null.");
         ValidateUtil.validNumberNotNull(userId, "id пользователя не должно быть null.");
-
-        if(!filmStorage.checkFilm(id)) {
+        if (!filmStorage.checkFilm(id)) {
             ValidateUtil.throwNotFound(String.format("Фильм с %d не найден.", id));
         }
-
-        if(!userStorage.checkUser(userId)){
+        if (!userStorage.checkUser(userId)) {
             ValidateUtil.throwNotFound(String.format("Пользователь с %d не найден.", userId));
         }
-
         if (likeStorage.delete(userId, id)) {
             // пользователь удаляет лайк
             filmStorage.decreaseFilmRate(id);

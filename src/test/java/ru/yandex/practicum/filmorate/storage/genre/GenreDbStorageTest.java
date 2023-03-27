@@ -9,15 +9,11 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.Mpa;
-import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.mpa.MpaDbStorage;
 
 import java.util.Collection;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 class GenreDbStorageTest {

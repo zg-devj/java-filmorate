@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.storage.filmlike;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
@@ -16,11 +17,14 @@ public class FilmLikeDbStorage implements FilmLikeStorage {
         String sql = "INSERT INTO film_like "
                 + "(user_id, film_id) "
                 + "VALUES (?,?)";
-        if (jdbcTemplate.update(sql, userId, filmId) == 1) {
-            return true;
-        } else {
+        try {
+            if (jdbcTemplate.update(sql, userId, filmId) == 1) {
+                return true;
+            }
+        } catch (DuplicateKeyException e){
             return false;
         }
+        return false;
     }
 
     @Override
