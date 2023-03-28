@@ -8,6 +8,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
+import ru.yandex.practicum.filmorate.dto.FilmRateDto;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
@@ -65,11 +66,11 @@ class FilmDbStorageTest {
 
     @Test
     void findPopularFilms_Normal() {
-        Collection<Film> films = filmDbStorage.findPopularFilms(10);
+        Collection<FilmRateDto> films = filmDbStorage.findPopularFilms(10);
 
         assertThat(films)
                 .hasSize(5)
-                .first().hasFieldOrPropertyWithValue("id", 3L);
+                .first().hasFieldOrPropertyWithValue("id", 1L);
     }
 
     @Test
@@ -165,52 +166,6 @@ class FilmDbStorageTest {
         assertThat(thrown)
                 .isInstanceOf(NotFoundException.class)
                 .hasMessageContaining(String.format("Фильм с id=%d не существует.", filmUpdated.getId()));
-    }
-
-    @Test
-    void increaseFilmRate_Normal() {
-        Optional<Film> data = filmDbStorage.findFilmById(1L);
-        assertThat(data)
-                .isPresent()
-                .hasValueSatisfying(film ->
-                        assertThat(film)
-                                .hasFieldOrPropertyWithValue("id", 1L)
-                                .hasFieldOrPropertyWithValue("rate", 1L)
-                );
-
-        filmDbStorage.increaseFilmRate(1L);
-
-        Optional<Film> filmcheck = filmDbStorage.findFilmById(1L);
-        assertThat(filmcheck)
-                .isPresent()
-                .hasValueSatisfying(film ->
-                        assertThat(film)
-                                .hasFieldOrPropertyWithValue("id", 1L)
-                                .hasFieldOrPropertyWithValue("rate", 2L)
-                );
-    }
-
-    @Test
-    void decreaseFilmRate_Normal() {
-        Optional<Film> data = filmDbStorage.findFilmById(2L);
-        assertThat(data)
-                .isPresent()
-                .hasValueSatisfying(film ->
-                        assertThat(film)
-                                .hasFieldOrPropertyWithValue("id", 2L)
-                                .hasFieldOrPropertyWithValue("rate", 2L)
-                );
-
-        filmDbStorage.decreaseFilmRate(2L);
-
-        Optional<Film> filmcheck = filmDbStorage.findFilmById(2L);
-        assertThat(filmcheck)
-                .isPresent()
-                .hasValueSatisfying(film ->
-                        assertThat(film)
-                                .hasFieldOrPropertyWithValue("id", 2L)
-                                .hasFieldOrPropertyWithValue("rate", 1L)
-                );
     }
 
     @Test

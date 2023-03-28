@@ -22,19 +22,15 @@ WHERE fl.user_id = 1;
 ```
 - ТОП фильмов по рейтингу
 ```roomsql
-SELECT f.*, COALESCE(s.count_like, 0) AS count_of_likes
+SELECT f.*, COALESCE(s.count_like, 0) AS rate
 FROM films AS f
 LEFT JOIN (SELECT fl.film_id, 
 			COUNT(fl.user_id) AS count_like 
     		FROM film_like AS fl
 			GROUP BY fl.film_id 
 		   	LIMIT 10) AS s ON f.film_id=s.film_id
-ORDER BY count_of_likes DESC
+ORDER BY rate DESC
 LIMIT 10;
-```
-- ТОП фильмов по рейтингу (вариант 2)
-```roomsql
-SELECT * FROM films ORDER BY rate DESC LIMIT 10;
 ```
 ### Запросы для пользователей
 - список друзей пользователя

@@ -16,24 +16,24 @@ INSERT INTO mpas(mpa_name) VALUES ('NC-17');
 
 -- добавляем фильмы
 INSERT INTO films(
-	mpa_id, film_name, description, release_date, duration, rate)
-	VALUES (1, 'Комедия 1', 'Описание 1', '1990-11-12', 180, 1);
+	mpa_id, film_name, description, release_date, duration)
+	VALUES (1, 'Комедия 1', 'Описание 1', '1990-11-12', 180);
 
 INSERT INTO films(
-	mpa_id, film_name, description, release_date, duration, rate)
-	VALUES (4, 'Драма 2', 'Описание 2', '2002-09-11', 210, 2);
+	mpa_id, film_name, description, release_date, duration)
+	VALUES (4, 'Драма 2', 'Описание 2', '2002-09-11', 210);
 
 INSERT INTO films(
-	mpa_id, film_name, description, release_date, duration, rate)
-	VALUES (5, 'Триллер 3', 'Описание 3', '2011-02-21', 192, 3);
+	mpa_id, film_name, description, release_date, duration)
+	VALUES (5, 'Триллер 3', 'Описание 3', '2011-02-21', 192);
 
 INSERT INTO films(
-	mpa_id, film_name, description, release_date, duration, rate)
-	VALUES (3, 'Боевик 4', 'Описание 4', '2005-12-04', 90, 1);
+	mpa_id, film_name, description, release_date, duration)
+	VALUES (3, 'Боевик 4', 'Описание 4', '2005-12-04', 90);
 
 INSERT INTO films(
-	mpa_id, film_name, description, release_date, duration, rate)
-	VALUES (1, 'Документальный 5', 'Описание 5', '2015-10-11', 190, 0);
+	mpa_id, film_name, description, release_date, duration)
+	VALUES (1, 'Документальный 5', 'Описание 5', '2015-10-11', 190);
 
 INSERT INTO film_genre (film_id, genre_id) VALUES (1, 1);
 INSERT INTO film_genre (film_id, genre_id) VALUES (1, 3);
@@ -58,12 +58,12 @@ INSERT INTO users(email, user_name, login, birthday)
 
 -- добавить лайки для фильма
 INSERT INTO public.film_like(user_id, film_id) VALUES (1, 1);
-INSERT INTO public.film_like(user_id, film_id) VALUES (1, 2);
-INSERT INTO public.film_like(user_id, film_id) VALUES (1, 3);
-INSERT INTO public.film_like(user_id, film_id) VALUES (2, 3);
-INSERT INTO public.film_like(user_id, film_id) VALUES (3, 2);
-INSERT INTO public.film_like(user_id, film_id) VALUES (3, 3);
-INSERT INTO public.film_like(user_id, film_id) VALUES (3, 4);
+--INSERT INTO public.film_like(user_id, film_id) VALUES (1, 2);
+--INSERT INTO public.film_like(user_id, film_id) VALUES (1, 3);
+--INSERT INTO public.film_like(user_id, film_id) VALUES (2, 3);
+--INSERT INTO public.film_like(user_id, film_id) VALUES (3, 2);
+--INSERT INTO public.film_like(user_id, film_id) VALUES (3, 3);
+--INSERT INTO public.film_like(user_id, film_id) VALUES (3, 4);
 
 
 -- добавить друзей

@@ -25,8 +25,7 @@ CREATE TABLE films (
 	film_name CHARACTER VARYING(200) NOT NULL,
 	description CHARACTER VARYING(200),
 	release_date DATE,
-	duration INTEGER CHECK(duration>0),
-	rate BIGINT DEFAULT 0 CHECK(rate>=0)
+	duration INTEGER CHECK(duration>0)
 );
 -- сводная таблица фильм-жанр
 CREATE TABLE film_genre (

@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.model;
 
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import ru.yandex.practicum.filmorate.utils.validators.MinBoundaryDate;
 
 import javax.validation.constraints.NotBlank;
@@ -16,7 +17,7 @@ import java.util.Objects;
 
 @Setter
 @Getter
-@Builder
+@SuperBuilder
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
@@ -46,8 +47,6 @@ public class Film {
      */
     @Positive(message = "Продолжительность фильма должна быть положительной.")
     private Integer duration;
-
-    private Long rate = Long.valueOf(0);
 
     private Mpa mpa;
 

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.dto.FilmRateDto;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.MessageResponse;
 import ru.yandex.practicum.filmorate.services.FilmService;
@@ -45,7 +46,7 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public Collection<Film> findPopularFilms(@RequestParam(defaultValue = "10") int count) {
+    public Collection<FilmRateDto> findPopularFilms(@RequestParam(defaultValue = "10") int count) {
         log.info("GET /films/popular - запрос популярных фильмов");
         return filmService.findPopularFilms(count);
     }

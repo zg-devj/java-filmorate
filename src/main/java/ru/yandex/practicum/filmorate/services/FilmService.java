@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.services;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.dto.FilmRateDto;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -63,7 +64,7 @@ public class FilmService {
     }
 
     // вернуть популярные фильмы
-    public Collection<Film> findPopularFilms(int count) {
+    public Collection<FilmRateDto> findPopularFilms(int count) {
         if (count <= 0) {
             throw new ValidationException("Значение count не может быть <=0");
         }
@@ -83,7 +84,6 @@ public class FilmService {
         }
         if (likeStorage.create(userId, id)) {
             // пользователь ставит лайк
-            filmStorage.increaseFilmRate(id);
             log.info("Пользователь с id={} поставил лайк фильму с id={}.", userId, id);
         } else {
             log.info("Пользователь с id={} уже ставил лайк фильму с id={}.", userId, id);
@@ -103,7 +103,6 @@ public class FilmService {
         }
         if (likeStorage.delete(userId, id)) {
             // пользователь удаляет лайк
-            filmStorage.decreaseFilmRate(id);
             log.info("Пользователь с id={} отменил лайк фильму с id={}.", userId, id);
         } else {
             log.info("У пользователя с id={} нет лайка к фильму с id={}. Нельзя отменить лайк.", userId, id);

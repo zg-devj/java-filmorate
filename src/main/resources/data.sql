@@ -14,7 +14,7 @@ INSERT INTO mpas(mpa_name) VALUES ('PG-13');
 INSERT INTO mpas(mpa_name) VALUES ('R');
 INSERT INTO mpas(mpa_name) VALUES ('NC-17');
 
--- добавляем фильмы
+---- добавляем фильмы
 --INSERT INTO films(
 --	mpa_id, film_name, description, release_date, duration)
 --	VALUES (1, 'Комедия 1', 'Описание 1', '1990-11-12', 180);
@@ -59,6 +59,7 @@ INSERT INTO mpas(mpa_name) VALUES ('NC-17');
 ---- добавить лайки для фильма
 --INSERT INTO public.film_like(user_id, film_id) VALUES (1, 1);
 --INSERT INTO public.film_like(user_id, film_id) VALUES (1, 2);
+--INSERT INTO public.film_like(user_id, film_id) VALUES (1, 3);
 --INSERT INTO public.film_like(user_id, film_id) VALUES (2, 3);
 --INSERT INTO public.film_like(user_id, film_id) VALUES (3, 2);
 --INSERT INTO public.film_like(user_id, film_id) VALUES (3, 3);
@@ -66,10 +67,7 @@ INSERT INTO mpas(mpa_name) VALUES ('NC-17');
 --
 --
 ---- добавить друзей
---INSERT INTO friends( user_id, friend_id, approve) VALUES (1, 1, true);
---INSERT INTO friends( user_id, friend_id, approve) VALUES (1, 3, true);
---INSERT INTO friends( user_id, friend_id, approve) VALUES (2, 1, true);
---INSERT INTO friends( user_id, friend_id, approve) VALUES (2, 3, true);
---INSERT INTO friends( user_id, friend_id, approve) VALUES (2, 4, true);
---INSERT INTO friends( user_id, friend_id, approve) VALUES (3, 4, true);
---INSERT INTO friends( user_id, friend_id, approve) VALUES (4, 3, true);
+--INSERT INTO friends( user_id, friend_id) VALUES (1, 2);
+--INSERT INTO friends( user_id, friend_id) VALUES (1, 3);
+--INSERT INTO friends( user_id, friend_id) VALUES (2, 1);
+--INSERT INTO friends( user_id, friend_id) VALUES (2, 3);
