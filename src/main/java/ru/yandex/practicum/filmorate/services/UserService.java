@@ -8,8 +8,6 @@ import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import ru.yandex.practicum.filmorate.utils.ValidateUtil;
 
 import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -20,95 +18,96 @@ public class UserService {
     // вернуть всех пользователей
     public Collection<User> findAllUsers() {
         Collection<User> allUsers = userStorage.findAllUsers();
-        log.debug("Запрошены все пользователи в количестве {}.", allUsers.size());
+        log.info("Запрошены все пользователи в количестве {}.", allUsers.size());
         return allUsers;
     }
 
     // вернуть пользователя по id
     public User findUserById(Long id) {
-        ValidateUtil.validLongNotNull(id, "id пользователя не должно быть null.");
-        User user = userStorage.findUserById(id);
-        ValidateUtil.validUserNotNull(user, String.format("Пользователя с %d не существует.", id));
-        log.debug("Запрошен пользователь c id={}.", id);
+        ValidateUtil.validNumberNotNull(id, "id пользователя не должно быть null.");
+        User user = userStorage.findUserById(id).orElseThrow(
+                () -> {
+                    ValidateUtil.throwNotFound(String.format("Пользователь с %d не найден.", id));
+                    return null;
+                }
+        );
+        log.info("Запрошен пользователь c id={}.", id);
         return user;
     }
 
     // добавить пользователя
     public User createUser(User user) {
         user.setName(ifStringIsNullOrEmpty(user.getName(), user.getLogin()));
-        return userStorage.createUser(user);
+        User created = userStorage.createUser(user);
+        log.info("Пользователь с id={} добавлен.", created.getId());
+        return created;
     }
 
     // обновить пользователя
     public User updateUser(User user) {
         user.setName(ifStringIsNullOrEmpty(user.getName(), user.getLogin()));
-        return userStorage.updateUser(user);
+        User updated = userStorage.updateUser(user);
+        log.info("Пользователь с id={} обновлен.", updated.getId());
+        return updated;
     }
 
     // добавление в друзья
     public void addFriend(Long userId, Long friendId) {
-        ValidateUtil.validLongNotNull(userId, "id пользователя не должно быть null.");
-        ValidateUtil.validLongNotNull(friendId, "id друга пользователя не должно быть null.");
+        ValidateUtil.validNumberNotNull(userId, "id пользователя не должно быть null.");
+        ValidateUtil.validNumberNotNull(friendId, "id друга пользователя не должно быть null.");
 
-        User user = userStorage.findUserById(userId);
-        User friend = userStorage.findUserById(friendId);
+        if (!userStorage.checkUser(userId)) {
+            ValidateUtil.throwNotFound(String.format("Пользователь с %d не найден.", userId));
+        }
+        if (!userStorage.checkUser(friendId)) {
+            ValidateUtil.throwNotFound(String.format("Друг с %d не найден.", friendId));
+        }
 
-        ValidateUtil.validUserNotNull(user, String.format("Пользователь с %d не найден.", userId));
-        ValidateUtil.validUserNotNull(friend, String.format("Друг с %d не найден.", friendId));
-
-        user.getFriends().add(friendId);
-        friend.getFriends().add(userId);
-        log.debug("Пользователь с id={} добавил друга с id={}.", userId, friendId);
+        userStorage.addFriend(userId, friendId);
+        log.info("Пользователь с id={} добавил друга с id={}.", userId, friendId);
     }
 
     // удаление из друзей
     public void removeFriend(Long userId, Long friendId) {
-        ValidateUtil.validLongNotNull(userId, "id пользователя не должно быть null.");
-        ValidateUtil.validLongNotNull(friendId, "id друга пользователя не должно быть null.");
+        ValidateUtil.validNumberNotNull(userId, "id пользователя не должно быть null.");
+        ValidateUtil.validNumberNotNull(friendId, "id друга пользователя не должно быть null.");
 
-        User user = userStorage.findUserById(userId);
-        User friend = userStorage.findUserById(friendId);
+        if (!userStorage.checkUser(userId)) {
+            ValidateUtil.throwNotFound(String.format("Пользователь с %d не найден.", userId));
+        }
+        if (!userStorage.checkUser(friendId)) {
+            ValidateUtil.throwNotFound(String.format("Друг с %d не найден.", friendId));
+        }
 
-        ValidateUtil.validUserNotNull(user, String.format("Пользователь с %d не найден.", userId));
-        ValidateUtil.validUserNotNull(friend, String.format("Друг с %d не найден.", friendId));
-
-        user.getFriends().remove(friendId);
-        friend.getFriends().remove(userId);
-        log.debug("Пользователь с id={} удалил из друзей пользователя с id={}.", userId, friendId);
+        userStorage.removeFriend(userId, friendId);
+        log.info("Пользователь с id={} удалил из друзей пользователя с id={}.", userId, friendId);
     }
 
     // список друзей, общих с другим пользователем.
-    public List<User> commonFriend(Long userId, Long otherId) {
-        ValidateUtil.validLongNotNull(userId, "id пользователя не должно быть null.");
-        ValidateUtil.validLongNotNull(otherId, "id другого пользователя не должно быть null.");
+    public Collection<User> commonFriend(Long userId, Long otherId) {
+        ValidateUtil.validNumberNotNull(userId, "id пользователя не должно быть null.");
+        ValidateUtil.validNumberNotNull(otherId, "id другого пользователя не должно быть null.");
 
-        User user = userStorage.findUserById(userId);
-        User otherUser = userStorage.findUserById(otherId);
+        if (!userStorage.checkUser(userId)) {
+            ValidateUtil.throwNotFound(String.format("Пользователь с %d не найден.", userId));
+        }
+        if (!userStorage.checkUser(otherId)) {
+            ValidateUtil.throwNotFound(String.format("Другой пользователь с %d не найден.", otherId));
+        }
 
-        ValidateUtil.validUserNotNull(user, String.format("Пользователь с %d не найден.", userId));
-        ValidateUtil.validUserNotNull(otherUser, String.format("Другой пользователь с %d не найден.", otherId));
-
-        List<User> commons = user.getFriends()
-                .stream()
-                .filter(otherUser.getFriends()::contains)
-                .map(userStorage::findUserById)
-                .collect(Collectors.toList());
-        log.debug("У пользователей с id={} и id={}, {} общих друзей.",
+        Collection<User> commons = userStorage.findBothUserFriends(userId, otherId);
+        log.info("У пользователей с id={} и id={}, {} общих друзей.",
                 userId, otherId, commons.size());
         return commons;
     }
 
     // возвращаем список пользователей, являющихся его друзьями.
-    public List<User> findFriends(Long userId) {
-        ValidateUtil.validLongNotNull(userId, "id пользователя не должно быть null.");
-        User user = userStorage.findUserById(userId);
-        ValidateUtil.validUserNotNull(user, String.format("Пользователь с %d не найден.", userId));
-        List<User> friends = user.getFriends()
-                .stream()
-                .map(userStorage::findUserById)
-                .collect(Collectors.toList());
-        log.debug("У пользователя с id={} : {} друзей.", userId, friends.size());
-        return friends;
+    public Collection<User> findFriends(Long userId) {
+        ValidateUtil.validNumberNotNull(userId, "id пользователя не должно быть null.");
+        if (!userStorage.checkUser(userId)) {
+            ValidateUtil.throwNotFound(String.format("Пользователь с %d не найден.", userId));
+        }
+        return userStorage.findFriends(userId);
     }
 
     private String ifStringIsNullOrEmpty(String param, String toParam) {

@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.controllers;
+package ru.yandex.practicum.filmorate.validation;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -13,7 +13,7 @@ import java.util.Set;
 
 public class FilmControllerValidateTest {
 
-    private static Validator validator;
+    private static final Validator validator;
 
     static {
         ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
@@ -23,13 +23,13 @@ public class FilmControllerValidateTest {
     @Test
     public void testValidateUser_BlankName() {
         LocalDate now = LocalDate.now().minusYears(1);
-        Film film = new Film(null, " ", "description",
-                now, 100);
+        Film film = new Film(null, " ", "description", now,
+                100, null, null);
 
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         Assertions.assertEquals(1, violations.size());
-        Assertions.assertEquals("Название фильма не может быть пустым."
-                , violations.iterator().next().getMessage());
+        Assertions.assertEquals("Название фильма не может быть пустым.",
+                violations.iterator().next().getMessage());
     }
 
     @Test
@@ -37,35 +37,35 @@ public class FilmControllerValidateTest {
         LocalDate now = LocalDate.now().minusYears(1);
         String description = "a".repeat(201);
         Film film = new Film(null, "name", description,
-                now, 100);
+                now, 100, null, null);
 
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         Assertions.assertEquals(1, violations.size());
-        Assertions.assertEquals("Длина описания не должна быть больше 200 символов."
-                , violations.iterator().next().getMessage());
+        Assertions.assertEquals("Длина описания не должна быть больше 200 символов.",
+                violations.iterator().next().getMessage());
     }
 
     @Test
     public void testValidateUser_ReleaseDateLessThen1895_12_28() {
         LocalDate lessDate = LocalDate.of(1895, 12, 28).minusDays(1);
         Film film = new Film(null, "name", "description",
-                lessDate, 100);
+                lessDate, 100, null, null);
 
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         Assertions.assertEquals(1, violations.size());
-        Assertions.assertEquals("Дата релиза не может быть раньше 1895-12-28"
-                , violations.iterator().next().getMessage());
+        Assertions.assertEquals("Дата релиза не может быть раньше 1895-12-28",
+                violations.iterator().next().getMessage());
     }
 
     @Test
     public void testValidateUser_PositiveDuration() {
         LocalDate now = LocalDate.now().minusYears(1);
         Film film = new Film(null, "name", "description",
-                now, -1);
+                now, -1, null, null);
 
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         Assertions.assertEquals(1, violations.size());
-        Assertions.assertEquals("Продолжительность фильма должна быть положительной."
-                , violations.iterator().next().getMessage());
+        Assertions.assertEquals("Продолжительность фильма должна быть положительной.",
+                violations.iterator().next().getMessage());
     }
 }

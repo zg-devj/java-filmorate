@@ -1,13 +1,21 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
+import ru.yandex.practicum.filmorate.dto.FilmRateDto;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.Collection;
+import java.util.Optional;
 
 public interface FilmStorage {
     Collection<Film> findAllFilms();
-    Film findFilmById(Long id);
+
+    Collection<FilmRateDto> findPopularFilms(int limit);
+
+    Optional<Film> findFilmById(Long filmId);
+
     Film createFilm(Film film);
+
     Film updateFilm(Film film);
+
+    Boolean checkFilm(Long filmId);
 }

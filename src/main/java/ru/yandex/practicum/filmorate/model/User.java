@@ -7,16 +7,16 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Past;
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
 
 /**
  * Пользователь
  */
 @Setter
 @Getter
+@Builder
 @ToString
+@AllArgsConstructor
 @NoArgsConstructor
 public class User {
     /**
@@ -44,20 +44,6 @@ public class User {
      */
     @Past(message = "День рождения не может быть в будущем.")
     private LocalDate birthday;
-
-    @Setter(AccessLevel.NONE)
-    private Set<Long> friends = new HashSet<>();
-
-    @Setter(AccessLevel.NONE)
-    private Set<Long> filmsLike = new HashSet<>();
-
-    public User(Long id, String email, String name, String login, LocalDate birthday) {
-        this.id = id;
-        this.email = email;
-        this.name = name;
-        this.login = login;
-        this.birthday = birthday;
-    }
 
     @Override
     public boolean equals(Object o) {
