@@ -61,7 +61,7 @@ class FilmDbStorageTest {
         Collection<Film> films = filmDbStorage.findAllFilms();
 
         assertThat(films)
-                .hasSize(5);
+                .hasSize(6);
     }
 
     @Test
@@ -69,7 +69,7 @@ class FilmDbStorageTest {
         Collection<FilmRateDto> films = filmDbStorage.findPopularFilms(10);
 
         assertThat(films)
-                .hasSize(5)
+                .hasSize(6)
                 .first().hasFieldOrPropertyWithValue("id", 1L);
     }
 
@@ -113,7 +113,7 @@ class FilmDbStorageTest {
                 .isPresent()
                 .hasValueSatisfying(film ->
                         assertThat(film)
-                                .hasFieldOrPropertyWithValue("id", 6L)
+                                .hasFieldOrPropertyWithValue("id", 7L)
                                 .hasFieldOrPropertyWithValue("name", "film")
                 );
         assertThat(filmOptional.get().getGenres())

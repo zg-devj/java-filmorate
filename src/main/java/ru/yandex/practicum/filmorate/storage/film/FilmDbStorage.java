@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.dto.FilmRateDto;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.filmganre.FilmGenreStorage;
 import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
@@ -20,9 +21,8 @@ import ru.yandex.practicum.filmorate.storage.mpa.MpaStorage;
 
 import javax.swing.tree.RowMapper;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Optional;
+import java.sql.Date;
+import java.util.*;
 
 @Slf4j
 @Component
@@ -35,10 +35,42 @@ public class FilmDbStorage implements FilmStorage {
     private final GenreStorage genreStorage;
 
     @Override
-    public Collection<Film> findAllFilms() {
-        String sql = "SELECT * FROM films as f " +
-                "JOIN mpas AS m on f.mpa_id=m.mpa_id";
-        return jdbcTemplate.query(sql, this::makeFilm);
+    public List<Film> findAllFilms() {
+        String sql = "SELECT f.*, m.mpa_name, g2.genre_id, " +
+                "g2.genre_name, COALESCE(s.count_like, 0) AS rate " +
+                "FROM films as f " +
+                "LEFT JOIN mpas AS m on f.mpa_id = m.mpa_id " +
+                "LEFT JOIN film_genre AS fg on f.film_id = fg.film_id " +
+                "LEFT JOIN genres AS g2 on g2.genre_id = fg.genre_id " +
+                "LEFT JOIN (SELECT fl.film_id, COUNT(fl.user_id) AS count_like " +
+                "FROM film_like AS fl " +
+                "GROUP BY fl.film_id) AS s ON f.film_id = s.film_id " +
+                "ORDER BY rate DESC";
+        return jdbcTemplate.query(sql, rs -> {
+            List<Film> list = new ArrayList<>();
+            while (rs.next()) {
+                Film film = Film.builder()
+                        .id(rs.getLong("film_id"))
+                        .name(rs.getString("film_name"))
+                        .description(rs.getString("description"))
+                        .releaseDate(rs.getDate("release_date").toLocalDate())
+                        .duration(rs.getInt("duration"))
+                        .mpa(new Mpa(rs.getInt("mpa_id"),
+                                rs.getString("mpa_name")))
+                        .genres(new ArrayList<>())
+                        .build();
+                if (!list.contains(film)) {
+                    list.add(film);
+                }
+                if (rs.getString("genre_name") != null) {
+                    int index = list.indexOf(film);
+                    list.get(index).getGenres()
+                            .add(new Genre(rs.getInt("genre_id"),
+                                    rs.getString("genre_name")));
+                }
+            }
+            return list;
+        });
     }
 
     @Override
@@ -58,7 +90,7 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Optional<Film> findFilmById(Long filmId) {
         String sql = "SELECT * FROM films AS f " +
-                "JOIN mpas AS m on f.mpa_id=m.mpa_id " +
+                "LEFT JOIN mpas AS m on f.mpa_id=m.mpa_id " +
                 "WHERE f.film_id=?";
         try {
             return Optional.of(jdbcTemplate.queryForObject(sql, this::makeFilm, filmId));
