@@ -52,7 +52,7 @@ class FilmServiceTest {
         genreStorage = new GenreDbStorage(jdbcTemplate);
         filmLikeDbStorage = new FilmLikeDbStorage(jdbcTemplate);
         filmDbStorage = new FilmDbStorage(jdbcTemplate, mpaStorage, filmGenreStorage, genreStorage);
-        filmService = new FilmService(filmDbStorage, userDbStorage, mpaStorage, filmLikeDbStorage);
+        filmService = new FilmService(filmDbStorage, userDbStorage, mpaStorage, filmLikeDbStorage, filmGenreStorage);
     }
 
     @AfterEach
