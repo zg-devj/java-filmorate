@@ -121,13 +121,12 @@ public class UserDbStorage implements UserStorage {
     }
 
     private User makeUser(ResultSet rs, int rowNum) throws SQLException {
-        User user = User.builder()
+        return User.builder()
                 .id(rs.getLong("user_id"))
                 .login(rs.getString("login"))
                 .name(rs.getString("user_name"))
                 .email(rs.getString("email"))
                 .birthday(rs.getDate("birthday").toLocalDate())
                 .build();
-        return user;
     }
 }

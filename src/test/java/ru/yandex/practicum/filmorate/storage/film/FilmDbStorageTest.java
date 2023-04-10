@@ -8,7 +8,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
-import ru.yandex.practicum.filmorate.dto.FilmRateDto;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
@@ -66,7 +65,7 @@ class FilmDbStorageTest {
 
     @Test
     void findPopularFilms_Normal() {
-        Collection<FilmRateDto> films = filmDbStorage.findPopularFilms(10);
+        Collection<Film> films = filmDbStorage.findPopularFilms(10);
 
         assertThat(films)
                 .hasSize(6)

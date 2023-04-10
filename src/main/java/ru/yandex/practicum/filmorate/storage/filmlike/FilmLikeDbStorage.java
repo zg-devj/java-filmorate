@@ -31,10 +31,6 @@ public class FilmLikeDbStorage implements FilmLikeStorage {
     public boolean delete(Long userId, Long filmId) {
         String sql = "DELETE FROM film_like "
                 + "WHERE user_id=? AND film_id=?";
-        if (jdbcTemplate.update(sql, userId, filmId) == 1) {
-            return true;
-        } else {
-            return false;
-        }
+        return jdbcTemplate.update(sql, userId, filmId) == 1;
     }
 }

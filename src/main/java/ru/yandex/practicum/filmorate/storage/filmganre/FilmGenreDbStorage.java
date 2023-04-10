@@ -6,6 +6,7 @@ import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.dto.FilmGenreDto;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -48,5 +49,17 @@ public class FilmGenreDbStorage implements FilmGenreStorage {
         String sql = "DELETE FROM film_genre "
                 + "WHERE film_id=?";
         jdbcTemplate.update(sql, filmId);
+    }
+
+    @Override
+    public List<FilmGenreDto> findFilmGenreAll() {
+        String sql = "SELECT fg.*, g2.genre_name " +
+                "FROM film_genre AS fg " +
+                "LEFT JOIN genres AS g2 on fg.genre_id = g2.genre_id";
+        return jdbcTemplate.query(sql, (rs, rowNum) -> FilmGenreDto.builder()
+                .filmId(rs.getLong("film_id"))
+                .genreId(rs.getInt("genre_id"))
+                .genreName(rs.getString("genre_name"))
+                .build());
     }
 }

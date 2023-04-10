@@ -9,8 +9,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
-import ru.yandex.practicum.filmorate.dto.FilmRateDto;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
 import ru.yandex.practicum.filmorate.storage.filmganre.FilmGenreDbStorage;
 import ru.yandex.practicum.filmorate.storage.filmganre.FilmGenreStorage;
@@ -65,7 +65,7 @@ class FilmServiceTest {
         filmService.likeFilm(5L, 1L);
         filmService.likeFilm(5L, 2L);
 
-        Collection<FilmRateDto> films = filmService.findPopularFilms(1);
+        Collection<Film> films = filmService.findPopularFilms(1);
 
         assertThat(films)
                 .hasSize(1)
@@ -77,7 +77,7 @@ class FilmServiceTest {
     void likeFilm_Exception_TwoLikeFromOneUser() {
         filmService.likeFilm(5L, 1L);
 
-        Collection<FilmRateDto> films = filmService.findPopularFilms(1);
+        Collection<Film> films = filmService.findPopularFilms(1);
 
         assertThat(films)
                 .hasSize(1)
@@ -95,7 +95,7 @@ class FilmServiceTest {
     void dislikeFilm_Normal() {
         filmService.dislikeFilm(1L, 1L);
 
-        Collection<FilmRateDto> films = filmService.findPopularFilms(1);
+        Collection<Film> films = filmService.findPopularFilms(1);
 
         assertThat(films)
                 .hasSize(1)

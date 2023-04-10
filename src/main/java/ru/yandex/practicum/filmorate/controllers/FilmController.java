@@ -4,13 +4,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.dto.FilmRateDto;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.MessageResponse;
 import ru.yandex.practicum.filmorate.services.FilmService;
 
 import javax.validation.Valid;
-import java.util.Collection;
+import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -20,7 +19,7 @@ public class FilmController {
     private final FilmService filmService;
 
     @GetMapping
-    public Collection<Film> allFilms() {
+    public List<Film> allFilms() {
         log.info("GET /films - запрос всех фильмов.");
         return filmService.findAllFilms();
     }
@@ -46,13 +45,13 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public Collection<FilmRateDto> findPopularFilms(@RequestParam(defaultValue = "10") int count) {
+    public List<Film> findPopularFilms(@RequestParam(defaultValue = "10") int count) {
         log.info("GET /films/popular - запрос популярных фильмов");
         return filmService.findPopularFilms(count);
     }
 
     @PutMapping("/{id}/like/{userId}")
-    public ResponseEntity likeFilm(
+    public ResponseEntity<MessageResponse> likeFilm(
             @PathVariable Long id,
             @PathVariable Long userId
     ) {
@@ -62,7 +61,7 @@ public class FilmController {
     }
 
     @DeleteMapping("/{id}/like/{userId}")
-    public ResponseEntity dislikeFilm(
+    public ResponseEntity<MessageResponse> dislikeFilm(
             @PathVariable Long id,
             @PathVariable Long userId
     ) {

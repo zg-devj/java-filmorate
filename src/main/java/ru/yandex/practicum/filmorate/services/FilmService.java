@@ -3,18 +3,22 @@ package ru.yandex.practicum.filmorate.services;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.dto.FilmRateDto;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
+import ru.yandex.practicum.filmorate.model.dto.FilmGenreDto;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.filmganre.FilmGenreDbStorage;
 import ru.yandex.practicum.filmorate.storage.filmlike.FilmLikeStorage;
 import ru.yandex.practicum.filmorate.storage.mpa.MpaStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import ru.yandex.practicum.filmorate.utils.ValidateUtil;
 
-import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -24,10 +28,22 @@ public class FilmService {
     private final UserStorage userStorage;
     private final MpaStorage mpaStorage;
     private final FilmLikeStorage likeStorage;
+    private final FilmGenreDbStorage filmGenreDbStorage;
 
     // вернуть все фильмы
-    public Collection<Film> findAllFilms() {
-        Collection<Film> allFilms = filmStorage.findAllFilms();
+    public List<Film> findAllFilms() {
+        List<Film> allFilms = filmStorage.findAllFilms();
+        List<FilmGenreDto> filmGenreList = filmGenreDbStorage.findFilmGenreAll();
+        for (Film film : allFilms) {
+            film.setGenres(
+                    filmGenreList.stream().filter(f -> Objects.equals(film.getId(), f.getFilmId()))
+                            .map(o -> Genre.builder()
+                                    .id(o.getGenreId())
+                                    .name(o.getGenreName())
+                                    .build())
+                            .collect(Collectors.toList())
+            );
+        }
         log.info("Запрошены все фильмы в количестве {}.", allFilms.size());
         return allFilms;
     }
@@ -64,7 +80,7 @@ public class FilmService {
     }
 
     // вернуть популярные фильмы
-    public Collection<FilmRateDto> findPopularFilms(int count) {
+    public List<Film> findPopularFilms(int count) {
         if (count <= 0) {
             throw new ValidationException("Значение count не может быть <=0");
         }

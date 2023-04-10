@@ -52,6 +52,8 @@ public class Film {
 
     private List<Genre> genres;
 
+    private Integer rate;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
