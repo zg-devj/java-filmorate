@@ -176,7 +176,7 @@ class FilmDbStorageTest {
     }
 
     @Test
-    void checkFilm_WrongIf() {
+    void checkFilm_WrongId() {
         Boolean result = filmDbStorage.checkFilm(999L);
 
         assertThat(result).isFalse();

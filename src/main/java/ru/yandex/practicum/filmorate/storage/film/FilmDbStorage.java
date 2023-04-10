@@ -2,18 +2,23 @@ package ru.yandex.practicum.filmorate.storage.film;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.jdbc.core.SingleColumnRowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.dto.FilmRateDto;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.filmganre.FilmGenreStorage;
 import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.mpa.MpaStorage;
 
+import javax.swing.tree.RowMapper;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -31,14 +36,16 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Collection<Film> findAllFilms() {
-        String sql = "SELECT * FROM films";
+        String sql = "SELECT * FROM films as f " +
+                "JOIN mpas AS m on f.mpa_id=m.mpa_id";
         return jdbcTemplate.query(sql, this::makeFilm);
     }
 
     @Override
     public Collection<FilmRateDto> findPopularFilms(int limit) {
-        String sql = "SELECT f.*, COALESCE(s.count_like, 0) AS rate " +
+        String sql = "SELECT f.*, m.mpa_name, COALESCE(s.count_like, 0) AS rate " +
                 "FROM films AS f " +
+                "LEFT JOIN mpas AS m on m.mpa_id = f.mpa_id " +
                 "LEFT JOIN (SELECT fl.film_id, " +
                 "COUNT(fl.user_id) AS count_like " +
                 "FROM film_like AS fl " +
@@ -50,7 +57,9 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Optional<Film> findFilmById(Long filmId) {
-        String sql = "SELECT * FROM films WHERE film_id=?";
+        String sql = "SELECT * FROM films AS f " +
+                "JOIN mpas AS m on f.mpa_id=m.mpa_id " +
+                "WHERE f.film_id=?";
         try {
             return Optional.of(jdbcTemplate.queryForObject(sql, this::makeFilm, filmId));
         } catch (EmptyResultDataAccessException e) {
@@ -95,7 +104,7 @@ public class FilmDbStorage implements FilmStorage {
             int mpaId = film.getMpa().getId();
             film.setMpa(mpaStorage.findMpaById(mpaId).get());
             Long key = film.getId();
-            if (film.getGenres() != null && film.getGenres().size() >= 0) {
+            if (film.getGenres() != null) {
                 filmGenreStorage.deleteGenresByFilmId(key);
                 filmGenreStorage.create(key, film.getGenres());
                 film.setGenres(genreStorage.findGenresByFilmId(key));
@@ -111,35 +120,35 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Boolean checkFilm(Long filmId) {
         String sql = "SELECT EXISTS(SELECT 1 FROM films WHERE film_id=?)";
-        return jdbcTemplate.queryForObject(sql, new Object[]{filmId}, Boolean.class);
+        return jdbcTemplate.queryForObject(sql, (rs, rowNum) -> rs.getBoolean(1), filmId);
     }
 
     private Film makeFilm(ResultSet rs, int rowNum) throws SQLException {
         Long filmId = rs.getLong("film_id");
-        Film film = Film.builder()
+        return Film.builder()
                 .id(filmId)
                 .name(rs.getString("film_name"))
                 .description(rs.getString("description"))
                 .releaseDate(rs.getDate("release_date").toLocalDate())
                 .duration(rs.getInt("duration"))
-                .mpa(mpaStorage.findMpaById(rs.getInt("mpa_id")).get())
+                //.mpa(mpaStorage.findMpaById(rs.getInt("mpa_id")).get())
+                .mpa(new Mpa(rs.getInt("mpa_id"), rs.getString("mpa_name")))
                 .genres(genreStorage.findGenresByFilmId(filmId))
                 .build();
-        return film;
     }
 
     private FilmRateDto makeFilmRate(ResultSet rs, int rowNum) throws SQLException {
         Long filmId = rs.getLong("film_id");
-        FilmRateDto film = FilmRateDto.builder()
+        return FilmRateDto.builder()
                 .id(filmId)
                 .name(rs.getString("film_name"))
                 .description(rs.getString("description"))
                 .releaseDate(rs.getDate("release_date").toLocalDate())
                 .duration(rs.getInt("duration"))
                 .rate(rs.getInt("rate"))
-                .mpa(mpaStorage.findMpaById(rs.getInt("mpa_id")).get())
+                .mpa(new Mpa(rs.getInt("mpa_id"), rs.getString("mpa_name")))
+                //.mpa(mpaStorage.findMpaById(rs.getInt("mpa_id")).get())
                 .genres(genreStorage.findGenresByFilmId(filmId))
                 .build();
-        return film;
     }
 }
