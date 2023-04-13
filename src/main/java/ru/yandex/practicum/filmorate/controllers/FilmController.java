@@ -9,7 +9,9 @@ import ru.yandex.practicum.filmorate.model.MessageResponse;
 import ru.yandex.practicum.filmorate.services.FilmService;
 
 import javax.validation.Valid;
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -30,6 +32,13 @@ public class FilmController {
     ) {
         log.info("GET /films/{} - запрос фильма.", id);
         return filmService.findFilmById(id);
+    }
+
+    @GetMapping("/director/{directorId}")
+    public Collection<Film> getDirectorFilms(@PathVariable Integer directorId
+            , @RequestParam(required = true) String sortBy) {
+        log.info(String.format("Пришёл запрос на получение режиссера с id = %d, сортировка по %s", directorId, sortBy));
+        return filmService.getAllFilmsByDirectorSorted(directorId, sortBy);
     }
 
     @PostMapping
@@ -69,4 +78,5 @@ public class FilmController {
         filmService.dislikeFilm(id, userId);
         return ResponseEntity.ok(new MessageResponse("Лайк удален!"));
     }
+
 }
