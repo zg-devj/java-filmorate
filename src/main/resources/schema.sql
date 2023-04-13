@@ -1,12 +1,12 @@
 DROP TABLE IF EXISTS friends;
 DROP TABLE IF EXISTS film_like;
 DROP TABLE IF EXISTS film_genre;
+DROP TABLE IF EXISTS review_user;
+DROP TABLE IF EXISTS reviews;
 DROP TABLE IF EXISTS films;
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS mpas;
 DROP TABLE IF EXISTS genres;
-DROP TABLE IF EXISTS review_user;
-DROP TABLE IF EXISTS reviews;
 
 -- Создание таблиц
 

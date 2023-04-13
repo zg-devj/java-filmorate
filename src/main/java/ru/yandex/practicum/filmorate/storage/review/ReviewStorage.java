@@ -15,6 +15,8 @@ public interface ReviewStorage {
     // Отзыв по идкетификатору
     Optional<Review> findReviewById(Long reviewId);
 
+    boolean chechReview(Long reviewId);
+
     Review createReview(Review review);
 
     Review updateReview(Review review);
