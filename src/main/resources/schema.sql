@@ -74,7 +74,7 @@ CREATE TABLE reviews
 
 CREATE TABLE review_user
 (
-    review_id BIGINT REFERENCES reviews (review_id),
+    review_id BIGINT REFERENCES reviews (review_id) ON DELETE CASCADE,
     user_id   BIGINT REFERENCES users (user_id),
     like_it   SMALLINT NOT NULL CHECK (like_it = 1 OR like_it = -1),
     PRIMARY KEY (review_id, user_id)

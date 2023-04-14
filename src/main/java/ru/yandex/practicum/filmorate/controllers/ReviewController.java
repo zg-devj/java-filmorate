@@ -9,6 +9,7 @@ import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.services.ReviewService;
 
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -20,7 +21,7 @@ public class ReviewController {
     private final ReviewService reviewService;
 
     @GetMapping
-    public Iterable<Review> findAllReviews(
+    public List<Review> findAllReviews(
             @RequestParam Optional<Long> filmId,
             @RequestParam(defaultValue = "10") int count
     ) {

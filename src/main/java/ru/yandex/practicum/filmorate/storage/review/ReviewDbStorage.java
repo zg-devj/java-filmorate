@@ -9,11 +9,13 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Review;
+import ru.yandex.practicum.filmorate.storage.reviewuser.ReviewUserStorage;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -21,9 +23,10 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ReviewDbStorage implements ReviewStorage {
     private final JdbcTemplate jdbcTemplate;
+    private final ReviewUserStorage reviewUserStorage;
 
     @Override
-    public Iterable<Review> findAllReviews(int limit) {
+    public List<Review> findAllReviews(int limit) {
         String sql = "SELECT r.*, COALESCE(sum(ru.like_it),0) AS useful FROM reviews AS r " +
                 "LEFT JOIN review_user AS ru on r.review_id = ru.review_id " +
                 "GROUP BY r.review_id " +
@@ -33,7 +36,7 @@ public class ReviewDbStorage implements ReviewStorage {
     }
 
     @Override
-    public Iterable<Review> findAllReviewsByFilmId(Long filmId, int limit) {
+    public List<Review> findAllReviewsByFilmId(Long filmId, int limit) {
         String sql = "SELECT r.*, COALESCE(sum(ru.like_it),0) AS useful FROM reviews AS r " +
                 "LEFT JOIN review_user AS ru on r.review_id = ru.review_id " +
                 "WHERE r.film_id=? " +
@@ -102,6 +105,7 @@ public class ReviewDbStorage implements ReviewStorage {
 
     @Override
     public void deleteReview(Long reviewId) {
+        reviewUserStorage.deleteAllByReviewId(reviewId);
         String sql = "DELETE FROM reviews "
                 + "WHERE review_id=?";
         jdbcTemplate.update(sql, reviewId);
@@ -109,6 +113,7 @@ public class ReviewDbStorage implements ReviewStorage {
 
     @Override
     public void deleteAllReviewByUserId(Long userId) {
+        reviewUserStorage.deleteAllByUserId(userId);
         String sql = "DELETE FROM reviews "
                 + "WHERE user_id=?";
         jdbcTemplate.update(sql, userId);

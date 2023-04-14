@@ -10,6 +10,8 @@ import ru.yandex.practicum.filmorate.storage.reviewuser.ReviewUserStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import ru.yandex.practicum.filmorate.utils.ValidateUtil;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -21,8 +23,8 @@ public class ReviewService {
     private final UserStorage userStorage;
     private final FilmStorage filmStorage;
 
-    public Iterable<Review> findAllReviews(Optional<Long> filmId, int limit) {
-        Iterable<Review> reviews;
+    public List<Review> findAllReviews(Optional<Long> filmId, int limit) {
+        List<Review> reviews;
         if (filmId.isEmpty()) {
             reviews = reviewStorage.findAllReviews(limit);
             log.info("Возвращаем {} отзывово всех фильмом", limit);
@@ -65,9 +67,8 @@ public class ReviewService {
 
     public void deleteReview(Long id) {
         ValidateUtil.validNumberNotNull(id, "id отзыва не должно быть null.");
-        reviewUserStorage.deleteAllByReviewId(id);
-        log.info("удалены все лайки и дизлайки для отзыва с ID={}", id);
         reviewStorage.deleteReview(id);
+        log.info("удалены все лайки и дизлайки для отзыва с ID={}", id);
         log.info("удален отзыв с ID={}", id);
     }
 

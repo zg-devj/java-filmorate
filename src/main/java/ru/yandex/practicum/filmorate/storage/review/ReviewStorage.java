@@ -2,14 +2,15 @@ package ru.yandex.practicum.filmorate.storage.review;
 
 import ru.yandex.practicum.filmorate.model.Review;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface ReviewStorage {
     // Все отзывы
-    Iterable<Review> findAllReviews(int limit);
+    List<Review> findAllReviews(int limit);
 
     // Все отзывы по фильму
-    Iterable<Review> findAllReviewsByFilmId(Long filmId, int limit);
+    List<Review> findAllReviewsByFilmId(Long filmId, int limit);
 
     // Отзыв по идкетификатору
     Optional<Review> findReviewById(Long reviewId);
