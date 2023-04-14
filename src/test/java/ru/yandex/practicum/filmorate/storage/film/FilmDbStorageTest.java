@@ -12,6 +12,10 @@ import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
+import ru.yandex.practicum.filmorate.storage.director.DirectorDbStorage;
+import ru.yandex.practicum.filmorate.storage.director.DirectorStorage;
+import ru.yandex.practicum.filmorate.storage.filmdirector.FilmDirectorDbStorage;
+import ru.yandex.practicum.filmorate.storage.filmdirector.FilmDirectorStorage;
 import ru.yandex.practicum.filmorate.storage.filmganre.FilmGenreDbStorage;
 import ru.yandex.practicum.filmorate.storage.filmganre.FilmGenreStorage;
 import ru.yandex.practicum.filmorate.storage.genre.GenreDbStorage;
@@ -21,6 +25,7 @@ import ru.yandex.practicum.filmorate.storage.mpa.MpaStorage;
 
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,6 +40,10 @@ class FilmDbStorageTest {
     private MpaStorage mpaStorage;
     private FilmGenreStorage filmGenreStorage;
     private GenreStorage genreStorage;
+    private DirectorStorage directorStorage;
+    private FilmDirectorStorage filmDirectorStorage;
+
+
 
     @BeforeEach
     void setUp() {
@@ -47,7 +56,9 @@ class FilmDbStorageTest {
         mpaStorage = new MpaDbStorage(jdbcTemplate);
         filmGenreStorage = new FilmGenreDbStorage(jdbcTemplate);
         genreStorage = new GenreDbStorage(jdbcTemplate);
-        filmDbStorage = new FilmDbStorage(jdbcTemplate, mpaStorage, filmGenreStorage, genreStorage);
+        directorStorage = new DirectorDbStorage(jdbcTemplate);
+        filmDirectorStorage = new FilmDirectorDbStorage(jdbcTemplate);
+        filmDbStorage = new FilmDbStorage(jdbcTemplate, mpaStorage, filmGenreStorage, genreStorage, directorStorage, filmDirectorStorage);
     }
 
     @AfterEach
@@ -103,7 +114,9 @@ class FilmDbStorageTest {
                 .genres(
                         List.of(genreStorage.findGenreById(1).get(),
                                 genreStorage.findGenreById(2).get()))
+                .directors(new HashSet<>())
                 .build();
+        filmCreate.setId(7L);
         Long id = filmDbStorage.createFilm(filmCreate).getId();
 
         Optional<Film> filmOptional = filmDbStorage.findFilmById(id);
