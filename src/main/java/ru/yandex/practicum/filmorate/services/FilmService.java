@@ -6,9 +6,8 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
-import ru.yandex.practicum.filmorate.model.dto.FilmGenreDto;
+import ru.yandex.practicum.filmorate.storage.director.DirectorStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.filmganre.FilmGenreStorage;
 import ru.yandex.practicum.filmorate.storage.filmlike.FilmLikeStorage;
@@ -16,9 +15,8 @@ import ru.yandex.practicum.filmorate.storage.mpa.MpaStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import ru.yandex.practicum.filmorate.utils.ValidateUtil;
 
+import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -29,21 +27,11 @@ public class FilmService {
     private final MpaStorage mpaStorage;
     private final FilmLikeStorage likeStorage;
     private final FilmGenreStorage filmGenreDbStorage;
+    private final DirectorStorage directorStorage;
 
     // вернуть все фильмы
     public List<Film> findAllFilms() {
         List<Film> allFilms = filmStorage.findAllFilms();
-        List<FilmGenreDto> filmGenreList = filmGenreDbStorage.findFilmGenreAll();
-        for (Film film : allFilms) {
-            film.setGenres(
-                    filmGenreList.stream().filter(f -> Objects.equals(film.getId(), f.getFilmId()))
-                            .map(o -> Genre.builder()
-                                    .id(o.getGenreId())
-                                    .name(o.getGenreName())
-                                    .build())
-                            .collect(Collectors.toList())
-            );
-        }
         log.info("Запрошены все фильмы в количестве {}.", allFilms.size());
         return allFilms;
     }
@@ -86,6 +74,16 @@ public class FilmService {
         }
         log.info("Запрошены {} популярных фильмов.", count);
         return filmStorage.findPopularFilms(count);
+    }
+
+    public Collection<Film> getAllFilmsByDirectorSorted(Integer directorId, String sortBy) {
+        if (!directorStorage.isDirectorExists(directorId)) {
+            throw new NotFoundException("Режиссёр не найден");
+        }
+        if (sortBy == null || !(sortBy.contentEquals("year") || sortBy.contentEquals("likes"))) {
+            throw new NotFoundException("Недопустимый признак для сортировки");
+        }
+        return filmStorage.getAllFilmsSorted(directorId, sortBy);
     }
 
     // пользователь ставит лайк фильму
