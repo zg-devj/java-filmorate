@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.storage.review;
 
-import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Review;
 
 import java.util.Optional;
@@ -15,7 +14,7 @@ public interface ReviewStorage {
     // Отзыв по идкетификатору
     Optional<Review> findReviewById(Long reviewId);
 
-    boolean chechReview(Long reviewId);
+    Boolean checkReview(Long reviewId);
 
     Review createReview(Review review);
 

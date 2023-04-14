@@ -7,11 +7,13 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Review;
 
-import java.sql.*;
-import java.util.List;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Optional;
 
 @Slf4j
@@ -22,9 +24,9 @@ public class ReviewDbStorage implements ReviewStorage {
 
     @Override
     public Iterable<Review> findAllReviews(int limit) {
-        String sql = "SELECT r.*, sum(ru.like_it) AS useful FROM reviews AS r " +
+        String sql = "SELECT r.*, COALESCE(sum(ru.like_it),0) AS useful FROM reviews AS r " +
                 "LEFT JOIN review_user AS ru on r.review_id = ru.review_id " +
-                "GROUP BY ru.review_id " +
+                "GROUP BY r.review_id " +
                 "ORDER BY useful DESC " +
                 "LIMIT ?";
         return jdbcTemplate.query(sql, this::makeReview, limit);
@@ -32,10 +34,10 @@ public class ReviewDbStorage implements ReviewStorage {
 
     @Override
     public Iterable<Review> findAllReviewsByFilmId(Long filmId, int limit) {
-        String sql = "SELECT r.*, sum(ru.like_it) AS useful FROM reviews AS r " +
+        String sql = "SELECT r.*, COALESCE(sum(ru.like_it),0) AS useful FROM reviews AS r " +
                 "LEFT JOIN review_user AS ru on r.review_id = ru.review_id " +
-                "WHERE r.FILM_ID = ? " +
-                "GROUP BY ru.review_id " +
+                "WHERE r.film_id=? " +
+                "GROUP BY r.review_id " +
                 "ORDER BY useful DESC " +
                 "LIMIT ?";
         return jdbcTemplate.query(sql, this::makeReview, filmId, limit);
@@ -43,9 +45,10 @@ public class ReviewDbStorage implements ReviewStorage {
 
     @Override
     public Optional<Review> findReviewById(Long reviewId) {
-        String sql = "SELECT r.*, sum(ru.like_it) AS useful FROM reviews AS r " +
+        String sql = "SELECT r.*, COALESCE(sum(ru.like_it),0) AS useful FROM reviews AS r " +
                 "LEFT JOIN review_user AS ru on r.review_id = ru.review_id " +
-                "WHERE r.review_id=?";
+                "WHERE r.review_id=? " +
+                "GROUP BY r.review_id";
         try {
             Review review = jdbcTemplate.queryForObject(sql, this::makeReview, reviewId);
             if (review != null) {
@@ -59,8 +62,9 @@ public class ReviewDbStorage implements ReviewStorage {
     }
 
     @Override
-    public boolean chechReview(Long reviewId) {
-        return false;
+    public Boolean checkReview(Long reviewId) {
+        String sql = "SELECT EXISTS(SELECT 1 FROM reviews WHERE review_id=?)";
+        return jdbcTemplate.queryForObject(sql, (rs, rowNum) -> rs.getBoolean(1), reviewId);
     }
 
     @Override
@@ -84,17 +88,30 @@ public class ReviewDbStorage implements ReviewStorage {
 
     @Override
     public Review updateReview(Review review) {
-        return null;
+        String sql = "UPDATE reviews SET content=?, is_positive=? " +
+                "WHERE review_id=?";
+        int res = jdbcTemplate.update(sql, review.getContent(), review.getIsPositive(),
+                review.getReviewId());
+        if (res != 1) {
+            throw new NotFoundException(String.format("Отзыва с id=%d не существует.", review.getReviewId()));
+        } else {
+            review = findReviewById(review.getReviewId()).get();
+        }
+        return review;
     }
 
     @Override
     public void deleteReview(Long reviewId) {
-
+        String sql = "DELETE FROM reviews "
+                + "WHERE review_id=?";
+        jdbcTemplate.update(sql, reviewId);
     }
 
     @Override
     public void deleteAllReviewByUserId(Long userId) {
-
+        String sql = "DELETE FROM reviews "
+                + "WHERE user_id=?";
+        jdbcTemplate.update(sql, userId);
     }
 
     private Review makeReview(ResultSet rs, int rowNum) throws SQLException {

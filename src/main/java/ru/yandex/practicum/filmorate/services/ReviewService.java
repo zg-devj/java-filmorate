@@ -93,7 +93,7 @@ public class ReviewService {
 
     private void validReview(Long reviewId) {
         ValidateUtil.validNumberNotNull(reviewId, "id отзыва не должно быть null.");
-        if (!reviewStorage.chechReview(reviewId)) {
+        if (!reviewStorage.checkReview(reviewId)) {
             ValidateUtil.throwNotFound(String.format("Отзыв с %d не найден.", reviewId));
         }
     }
