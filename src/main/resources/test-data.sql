@@ -75,9 +75,10 @@ VALUES ('user4@example.com', 'user4', 'login4', '2003-01-10');
 -- добавить лайки для фильма
 INSERT INTO public.film_like(user_id, film_id)
 VALUES (1, 1);
---INSERT INTO public.film_like(user_id, film_id) VALUES (1, 2);
---INSERT INTO public.film_like(user_id, film_id) VALUES (1, 3);
---INSERT INTO public.film_like(user_id, film_id) VALUES (2, 3);
+INSERT INTO public.film_like(user_id, film_id) VALUES (1, 2);
+INSERT INTO public.film_like(user_id, film_id) VALUES (1, 3);
+INSERT INTO public.film_like(user_id, film_id) VALUES (2, 3);
+INSERT INTO public.film_like(user_id, film_id) VALUES (2, 4);
 --INSERT INTO public.film_like(user_id, film_id) VALUES (3, 2);
 --INSERT INTO public.film_like(user_id, film_id) VALUES (3, 3);
 --INSERT INTO public.film_like(user_id, film_id) VALUES (3, 4);

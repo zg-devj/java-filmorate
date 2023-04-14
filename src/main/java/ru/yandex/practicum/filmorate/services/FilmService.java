@@ -10,7 +10,6 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.model.dto.FilmGenreDto;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.filmganre.FilmGenreDbStorage;
 import ru.yandex.practicum.filmorate.storage.filmganre.FilmGenreStorage;
 import ru.yandex.practicum.filmorate.storage.filmlike.FilmLikeStorage;
 import ru.yandex.practicum.filmorate.storage.mpa.MpaStorage;
@@ -125,5 +124,17 @@ public class FilmService {
             log.info("У пользователя с id={} нет лайка к фильму с id={}. Нельзя отменить лайк.", userId, id);
             throw new ValidationException("Пользователь уже отменил лайк к фильму.");
         }
+    }
+
+    public List<Film> sharedUserMovies(Long userId, Long friendId) { // получение общих фильмов пользователей
+        ValidateUtil.validNumberNotNull(userId, "id пользователя не должно быть null.");
+        ValidateUtil.validNumberNotNull(friendId, "id пользователя не должно быть null.");
+        if (!userStorage.checkUser(userId)) {
+            ValidateUtil.throwNotFound(String.format("Пользователь с %d не найден.", userId));
+        }
+        if (!userStorage.checkUser(friendId)) {
+            ValidateUtil.throwNotFound(String.format("Пользователь с %d не найден.", friendId));
+        }
+        return filmStorage.sharedUserMovies(userId, friendId);
     }
 }

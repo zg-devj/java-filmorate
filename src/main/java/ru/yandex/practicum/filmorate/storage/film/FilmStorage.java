@@ -18,4 +18,6 @@ public interface FilmStorage {
     Film updateFilm(Film film);
 
     Boolean checkFilm(Long filmId);
+
+    List<Film> sharedUserMovies (Long userId, Long friendId);
 }

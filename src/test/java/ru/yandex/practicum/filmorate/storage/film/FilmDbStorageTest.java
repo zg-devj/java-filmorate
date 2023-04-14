@@ -180,4 +180,14 @@ class FilmDbStorageTest {
 
         assertThat(result).isFalse();
     }
+
+    @Test
+    void sharedUserMovies_Normal() {
+        List<Film> sharedMovies = filmDbStorage.sharedUserMovies(1L, 2L);
+
+        assertThat(sharedMovies)
+                .isNotEmpty()
+                .hasSize(1)
+                .first().hasFieldOrPropertyWithValue("id", 3L);
+    }
 }
