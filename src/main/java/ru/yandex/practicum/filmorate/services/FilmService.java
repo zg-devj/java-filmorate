@@ -37,17 +37,6 @@ public class FilmService {
     // вернуть все фильмы
     public List<Film> findAllFilms() {
         List<Film> allFilms = filmStorage.findAllFilms();
-        List<FilmGenreDto> filmGenreList = filmGenreDbStorage.findFilmGenreAll();
-        for (Film film : allFilms) {
-            film.setGenres(
-                    filmGenreList.stream().filter(f -> Objects.equals(film.getId(), f.getFilmId()))
-                            .map(o -> Genre.builder()
-                                    .id(o.getGenreId())
-                                    .name(o.getGenreName())
-                                    .build())
-                            .collect(Collectors.toList())
-            );
-        }
         log.info("Запрошены все фильмы в количестве {}.", allFilms.size());
         return allFilms;
     }

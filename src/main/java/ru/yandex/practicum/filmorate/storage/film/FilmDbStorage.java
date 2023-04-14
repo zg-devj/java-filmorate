@@ -180,8 +180,6 @@ public class FilmDbStorage implements FilmStorage {
                             .add(new Genre(rs.getInt("genre_id"),
                                     rs.getString("genre_name")));
                 }
-                // TODO: 13.04.2023  
-//              ВОТ ТУТ не работает!
                 if (rs.getString("director_name") != null) {
                     int index = list.indexOf(film);
                     list.get(index).getDirectors().add(new Director(rs.getInt("director_id"),
