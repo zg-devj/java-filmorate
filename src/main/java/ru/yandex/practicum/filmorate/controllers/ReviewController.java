@@ -89,7 +89,7 @@ public class ReviewController {
     }
 
     @DeleteMapping("/{id}/dislike/{userId}")
-    public ResponseEntity<MessageResponse> DeleteDislikeReview(
+    public ResponseEntity<MessageResponse> deleteDislikeReview(
             @PathVariable Long id,
             @PathVariable Long userId
     ) {
