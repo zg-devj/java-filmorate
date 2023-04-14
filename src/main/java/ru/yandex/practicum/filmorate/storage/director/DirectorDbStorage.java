@@ -22,7 +22,6 @@ public class DirectorDbStorage implements DirectorStorage {
         return jdbcTemplate.query(statement, this::makeDirector);
     }
 
-
     @Override
     public Director getDirectorById(Integer directorId) {
         String statement = "select * from directors where director_id = ?";
@@ -31,18 +30,13 @@ public class DirectorDbStorage implements DirectorStorage {
 
     @Override
     public List<Director> getDirectorsById(Long filmId) {
-        String statement = "select * from directors as d " +
-                "left join film_directors as fd " +
-                "on d.director_id = fd.director_id " +
-                "where fd.film_id = ?";
+        String statement = "select * from directors as d " + "left join film_directors as fd " + "on d.director_id = fd.director_id " + "where fd.film_id = ?";
         return jdbcTemplate.query(statement, this::makeDirector, filmId);
     }
 
     @Override
-    public Director createDirector (Director director) {
-        SimpleJdbcInsert insert = new SimpleJdbcInsert(jdbcTemplate)
-                .withTableName("directors")
-                .usingGeneratedKeyColumns("director_id");
+    public Director createDirector(Director director) {
+        SimpleJdbcInsert insert = new SimpleJdbcInsert(jdbcTemplate).withTableName("directors").usingGeneratedKeyColumns("director_id");
         int directorId = insert.executeAndReturnKey(director.toMap()).intValue();
 
         director.setId(directorId);
@@ -70,11 +64,8 @@ public class DirectorDbStorage implements DirectorStorage {
         return !userList.isEmpty();
     }
 
-    private Director makeDirector (ResultSet rs, int rowNum) throws SQLException {
-        return Director.builder()
-                .id(rs.getInt("director_id"))
-                .name(rs.getString("director_name"))
-                .build();
+    private Director makeDirector(ResultSet rs, int rowNum) throws SQLException {
+        return Director.builder().id(rs.getInt("director_id")).name(rs.getString("director_name")).build();
     }
 
     public boolean isAllDirectorsExists(List<Integer> directorIds, Integer expectedIdsCount) {

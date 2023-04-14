@@ -20,8 +20,8 @@ import ru.yandex.practicum.filmorate.storage.filmganre.FilmGenreStorage;
 import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.mpa.MpaStorage;
 
-import java.sql.*;
 import java.sql.Date;
+import java.sql.*;
 import java.util.*;
 
 @Slf4j
@@ -53,7 +53,7 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public List<Film> findPopularFilms(int limit) {
         String sql = "SELECT f.*, m.mpa_name, g2.genre_id, " +
-                "g2.genre_name, COALESCE(s.count_like, 0) AS rate " +
+                "g2.genre_name, d.director_id, d.director_name, COALESCE(s.count_like, 0) AS rate " +
                 "FROM films as f " +
                 "LEFT JOIN mpas AS m on f.mpa_id = m.mpa_id " +
                 "LEFT JOIN film_genre AS fg on f.film_id = fg.film_id " +
@@ -70,7 +70,8 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Optional<Film> findFilmById(Long filmId) {
-        String sql = "SELECT f.*, m.mpa_name, g2.genre_id, g2.genre_name, COALESCE(s.count_like, 0) AS rate " +
+        String sql = "SELECT f.*, m.mpa_name, g2.genre_id," +
+                " g2.genre_name, d.director_id, d.director_name, COALESCE(s.count_like, 0) AS rate " +
                 "FROM films as f " +
                 "LEFT JOIN mpas AS m on f.mpa_id = m.mpa_id " +
                 "LEFT JOIN film_genre AS fg on f.film_id = fg.film_id " +
@@ -141,14 +142,6 @@ public class FilmDbStorage implements FilmStorage {
                 film.setGenres(new ArrayList<>());
             }
             addDirector(film);
-//            filmDirectorStorage.deleteRecords(film.getId());
-//            List<Integer> directorIDs = film.getDirectors().stream().map(Director::getId).collect(toList());
-//            for (Integer directorId: directorIDs){
-//                if (!directorStorage.isDirectorExists(directorId)){
-//                    throw new NotFoundException("Режиссер не найден");
-//                }
-//            }
-//            filmDirectorStorage.addRecords(new ArrayList<>(film.getDirectors()), film.getId());
             return film;
         } else {
             throw new NotFoundException(String.format("Фильм с id=%d не существует.", film.getId()));
@@ -189,11 +182,11 @@ public class FilmDbStorage implements FilmStorage {
                 }
                 // TODO: 13.04.2023  
 //              ВОТ ТУТ не работает!
-//                if (rs.getString("director_name") != null) {
-//                    int index = list.indexOf(film);
-//                    list.get(index).getDirectors().add(new Director(rs.getInt("director_id"),
-//                            rs.getString("director_name")));
-//                }
+                if (rs.getString("director_name") != null) {
+                    int index = list.indexOf(film);
+                    list.get(index).getDirectors().add(new Director(rs.getInt("director_id"),
+                            rs.getString("director_name")));
+                }
             }
             return list;
         };
@@ -245,13 +238,13 @@ public class FilmDbStorage implements FilmStorage {
 
         String statement = null;
         if (sortBy.contentEquals("year")) {
-//            statement = "select f.*, m.mpa_name, g2.genre_id, g2.genre_name from films as f " +
-//                    "left join film_directors as fd on f.film_id = fd.film_id " +
-//                    "where fd.director_id = ? order by release_date";
-            statement = "SELECT f.*, m.mpa_name, COALESCE(s.count_like, 0) AS rate " +
+            statement = "SELECT f.*, m.mpa_name, g2.genre_id, g2.genre_name, d.director_id, d.director_name, COALESCE(s.count_like, 0) AS rate " +
                     "FROM films AS f " +
                     "LEFT JOIN mpas AS m on m.mpa_id = f.mpa_id " +
+                    "LEFT JOIN film_genre AS fg on f.film_id = fg.film_id " +
+                    "LEFT JOIN genres AS g2 on g2.genre_id = fg.genre_id " +
                     "left join film_directors as fd on f.film_id = fd.film_id " +
+                    "left join directors as d on fd.director_id = d.director_id " +
                     "LEFT JOIN (SELECT fl.film_id, " +
                     "COUNT(fl.user_id) AS count_like " +
                     "FROM film_like AS fl " +
@@ -259,10 +252,13 @@ public class FilmDbStorage implements FilmStorage {
                     "where fd.director_id = ? order by release_date";
 
         } else {
-            statement = "SELECT f.*, m.mpa_name, COALESCE(s.count_like, 0) AS rate " +
+            statement = "SELECT f.*, m.mpa_name, g2.genre_id, g2.genre_name, d.director_id, d.director_name, COALESCE(s.count_like, 0) AS rate " +
                     "FROM films AS f " +
                     "LEFT JOIN mpas AS m on m.mpa_id = f.mpa_id " +
+                    "LEFT JOIN film_genre AS fg on f.film_id = fg.film_id " +
+                    "LEFT JOIN genres AS g2 on g2.genre_id = fg.genre_id " +
                     "left join film_directors as fd on f.film_id = fd.film_id " +
+                    "left join directors as d on fd.director_id = d.director_id " +
                     "LEFT JOIN (SELECT fl.film_id, " +
                     "COUNT(fl.user_id) AS count_like " +
                     "FROM film_like AS fl " +
