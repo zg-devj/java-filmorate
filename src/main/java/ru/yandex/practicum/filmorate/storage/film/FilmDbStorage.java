@@ -206,35 +206,6 @@ public class FilmDbStorage implements FilmStorage {
         return jdbcTemplate.query(sql, getListResultSetExtractor(), userId, friendId);
     }
 
-    private static ResultSetExtractor<List<Film>> getListResultSetExtractor() {
-        return rs -> {
-            List<Film> list = new ArrayList<>();
-            while (rs.next()) {
-                Film film = Film.builder()
-                        .id(rs.getLong("film_id"))
-                        .name(rs.getString("film_name"))
-                        .description(rs.getString("description"))
-                        .releaseDate(rs.getDate("release_date").toLocalDate())
-                        .duration(rs.getInt("duration"))
-                        .rate(rs.getInt("rate"))
-                        .mpa(new Mpa(rs.getInt("mpa_id"),
-                                rs.getString("mpa_name")))
-                        .genres(new ArrayList<>())
-                        .build();
-                if (!list.contains(film)) {
-                    list.add(film);
-                }
-                if (rs.getString("genre_name") != null) {
-                    int index = list.indexOf(film);
-                    list.get(index).getGenres()
-                            .add(new Genre(rs.getInt("genre_id"),
-                                    rs.getString("genre_name")));
-                }
-            }
-            return list;
-        };
-    }
-
     private Film makeFilm(ResultSet rs, int rowNum) throws SQLException {
         Long filmId = rs.getLong("film_id");
         return Film.builder()
