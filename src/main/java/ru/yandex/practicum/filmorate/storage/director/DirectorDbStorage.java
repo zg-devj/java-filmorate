@@ -30,7 +30,10 @@ public class DirectorDbStorage implements DirectorStorage {
 
     @Override
     public List<Director> getDirectorsById(Long filmId) {
-        String statement = "select * from directors as d " + "left join film_directors as fd " + "on d.director_id = fd.director_id " + "where fd.film_id = ?";
+        String statement = "select * from directors as d " +
+                "left join film_directors as fd " +
+                "on d.director_id = fd.director_id " +
+                "where fd.film_id = ?";
         return jdbcTemplate.query(statement, this::makeDirector, filmId);
     }
 

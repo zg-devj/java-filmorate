@@ -236,7 +236,8 @@ public class FilmDbStorage implements FilmStorage {
 
         String statement = null;
         if (sortBy.contentEquals("year")) {
-            statement = "SELECT f.*, m.mpa_name, g2.genre_id, g2.genre_name, d.director_id, d.director_name, COALESCE(s.count_like, 0) AS rate " +
+            statement = "SELECT f.*, m.mpa_name, g2.genre_id, g2.genre_name, d.director_id, d.director_name," +
+                    " COALESCE(s.count_like, 0) AS rate " +
                     "FROM films AS f " +
                     "LEFT JOIN mpas AS m on m.mpa_id = f.mpa_id " +
                     "LEFT JOIN film_genre AS fg on f.film_id = fg.film_id " +
@@ -250,7 +251,8 @@ public class FilmDbStorage implements FilmStorage {
                     "where fd.director_id = ? order by release_date";
 
         } else {
-            statement = "SELECT f.*, m.mpa_name, g2.genre_id, g2.genre_name, d.director_id, d.director_name, COALESCE(s.count_like, 0) AS rate " +
+            statement = "SELECT f.*, m.mpa_name, g2.genre_id, g2.genre_name, d.director_id, d.director_name, " +
+                    "COALESCE(s.count_like, 0) AS rate " +
                     "FROM films AS f " +
                     "LEFT JOIN mpas AS m on m.mpa_id = f.mpa_id " +
                     "LEFT JOIN film_genre AS fg on f.film_id = fg.film_id " +
