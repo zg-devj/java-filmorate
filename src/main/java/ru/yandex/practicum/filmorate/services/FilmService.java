@@ -6,12 +6,9 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
-import ru.yandex.practicum.filmorate.model.dto.FilmGenreDto;
 import ru.yandex.practicum.filmorate.storage.director.DirectorStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.filmganre.FilmGenreDbStorage;
 import ru.yandex.practicum.filmorate.storage.filmganre.FilmGenreStorage;
 import ru.yandex.practicum.filmorate.storage.filmlike.FilmLikeStorage;
 import ru.yandex.practicum.filmorate.storage.mpa.MpaStorage;
@@ -20,8 +17,6 @@ import ru.yandex.practicum.filmorate.utils.ValidateUtil;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -81,7 +76,7 @@ public class FilmService {
         return filmStorage.findPopularFilms(count);
     }
 
-    public Collection<Film> getAllFilmsByDirectorSorted (Integer directorId, String sortBy) {
+    public Collection<Film> getAllFilmsByDirectorSorted(Integer directorId, String sortBy) {
         if (!directorStorage.isDirectorExists(directorId)) {
             throw new NotFoundException("Режиссёр не найден");
         }

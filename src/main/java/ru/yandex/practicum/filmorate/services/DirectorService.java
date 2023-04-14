@@ -25,18 +25,18 @@ public class DirectorService {
         return directorStorage.getDirectorById(id);
     }
 
-    public Director createDirector(Director director){
+    public Director createDirector(Director director) {
         return directorStorage.createDirector(director);
     }
 
-    public Director updateDirector(Director director){
+    public Director updateDirector(Director director) {
         if (!directorStorage.isDirectorExists(director.getId())) {
             throw new NotFoundException(String.format("Режиссера с id %d нет в базе", director.getId()));
         }
         return directorStorage.updateDirector(director);
     }
 
-    public void deleteDirector(Integer directorId){
+    public void deleteDirector(Integer directorId) {
         if (!directorStorage.isDirectorExists(directorId)) {
             throw new NotFoundException(String.format("Режиссера с id %d нет в базе", directorId));
         }

@@ -15,9 +15,10 @@ import java.util.Map;
 
 @Repository
 @RequiredArgsConstructor
-public class FilmDirectorDbStorage implements FilmDirectorStorage{
+public class FilmDirectorDbStorage implements FilmDirectorStorage {
 
     private final JdbcTemplate jdbcTemplate;
+
     @Override
     public Collection<Director> getFilmDirectors(Integer filmId) {
         String statement = "select * from directors as d " +
@@ -45,6 +46,7 @@ public class FilmDirectorDbStorage implements FilmDirectorStorage{
                 ps.setInt(1, directors.get(i).getId());
                 ps.setLong(2, filmId);
             }
+
             @Override
             public int getBatchSize() {
                 return directors.size();
