@@ -180,7 +180,7 @@ public class FilmDbStorage implements FilmStorage {
                 .rate(rs.getInt("rate"))
                 .duration(rs.getInt("duration"))
                 .mpa(new Mpa(rs.getInt("mpa_id"), rs.getString("mpa_name")))
-                .genres(genreStorage.findGenresByFilmId(filmId))
+                .genres(new ArrayList<>())
                 .build();
     }
 }

@@ -50,16 +50,16 @@ public class ReviewService {
         validUser(review.getUserId());
         validFilm(review.getFilmId());
         Review created = reviewStorage.createReview(review);
-        log.info("Отзыв с id={} добавлен.", created.getId());
+        log.info("Отзыв с id={} добавлен.", created.getReviewId());
         return created;
     }
 
     public Review updateReview(Review review) {
-        validReview(review.getId());
+        validReview(review.getReviewId());
         validUser(review.getUserId());
         validFilm(review.getFilmId());
         Review updated = reviewStorage.updateReview(review);
-        log.info("Отзыв с id={} обновлен.", updated.getId());
+        log.info("Отзыв с id={} обновлен.", updated.getReviewId());
         return updated;
     }
 

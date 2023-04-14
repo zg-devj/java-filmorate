@@ -13,7 +13,7 @@ import java.util.Objects;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Review {
-    private Long id;
+    private Long reviewId;
     @NotBlank(message = "Отзыв не может быть пустым.")
     @Size(max = 255, message = "Длина отзыва не должна быть больше 255 символов.")
     private String content;
@@ -27,11 +27,11 @@ public class Review {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Review review = (Review) o;
-        return Objects.equals(id, review.id);
+        return Objects.equals(reviewId, review.reviewId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(reviewId);
     }
 }
