@@ -35,7 +35,7 @@ public class UserController {
 
     @GetMapping ("/{id}/recommendations")
     public Collection<Film> getRecommendations(@PathVariable Long id) {
-        log.info("GET /users/{}/friends - запрос рекомендаций для пользователя.", id);
+        log.info("GET /{}/recommendations - запрос рекомендаций для пользователя.", id);
         return null;
     }
 

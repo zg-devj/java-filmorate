@@ -12,7 +12,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.services.UserService;
 import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
 import java.util.Collection;
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 @SpringBootTest
 public class UserControllerTest {
@@ -37,9 +37,9 @@ public class UserControllerTest {
     }
 
     @Test
-    void shouldReturnEmptyFilmsCollection() {
+    void shouldReturnNullFilmsCollection() {
         Collection<Film> films = userController.getRecommendations(1L);
-        assertThat(films).isEmpty();
+        assertNull(films);
     }
 
     @AfterEach
