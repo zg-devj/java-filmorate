@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.MessageResponse;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.services.UserService;
@@ -30,6 +31,12 @@ public class UserController {
     ) {
         log.info("GET /users/{} - пользователь", id);
         return userService.findUserById(id);
+    }
+
+    @GetMapping ("/{id}/recommendations")
+    public Collection<Film> getRecommendations(@PathVariable Long id) {
+        log.info("GET /users/{}/friends - запрос рекомендаций для пользователя.", id);
+        return null;
     }
 
     @PostMapping
