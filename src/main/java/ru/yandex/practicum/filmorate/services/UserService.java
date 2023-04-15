@@ -112,6 +112,10 @@ public class UserService {
     }
 
     public Collection<Film> getRecommendations(Long userId) {
+        ValidateUtil.validNumberNotNull(userId, "id пользователя не должно быть null.");
+        if (!userStorage.checkUser(userId)) {
+            ValidateUtil.throwNotFound(String.format("Пользователь с %d не найден.", userId));
+        }
         return userStorage.getRecommendations(userId);
     }
 
