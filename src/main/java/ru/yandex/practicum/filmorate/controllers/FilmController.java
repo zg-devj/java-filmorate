@@ -78,4 +78,11 @@ public class FilmController {
         return ResponseEntity.ok(new MessageResponse("Лайк удален!"));
     }
 
+    @GetMapping("/common")
+    public List<Film> sharedUserMovies(
+            @RequestParam Long userId, Long friendId
+    ) {
+        log.info("GET /common - запрос общих фильмов пользователей");
+        return filmService.sharedUserMovies(userId, friendId);
+    }
 }

@@ -72,7 +72,7 @@ class FilmDbStorageTest {
     void findPopularFilms_Normal() {
         Collection<Film> films = filmDbStorage.findPopularFilms(10);
 
-        assertThat(films).hasSize(6).first().hasFieldOrPropertyWithValue("id", 1L);
+        assertThat(films).hasSize(6).first().hasFieldOrPropertyWithValue("id", 3L);
     }
 
     @Test
@@ -146,5 +146,15 @@ class FilmDbStorageTest {
         Boolean result = filmDbStorage.checkFilm(999L);
 
         assertThat(result).isFalse();
+    }
+
+    @Test
+    void sharedUserMovies_Normal() {
+        List<Film> sharedMovies = filmDbStorage.sharedUserMovies(1L, 2L);
+
+        assertThat(sharedMovies)
+                .isNotEmpty()
+                .hasSize(1)
+                .first().hasFieldOrPropertyWithValue("id", 3L);
     }
 }

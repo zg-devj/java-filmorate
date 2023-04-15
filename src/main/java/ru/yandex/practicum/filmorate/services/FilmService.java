@@ -123,4 +123,16 @@ public class FilmService {
             throw new ValidationException("Пользователь уже отменил лайк к фильму.");
         }
     }
+
+    public List<Film> sharedUserMovies(Long userId, Long friendId) { // получение общих фильмов пользователей
+        ValidateUtil.validNumberNotNull(userId, "id пользователя не должно быть null.");
+        ValidateUtil.validNumberNotNull(friendId, "id пользователя не должно быть null.");
+        if (!userStorage.checkUser(userId)) {
+            ValidateUtil.throwNotFound(String.format("Пользователь с %d не найден.", userId));
+        }
+        if (!userStorage.checkUser(friendId)) {
+            ValidateUtil.throwNotFound(String.format("Пользователь с %d не найден.", friendId));
+        }
+        return filmStorage.sharedUserMovies(userId, friendId);
+    }
 }
