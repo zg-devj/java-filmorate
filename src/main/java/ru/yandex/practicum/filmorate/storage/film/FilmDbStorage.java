@@ -183,4 +183,9 @@ public class FilmDbStorage implements FilmStorage {
                 .genres(genreStorage.findGenresByFilmId(filmId))
                 .build();
     }
+
+    public Film makeClientFilm(ResultSet rs, int rowNum) throws SQLException {
+        return this.makeFilm(rs,rowNum);
+    }
+
 }

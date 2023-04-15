@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.*;
@@ -117,6 +118,10 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public Collection<Film> getRecommendations(Long userId) {
+        String sql = "SELECT * FROM film " +
+                "WHERE film_id IN " +
+                "(SELECT film_id FROM film_like WHERE user_id = ?)";
+        //Collection<Film> films = jdbcTemplate.query(sql, filmDbStorage::makeFilm, userId);
         return null;
     }
 
@@ -135,4 +140,5 @@ public class UserDbStorage implements UserStorage {
                 .birthday(rs.getDate("birthday").toLocalDate())
                 .build();
     }
+
 }
