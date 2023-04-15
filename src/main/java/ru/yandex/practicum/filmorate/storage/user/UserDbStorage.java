@@ -11,6 +11,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.*;
@@ -112,6 +113,11 @@ public class UserDbStorage implements UserStorage {
                 "(SELECT friend_id " +
                 "FROM friends WHERE user_id=?)";
         return jdbcTemplate.query(sql, this::makeUser, userId);
+    }
+
+    @Override
+    public Collection<Film> getRecommendations(Long userId) {
+        return null;
     }
 
     @Override

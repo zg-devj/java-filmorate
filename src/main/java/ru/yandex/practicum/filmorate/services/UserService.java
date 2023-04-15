@@ -111,8 +111,8 @@ public class UserService {
         return userStorage.findFriends(userId);
     }
 
-    public Collection<Film> getRecommendations(Long id) {
-        return null;
+    public Collection<Film> getRecommendations(Long userId) {
+        return userStorage.getRecommendations(userId);
     }
 
     private String ifStringIsNullOrEmpty(String param, String toParam) {
