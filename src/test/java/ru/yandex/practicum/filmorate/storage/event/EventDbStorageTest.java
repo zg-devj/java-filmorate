@@ -1,7 +1,5 @@
 package ru.yandex.practicum.filmorate.storage.event;
 
-import lombok.AccessLevel;
-import lombok.experimental.FieldDefaults;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,12 +23,11 @@ import static org.assertj.core.api.Assertions.catchException;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @SpringBootTest
-@FieldDefaults(level = AccessLevel.PRIVATE)
 public class EventDbStorageTest {
-    EmbeddedDatabase embeddedDatabase;
-    JdbcTemplate jdbcTemplate;
-    EventStorage eventStorage;
-    UserStorage userStorage;
+    private EmbeddedDatabase embeddedDatabase;
+    private JdbcTemplate jdbcTemplate;
+    private EventStorage eventStorage;
+    private UserStorage userStorage;
 
     @BeforeEach
     void setUp() {
@@ -49,7 +46,7 @@ public class EventDbStorageTest {
     }
 
     @Test
-    public void testAddEventWithValidUserId() {
+    void testAddEventWithValidUserId() {
         User user = new User();
         user.setLogin("dolore");
         user.setName("Nick Name");
@@ -71,7 +68,7 @@ public class EventDbStorageTest {
     }
 
     @Test
-    public void testOrderOfReturnedEventFeed() {
+    void testOrderOfReturnedEventFeed() {
         User user = new User();
         user.setLogin("dolore");
         user.setName("Nick Name");
@@ -88,7 +85,7 @@ public class EventDbStorageTest {
     }
 
     @Test
-    public void testRemoveEventsFromDbByUserId() {
+    void testRemoveEventsFromDbByUserId() {
         User user = new User();
         user.setLogin("dolore");
         user.setName("Nick Name");
