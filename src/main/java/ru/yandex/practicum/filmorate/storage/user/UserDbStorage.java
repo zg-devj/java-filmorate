@@ -120,10 +120,11 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public Collection<Film> getRecommendations(Long userId) {
-        String sql = "SELECT * FROM film " +
+        /*String sql = "SELECT * FROM films " +
                 "WHERE film_id IN " +
-                "(SELECT film_id FROM film_like WHERE user_id = ?)";
-        Collection<Film> films = jdbcTemplate.query(sql, filmDbStorage::makeFilm, userId);
+                "(SELECT film_id FROM film_like WHERE user_id = ?)";*/
+        String sql = "SELECT * FROM films";
+        Collection<Film> films = jdbcTemplate.query(sql, filmDbStorage::makeFilm);
         return null;
     }
 
