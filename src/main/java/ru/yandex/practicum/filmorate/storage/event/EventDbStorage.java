@@ -7,8 +7,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Event;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.time.Instant;
 import java.util.Date;
 import java.util.List;
