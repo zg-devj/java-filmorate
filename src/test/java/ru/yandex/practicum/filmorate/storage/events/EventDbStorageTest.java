@@ -28,8 +28,6 @@ import static org.assertj.core.api.Assertions.catchException;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @SpringBootTest
-@AutoConfigureTestDatabase
-@RequiredArgsConstructor(onConstructor_ = @Autowired)
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class EventDbStorageTest {
     EmbeddedDatabase embeddedDatabase;
