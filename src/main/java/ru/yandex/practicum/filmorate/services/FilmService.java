@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.director.DirectorStorage;
+import ru.yandex.practicum.filmorate.storage.event.EventStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.filmganre.FilmGenreStorage;
 import ru.yandex.practicum.filmorate.storage.filmlike.FilmLikeStorage;
@@ -28,6 +29,7 @@ public class FilmService {
     private final FilmLikeStorage likeStorage;
     private final FilmGenreStorage filmGenreDbStorage;
     private final DirectorStorage directorStorage;
+    private final EventStorage eventStorage;
 
     // вернуть все фильмы
     public List<Film> findAllFilms() {
@@ -99,6 +101,7 @@ public class FilmService {
         if (likeStorage.create(userId, id)) {
             // пользователь ставит лайк
             log.info("Пользователь с id={} поставил лайк фильму с id={}.", userId, id);
+            eventStorage.addEvent(userId, id, EventStorage.TypeName.LIKE, EventStorage.OperationName.ADD);
         } else {
             log.info("Пользователь с id={} уже ставил лайк фильму с id={}.", userId, id);
             throw new ValidationException("Пользователь уже поставил лайк к фильму.");
@@ -118,6 +121,7 @@ public class FilmService {
         if (likeStorage.delete(userId, id)) {
             // пользователь удаляет лайк
             log.info("Пользователь с id={} отменил лайк фильму с id={}.", userId, id);
+            eventStorage.addEvent(userId, id, EventStorage.TypeName.LIKE, EventStorage.OperationName.REMOVE);
         } else {
             log.info("У пользователя с id={} нет лайка к фильму с id={}. Нельзя отменить лайк.", userId, id);
             throw new ValidationException("Пользователь уже отменил лайк к фильму.");

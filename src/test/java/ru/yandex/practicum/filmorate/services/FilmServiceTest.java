@@ -13,6 +13,8 @@ import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.director.DirectorDbStorage;
 import ru.yandex.practicum.filmorate.storage.director.DirectorStorage;
+import ru.yandex.practicum.filmorate.storage.event.EventDbStorage;
+import ru.yandex.practicum.filmorate.storage.event.EventStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
 import ru.yandex.practicum.filmorate.storage.filmdirector.FilmDirectorDbStorage;
 import ru.yandex.practicum.filmorate.storage.filmdirector.FilmDirectorStorage;
@@ -43,6 +45,7 @@ class FilmServiceTest {
     private FilmService filmService;
     private DirectorStorage directorStorage;
     private FilmDirectorStorage filmDirectorStorage;
+    private EventStorage eventStorage;
 
     @BeforeEach
     void setUp() {
@@ -59,8 +62,10 @@ class FilmServiceTest {
         filmLikeDbStorage = new FilmLikeDbStorage(jdbcTemplate);
         directorStorage = new DirectorDbStorage(jdbcTemplate);
         filmDirectorStorage = new FilmDirectorDbStorage(jdbcTemplate);
+        eventStorage = new EventDbStorage(jdbcTemplate);
         filmDbStorage = new FilmDbStorage(jdbcTemplate, mpaStorage, filmGenreStorage, genreStorage, directorStorage, filmDirectorStorage);
-        filmService = new FilmService(filmDbStorage, userDbStorage, mpaStorage, filmLikeDbStorage, filmGenreStorage, directorStorage);
+        filmService = new FilmService(filmDbStorage, userDbStorage, mpaStorage, filmLikeDbStorage, filmGenreStorage,
+                directorStorage, eventStorage);
     }
 
     @AfterEach

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Review;
+import ru.yandex.practicum.filmorate.storage.event.EventStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.review.ReviewStorage;
 import ru.yandex.practicum.filmorate.storage.reviewuser.ReviewUserStorage;
@@ -21,6 +22,7 @@ public class ReviewService {
     private final ReviewUserStorage reviewUserStorage;
     private final UserStorage userStorage;
     private final FilmStorage filmStorage;
+    private final EventStorage eventStorage;
 
     public List<Review> findAllReviews(Optional<Long> filmId, int limit) {
         List<Review> reviews;
@@ -52,6 +54,8 @@ public class ReviewService {
         validFilm(review.getFilmId());
         Review created = reviewStorage.createReview(review);
         log.info("Отзыв с id={} добавлен.", created.getReviewId());
+        eventStorage.addEvent(review.getUserId(), review.getReviewId(), EventStorage.TypeName.REVIEW,
+                EventStorage.OperationName.ADD);
         return created;
     }
 
@@ -61,14 +65,19 @@ public class ReviewService {
         validFilm(review.getFilmId());
         Review updated = reviewStorage.updateReview(review);
         log.info("Отзыв с id={} обновлен.", updated.getReviewId());
+        eventStorage.addEvent(updated.getUserId(), updated.getReviewId(), EventStorage.TypeName.REVIEW,
+                EventStorage.OperationName.UPDATE);
         return updated;
     }
 
     public void deleteReview(Long id) {
         ValidateUtil.validNumberNotNull(id, "id отзыва не должно быть null.");
+        Review review = reviewStorage.findReviewById(id).get();
         reviewStorage.deleteReview(id);
         log.info("удалены все лайки и дизлайки для отзыва с ID={}", id);
         log.info("удален отзыв с ID={}", id);
+        eventStorage.addEvent(review.getUserId(), id, EventStorage.TypeName.REVIEW,
+                EventStorage.OperationName.REMOVE);
     }
 
     public void likeReview(Long reviewId, Long userId) {
