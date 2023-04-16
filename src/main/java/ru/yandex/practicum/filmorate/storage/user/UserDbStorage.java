@@ -17,6 +17,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -128,11 +129,11 @@ public class UserDbStorage implements UserStorage {
                 "COUNT(fl.user_id) AS count_like " +
                 "FROM film_like AS fl " +
                 "GROUP BY fl.film_id) AS s ON f.film_id=s.film_id " +
-                "LEFT JOIN " +
+                "INNER JOIN " +
                     "(SELECT film_id " +
                     "FROM film_like " +
                     "WHERE user_id = " +
-                        "(SELECT COUNT(user_id) " +
+                        "(SELECT user_id " +
                         "FROM film_like WHERE film_id IN " +
                             "(SELECT film_id FROM film_like WHERE user_id = ?) " +
                         "GROUP BY user_id " +
@@ -143,6 +144,53 @@ public class UserDbStorage implements UserStorage {
                 "AS uf ON uf.film_id = f.film_id "+
                 "ORDER BY rate DESC";
         Collection<Film> films = jdbcTemplate.query(sql, filmDbStorage::makeFilm, userId, userId);
+        return films;
+    }
+
+    @Override
+    public Collection<Film> getRecommendationsWithSeparateMethods(Long userId) {
+        Collection<Film> recommendedFilms = new ArrayList<>();
+        if (!isUserSetLike(userId)) return recommendedFilms;
+        Long anotherUser = findRecommendedUser(userId);
+        Collection<Film> anotherUserFilms = findUserFilms(anotherUser);
+        Collection<Film> userFilms = findUserFilms(userId);
+        for (Film film : anotherUserFilms) {
+            if (!userFilms.contains(film)) {
+                recommendedFilms.add(film);
+            }
+        }
+        return recommendedFilms;
+    }
+
+    private Long findRecommendedUser(Long userId) {
+        String findAnotherUser = "(SELECT user_id FROM film_like WHERE film_id IN " +
+                "(SELECT film_id FROM film_like WHERE user_id = ?) " +
+                "GROUP BY user_id " +
+                "ORDER BY COUNT(user_id) DESC " +
+                "LIMIT 1) ";
+        return jdbcTemplate.queryForObject(findAnotherUser, Long.class, userId);
+    }
+
+    private boolean isUserSetLike(Long userId) {
+        String findLike = "SELECT EXISTS(SELECT * FROM film_like WHERE user_id=?)";
+        return jdbcTemplate.queryForObject(findLike, (rs, rowNum) -> rs.getBoolean("film_id"), userId);
+    }
+
+    private Collection<Film> findUserFilms(Long userId) {
+        String sql = "SELECT f.*, m.mpa_name, COALESCE(s.count_like, 0) AS rate " +
+                "FROM films AS f " +
+                "LEFT JOIN mpas AS m on m.mpa_id = f.mpa_id " +
+                "LEFT JOIN (SELECT fl.film_id, " +
+                "COUNT(fl.user_id) AS count_like " +
+                "FROM film_like AS fl " +
+                "GROUP BY fl.film_id) AS s ON f.film_id=s.film_id " +
+                "INNER JOIN " +
+                    "(SELECT film_id " +
+                    "FROM film_like " +
+                    "WHERE user_id = ?)" +
+                    "AS uf ON uf.film_id = f.film_id "+
+                "ORDER BY rate DESC";
+        Collection<Film> films = jdbcTemplate.query(sql, filmDbStorage::makeFilm, userId);
         return films;
     }
 

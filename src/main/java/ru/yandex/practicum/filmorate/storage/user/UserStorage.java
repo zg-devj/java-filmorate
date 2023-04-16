@@ -26,4 +26,6 @@ public interface UserStorage {
     Boolean checkUser(Long userId);
 
     Collection<Film> getRecommendations(Long userId);
+
+    Collection<Film> getRecommendationsWithSeparateMethods(Long userId);
 }
