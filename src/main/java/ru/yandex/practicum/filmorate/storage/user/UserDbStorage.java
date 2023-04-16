@@ -14,6 +14,7 @@ import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
 
 import java.sql.*;
 import java.util.Collection;
@@ -26,6 +27,7 @@ import java.util.Optional;
 public class UserDbStorage implements UserStorage {
 
     private final JdbcTemplate jdbcTemplate;
+    private final FilmDbStorage filmDbStorage;
 
     @Override
     public Collection<User> findAllUsers() {
@@ -121,7 +123,7 @@ public class UserDbStorage implements UserStorage {
         String sql = "SELECT * FROM film " +
                 "WHERE film_id IN " +
                 "(SELECT film_id FROM film_like WHERE user_id = ?)";
-        //Collection<Film> films = jdbcTemplate.query(sql, filmDbStorage::makeFilm, userId);
+        Collection<Film> films = jdbcTemplate.query(sql, filmDbStorage::makeFilm, userId);
         return null;
     }
 

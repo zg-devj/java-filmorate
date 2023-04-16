@@ -170,7 +170,7 @@ public class FilmDbStorage implements FilmStorage {
         };
     }
 
-    private Film makeFilm(ResultSet rs, int rowNum) throws SQLException {
+    public Film makeFilm(ResultSet rs, int rowNum) throws SQLException {
         Long filmId = rs.getLong("film_id");
         return Film.builder()
                 .id(filmId)
@@ -182,10 +182,6 @@ public class FilmDbStorage implements FilmStorage {
                 .mpa(new Mpa(rs.getInt("mpa_id"), rs.getString("mpa_name")))
                 .genres(genreStorage.findGenresByFilmId(filmId))
                 .build();
-    }
-
-    public Film makeClientFilm(ResultSet rs, int rowNum) throws SQLException {
-        return this.makeFilm(rs,rowNum);
     }
 
 }

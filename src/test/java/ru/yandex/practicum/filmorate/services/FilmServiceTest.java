@@ -48,7 +48,7 @@ class FilmServiceTest {
         jdbcTemplate = new JdbcTemplate(embeddedDatabase);
         mpaStorage = new MpaDbStorage(jdbcTemplate);
         filmGenreStorage = new FilmGenreDbStorage(jdbcTemplate);
-        userDbStorage = new UserDbStorage(jdbcTemplate);
+        userDbStorage = new UserDbStorage(jdbcTemplate, filmDbStorage);
         genreStorage = new GenreDbStorage(jdbcTemplate);
         filmLikeDbStorage = new FilmLikeDbStorage(jdbcTemplate);
         filmDbStorage = new FilmDbStorage(jdbcTemplate, mpaStorage, filmGenreStorage, genreStorage);
