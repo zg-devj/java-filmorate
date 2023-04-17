@@ -136,6 +136,7 @@ public class UserDbStorage implements UserStorage {
                         "(SELECT user_id " +
                         "FROM film_like WHERE film_id IN " +
                             "(SELECT film_id FROM film_like WHERE user_id = ?) " +
+                        "AND user_id <> ? " +
                         "GROUP BY user_id " +
                         "ORDER BY COUNT(user_id) DESC " +
                         "LIMIT 1) " +
@@ -143,7 +144,7 @@ public class UserDbStorage implements UserStorage {
                         "(SELECT film_id FROM film_like WHERE user_id = ?)) " +
                 "AS uf ON uf.film_id = f.film_id "+
                 "ORDER BY rate DESC";
-        Collection<Film> films = jdbcTemplate.query(sql, filmDbStorage::makeFilm, userId, userId);
+        Collection<Film> films = jdbcTemplate.query(sql, filmDbStorage::makeFilm, userId, userId, userId);
         return films;
     }
 
@@ -152,6 +153,7 @@ public class UserDbStorage implements UserStorage {
         Collection<Film> recommendedFilms = new ArrayList<>();
         if (!isUserSetLike(userId)) return recommendedFilms;
         Long anotherUser = findRecommendedUser(userId);
+        if (anotherUser == null) return recommendedFilms;
         Collection<Film> anotherUserFilms = findUserFilms(anotherUser);
         Collection<Film> userFilms = findUserFilms(userId);
         for (Film film : anotherUserFilms) {
@@ -163,17 +165,22 @@ public class UserDbStorage implements UserStorage {
     }
 
     private Long findRecommendedUser(Long userId) {
-        String findAnotherUser = "(SELECT user_id FROM film_like WHERE film_id IN " +
+        String findAnotherUser = "SELECT user_id FROM film_like WHERE film_id IN " +
                 "(SELECT film_id FROM film_like WHERE user_id = ?) " +
+                "AND user_id <> ? " +
                 "GROUP BY user_id " +
                 "ORDER BY COUNT(user_id) DESC " +
-                "LIMIT 1) ";
-        return jdbcTemplate.queryForObject(findAnotherUser, Long.class, userId);
+                "LIMIT 1";
+        try {
+            return jdbcTemplate.queryForObject(findAnotherUser, Long.class, userId, userId);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
-    private boolean isUserSetLike(Long userId) {
-        String findLike = "SELECT EXISTS(SELECT * FROM film_like WHERE user_id=?)";
-        return jdbcTemplate.queryForObject(findLike, (rs, rowNum) -> rs.getBoolean("film_id"), userId);
+    private Boolean isUserSetLike(Long userId) {
+        String findLike = "SELECT EXISTS(SELECT 1 FROM film_like WHERE user_id=?)";
+        return jdbcTemplate.queryForObject(findLike, (rs, rowNum) -> rs.getBoolean(1), userId);
     }
 
     private Collection<Film> findUserFilms(Long userId) {

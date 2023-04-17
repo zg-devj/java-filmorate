@@ -116,8 +116,8 @@ public class UserService {
         if (!userStorage.checkUser(userId)) {
             ValidateUtil.throwNotFound(String.format("Пользователь с %d не найден.", userId));
         }
-        //return userStorage.getRecommendations(userId);
-        return userStorage.getRecommendationsWithSeparateMethods(userId);
+        return userStorage.getRecommendations(userId);
+        //return userStorage.getRecommendationsWithSeparateMethods(userId);
     }
 
     private String ifStringIsNullOrEmpty(String param, String toParam) {
