@@ -139,4 +139,9 @@ public class FilmService {
         }
         return filmStorage.sharedUserMovies(userId, friendId);
     }
+
+    public List<Film> searchForMoviesByDescription(String query, String by) {
+        log.info("Запрошен фильм по ключевым словам: {}", query);
+        return filmStorage.searchForMoviesByDescription(query, by);
+    }
 }
