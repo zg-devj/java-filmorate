@@ -85,4 +85,13 @@ public class FilmController {
         log.info("GET /common - запрос общих фильмов пользователей");
         return filmService.sharedUserMovies(userId, friendId);
     }
+
+    @GetMapping("/search")
+    public List<Film> searchForMoviesByDescription(
+            @RequestParam String query,
+            @RequestParam(name = "by", required = false) String by
+    ) {
+        log.info("GET /films/search?query=" + query + "&by= " + by);
+        return filmService.searchForMoviesByDescription(query, by);
+    }
 }
