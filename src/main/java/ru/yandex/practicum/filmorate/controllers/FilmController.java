@@ -11,6 +11,7 @@ import ru.yandex.practicum.filmorate.services.FilmService;
 import javax.validation.Valid;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -53,9 +54,13 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public List<Film> findPopularFilms(@RequestParam(defaultValue = "10") int count) {
+    public List<Film> findPopularFilms(
+            @RequestParam Optional<Integer> genreId,
+            @RequestParam Optional<Integer> year,
+            @RequestParam(defaultValue = "10") int count
+    ) {
         log.info("GET /films/popular - запрос популярных фильмов");
-        return filmService.findPopularFilms(count);
+        return filmService.findPopularFilms(genreId, year, count);
     }
 
     @PutMapping("/{id}/like/{userId}")

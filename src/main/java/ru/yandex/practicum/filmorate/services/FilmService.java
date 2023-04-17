@@ -18,6 +18,7 @@ import ru.yandex.practicum.filmorate.utils.ValidateUtil;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -70,12 +71,15 @@ public class FilmService {
     }
 
     // вернуть популярные фильмы
-    public List<Film> findPopularFilms(int count) {
+    public List<Film> findPopularFilms(Optional<Integer> genreId, Optional<Integer> year, int count) {
         if (count <= 0) {
             throw new ValidationException("Значение count не может быть <=0");
         }
-        log.info("Запрошены {} популярных фильмов.", count);
-        return filmStorage.findPopularFilms(count);
+        List<Film> films = filmStorage.findPopularFilms(genreId.orElse(null), year.orElse(null), count);
+        log.info("Запрошены {} популярных фильмов. Возвращено {}. genreId={}, release_date={}", count, films.size(),
+                genreId.orElse(null), year.orElse(null));
+
+        return films;
     }
 
     public Collection<Film> getAllFilmsByDirectorSorted(Integer directorId, String sortBy) {
