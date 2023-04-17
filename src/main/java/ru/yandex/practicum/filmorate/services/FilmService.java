@@ -6,7 +6,9 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
+import ru.yandex.practicum.filmorate.model.dto.FilmGenreDto;
 import ru.yandex.practicum.filmorate.storage.director.DirectorStorage;
 import ru.yandex.practicum.filmorate.storage.event.EventStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
@@ -16,9 +18,9 @@ import ru.yandex.practicum.filmorate.storage.mpa.MpaStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import ru.yandex.practicum.filmorate.utils.ValidateUtil;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.LongStream;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -75,11 +77,27 @@ public class FilmService {
         if (count <= 0) {
             throw new ValidationException("Значение count не может быть <=0");
         }
-        List<Film> films = filmStorage.findPopularFilms(genreId.orElse(null), year.orElse(null), count);
-        log.info("Запрошены {} популярных фильмов. Возвращено {}. genreId={}, release_date={}", count, films.size(),
+        List<Film> allFilms = filmStorage.findPopularFilms(genreId.orElse(null), year.orElse(null), count);
+        log.info("Запрошены {} популярных фильмов. Возвращено {}. genreId={}, release_date={}",
+                count, allFilms.size(),
                 genreId.orElse(null), year.orElse(null));
 
-        return films;
+        List<Long> idS = allFilms.stream()
+                .map(Film::getId)
+                .collect(Collectors.toCollection(ArrayList::new));
+
+        List<FilmGenreDto> filmGenreList = filmGenreDbStorage.findFilmGenreAll(idS);
+        for (Film film : allFilms) {
+            film.setGenres(
+                    filmGenreList.stream().filter(f -> Objects.equals(film.getId(), f.getFilmId()))
+                            .map(o -> Genre.builder()
+                                    .id(o.getGenreId())
+                                    .name(o.getGenreName())
+                                    .build())
+                            .collect(Collectors.toList())
+            );
+        }
+        return allFilms;
     }
 
     public Collection<Film> getAllFilmsByDirectorSorted(Integer directorId, String sortBy) {

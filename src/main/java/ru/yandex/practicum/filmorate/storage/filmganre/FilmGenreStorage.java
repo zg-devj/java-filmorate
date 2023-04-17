@@ -10,5 +10,5 @@ public interface FilmGenreStorage {
 
     void deleteGenresByFilmId(Long filmId);
 
-    List<FilmGenreDto> findFilmGenreAll();
+    List<FilmGenreDto> findFilmGenreAll(List<Long> filmsIds);
 }
