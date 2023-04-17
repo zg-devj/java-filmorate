@@ -58,9 +58,11 @@ public class FilmDbStorage implements FilmStorage {
                 }
                 if (rs.getString("genre_name") != null) {
                     int index = list.indexOf(film);
-                    list.get(index).getGenres()
-                            .add(new Genre(rs.getInt("genre_id"),
-                                    rs.getString("genre_name")));
+                    Genre genre = new Genre(rs.getInt("genre_id"),
+                            rs.getString("genre_name"));
+                    if (!list.get(index).getGenres().contains(genre)) {
+                        list.get(index).getGenres().add(genre);
+                    }
                 }
                 if (rs.getString("director_name") != null) {
                     int index = list.indexOf(film);
