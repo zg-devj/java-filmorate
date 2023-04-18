@@ -37,4 +37,16 @@ public class EventDbStorage implements EventStorage {
         String sql = "DELETE FROM events WHERE user_id=" + id;
         jdbcTemplate.execute(sql);
     }
+
+    @Override
+    public void removeEventsByUserEntityId(Long id) {
+        String sql = "DELETE FROM events WHERE event_type='FRIEND' AND entity_id=" + id;
+        jdbcTemplate.execute(sql);
+    }
+
+    @Override
+    public void removeEventsByFilmEntityId(Long id) {
+        String sql = "DELETE FROM events WHERE event_type='LIKE' AND entity_id=" + id;
+        jdbcTemplate.execute(sql);
+    }
 }

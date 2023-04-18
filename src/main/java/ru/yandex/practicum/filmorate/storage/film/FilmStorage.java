@@ -24,4 +24,8 @@ public interface FilmStorage {
 
     Collection<Film> getAllFilmsSorted(Integer directorId, String sortBy);
 
+    void deleteLikesByFilmId(Long id);
+
+    void deleteFilm(Long id);
+
 }

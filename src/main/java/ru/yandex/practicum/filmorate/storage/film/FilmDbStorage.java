@@ -288,4 +288,18 @@ public class FilmDbStorage implements FilmStorage {
         Collection<Film> list = jdbcTemplate.query(statement, this::makeFilm, directorId);
         return list;
     }
+
+    @Override
+    public void deleteLikesByFilmId(Long id) {
+        String sql = "DELETE FROM film_like "
+                + "WHERE film_id=?";
+        jdbcTemplate.update(sql, id);
+    }
+
+    @Override
+    public void deleteFilm(Long id) {
+        String sql = "DELETE FROM films "
+                + "WHERE film_id=?";
+        jdbcTemplate.update(sql, id);
+    }
 }

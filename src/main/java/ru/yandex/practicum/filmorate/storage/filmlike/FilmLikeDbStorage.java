@@ -33,4 +33,11 @@ public class FilmLikeDbStorage implements FilmLikeStorage {
                 + "WHERE user_id=? AND film_id=?";
         return jdbcTemplate.update(sql, userId, filmId) == 1;
     }
+
+    @Override
+    public void deleteLikesByUserId(Long userId) {
+        String sql = "DELETE FROM film_like "
+                + "WHERE user_id=?";
+        jdbcTemplate.update(sql, userId);
+    }
 }

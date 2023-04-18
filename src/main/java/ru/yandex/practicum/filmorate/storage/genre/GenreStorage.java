@@ -12,4 +12,6 @@ public interface GenreStorage {
     Optional<Genre> findGenreById(Integer genreId);
 
     List<Genre> findGenresByFilmId(Long filmId);
+
+    void deleteFilmGenresByFilmId(Long id);
 }

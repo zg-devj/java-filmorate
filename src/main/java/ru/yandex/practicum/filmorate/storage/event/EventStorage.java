@@ -22,4 +22,8 @@ public interface EventStorage {
     void addEvent(Long userId, Long entityId, TypeName type, OperationName operation);
 
     void removeEventsByUserId(Long id);
+
+    void removeEventsByUserEntityId(Long id);
+
+    void removeEventsByFilmEntityId(Long id);
 }
