@@ -251,7 +251,7 @@ public class FilmDbStorage implements FilmStorage {
                 .directors(new HashSet<>())
                 .build();
     }
-    
+
     @Override
     public Collection<Film> getRecommendations(Long userId) {
         //uf - user films table
