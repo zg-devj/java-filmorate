@@ -26,6 +26,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchException;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 class FilmDbStorageTest {
@@ -177,7 +178,13 @@ class FilmDbStorageTest {
     @Test
     void checkFilm_WrongId() {
         Boolean result = filmDbStorage.checkFilm(999L);
-
         assertThat(result).isFalse();
     }
+
+    @Test
+    void shouldReturnFilmsCollectionSize0() {
+        Collection<Film> films = filmDbStorage.getRecommendations(1L);
+        assertEquals(0, films.size());
+    }
+
 }

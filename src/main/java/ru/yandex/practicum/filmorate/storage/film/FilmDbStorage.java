@@ -18,6 +18,7 @@ import ru.yandex.practicum.filmorate.storage.mpa.MpaStorage;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -170,7 +171,7 @@ public class FilmDbStorage implements FilmStorage {
         };
     }
 
-    public Film makeFilm(ResultSet rs, int rowNum) throws SQLException {
+    private Film makeFilm(ResultSet rs, int rowNum) throws SQLException {
         Long filmId = rs.getLong("film_id");
         return Film.builder()
                 .id(filmId)
@@ -182,6 +183,35 @@ public class FilmDbStorage implements FilmStorage {
                 .mpa(new Mpa(rs.getInt("mpa_id"), rs.getString("mpa_name")))
                 .genres(genreStorage.findGenresByFilmId(filmId))
                 .build();
+    }
+
+    @Override
+    public Collection<Film> getRecommendations(Long userId) {
+        //uf - user films table
+        String sql = "SELECT f.*, m.mpa_name, COALESCE(s.count_like, 0) AS rate " +
+                "FROM films AS f " +
+                "LEFT JOIN mpas AS m on m.mpa_id = f.mpa_id " +
+                "LEFT JOIN (SELECT fl.film_id, " +
+                "COUNT(fl.user_id) AS count_like " +
+                "FROM film_like AS fl " +
+                "GROUP BY fl.film_id) AS s ON f.film_id=s.film_id " +
+                "INNER JOIN " +
+                "(SELECT film_id " +
+                "FROM film_like " +
+                "WHERE user_id = " +
+                "(SELECT user_id " +
+                "FROM film_like WHERE film_id IN " +
+                "(SELECT film_id FROM film_like WHERE user_id = ?) " +
+                "AND user_id <> ? " +
+                "GROUP BY user_id " +
+                "ORDER BY COUNT(user_id) DESC " +
+                "LIMIT 1) " +
+                "AND film_id NOT IN " +
+                "(SELECT film_id FROM film_like WHERE user_id = ?)) " +
+                "AS uf ON uf.film_id = f.film_id "+
+                "ORDER BY rate DESC";
+        Collection<Film> films = jdbcTemplate.query(sql, this::makeFilm, userId, userId, userId);
+        return films;
     }
 
 }

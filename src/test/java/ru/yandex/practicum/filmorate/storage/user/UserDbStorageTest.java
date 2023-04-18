@@ -233,10 +233,4 @@ class UserDbStorageTest {
         assertThat(result).isFalse();
     }
 
-    @Test
-    void shouldReturnFilmsCollectionSize6() {
-        Collection<Film> films = userDbStorage.getRecommendations(1L);
-        assertEquals(6, films.size());
-    }
-
 }

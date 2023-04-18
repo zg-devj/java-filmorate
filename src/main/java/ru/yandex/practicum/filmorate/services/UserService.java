@@ -3,11 +3,9 @@ package ru.yandex.practicum.filmorate.services;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import ru.yandex.practicum.filmorate.utils.ValidateUtil;
-
 import java.util.Collection;
 
 @Slf4j
@@ -111,15 +109,6 @@ public class UserService {
         return userStorage.findFriends(userId);
     }
 
-    public Collection<Film> getRecommendations(Long userId) {
-        ValidateUtil.validNumberNotNull(userId, "id пользователя не должно быть null.");
-        if (!userStorage.checkUser(userId)) {
-            ValidateUtil.throwNotFound(String.format("Пользователь с %d не найден.", userId));
-        }
-        return userStorage.getRecommendations(userId);
-        //return userStorage.getRecommendationsWithSeparateMethods(userId);
-    }
-
     private String ifStringIsNullOrEmpty(String param, String toParam) {
         if (param == null || param.isBlank()) {
             // Если поле не существует или пустое
@@ -127,4 +116,5 @@ public class UserService {
         }
         return param;
     }
+
 }

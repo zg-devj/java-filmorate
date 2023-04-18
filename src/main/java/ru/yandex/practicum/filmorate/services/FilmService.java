@@ -17,6 +17,7 @@ import ru.yandex.practicum.filmorate.storage.mpa.MpaStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import ru.yandex.practicum.filmorate.utils.ValidateUtil;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -126,4 +127,13 @@ public class FilmService {
             throw new ValidationException("Пользователь уже отменил лайк к фильму.");
         }
     }
+
+    public Collection<Film> getRecommendations(Long userId) {
+        ValidateUtil.validNumberNotNull(userId, "id пользователя не должно быть null.");
+        if (!userStorage.checkUser(userId)) {
+            ValidateUtil.throwNotFound(String.format("Пользователь с %d не найден.", userId));
+        }
+        return filmStorage.getRecommendations(userId);
+    }
+
 }

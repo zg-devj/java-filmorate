@@ -9,10 +9,12 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.services.FilmService;
 import ru.yandex.practicum.filmorate.services.UserService;
 import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
 import ru.yandex.practicum.filmorate.storage.filmganre.FilmGenreDbStorage;
 import ru.yandex.practicum.filmorate.storage.filmganre.FilmGenreStorage;
+import ru.yandex.practicum.filmorate.storage.filmlike.FilmLikeDbStorage;
 import ru.yandex.practicum.filmorate.storage.genre.GenreDbStorage;
 import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.mpa.MpaDbStorage;
@@ -33,6 +35,8 @@ public class UserControllerTest {
     private GenreStorage genreStorage;
     private UserDbStorage userDbStorage;
     private UserService userService;
+    private FilmService filmService;
+    private FilmLikeDbStorage filmLikeStorage;
     private UserController userController;
 
     @BeforeEach
@@ -44,18 +48,20 @@ public class UserControllerTest {
                 .build();
         jdbcTemplate = new JdbcTemplate(embeddedDatabase);
         filmGenreStorage = new FilmGenreDbStorage(jdbcTemplate);
+        filmLikeStorage = new FilmLikeDbStorage(jdbcTemplate);
         genreStorage = new GenreDbStorage(jdbcTemplate);
         mpaStorage = new MpaDbStorage(jdbcTemplate);
         filmDbStorage = new FilmDbStorage(jdbcTemplate, mpaStorage, filmGenreStorage, genreStorage);
         userDbStorage = new UserDbStorage(jdbcTemplate, filmDbStorage);
         userService = new UserService(userDbStorage);
-        userController = new UserController(userService);
+        filmService = new FilmService(filmDbStorage, userDbStorage, mpaStorage, filmLikeStorage, filmGenreStorage);
+        userController = new UserController(userService, filmService);
     }
 
     @Test
-    void shouldReturnFilmsCollectionSize6() {
+    void shouldReturnFilmsCollectionSize0() {
         Collection<Film> films = userController.getRecommendations(1L);
-        assertEquals(6, films.size());
+        assertEquals(0, films.size());
     }
 
     @AfterEach

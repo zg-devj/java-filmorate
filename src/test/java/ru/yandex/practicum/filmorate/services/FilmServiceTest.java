@@ -25,6 +25,7 @@ import java.util.Collection;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchException;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 class FilmServiceTest {
@@ -58,6 +59,12 @@ class FilmServiceTest {
     @AfterEach
     void tearDown() {
         embeddedDatabase.shutdown();
+    }
+
+    @Test
+    void shouldReturnFilmsCollectionSize0() {
+        Collection<Film> films = filmService.getRecommendations(1L);
+        assertEquals(0, films.size());
     }
 
     @Test
