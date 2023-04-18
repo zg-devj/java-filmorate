@@ -15,9 +15,6 @@ public class MinBoundaryDateValidator implements ConstraintValidator<MinBoundary
 
     @Override
     public boolean isValid(LocalDate value, ConstraintValidatorContext constraintValidatorContext) {
-        if (value.isBefore(date)) {
-            return false;
-        }
-        return true;
+        return !value.isBefore(date);
     }
 }

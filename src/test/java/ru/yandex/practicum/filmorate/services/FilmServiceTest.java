@@ -11,7 +11,13 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.storage.director.DirectorDbStorage;
+import ru.yandex.practicum.filmorate.storage.director.DirectorStorage;
+import ru.yandex.practicum.filmorate.storage.event.EventDbStorage;
+import ru.yandex.practicum.filmorate.storage.event.EventStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
+import ru.yandex.practicum.filmorate.storage.filmdirector.FilmDirectorDbStorage;
+import ru.yandex.practicum.filmorate.storage.filmdirector.FilmDirectorStorage;
 import ru.yandex.practicum.filmorate.storage.filmganre.FilmGenreDbStorage;
 import ru.yandex.practicum.filmorate.storage.filmganre.FilmGenreStorage;
 import ru.yandex.practicum.filmorate.storage.filmlike.FilmLikeDbStorage;
@@ -37,6 +43,9 @@ class FilmServiceTest {
     private GenreStorage genreStorage;
     private FilmLikeDbStorage filmLikeDbStorage;
     private FilmService filmService;
+    private DirectorStorage directorStorage;
+    private FilmDirectorStorage filmDirectorStorage;
+    private EventStorage eventStorage;
 
     @BeforeEach
     void setUp() {
@@ -51,8 +60,12 @@ class FilmServiceTest {
         userDbStorage = new UserDbStorage(jdbcTemplate, filmDbStorage);
         genreStorage = new GenreDbStorage(jdbcTemplate);
         filmLikeDbStorage = new FilmLikeDbStorage(jdbcTemplate);
-        filmDbStorage = new FilmDbStorage(jdbcTemplate, mpaStorage, filmGenreStorage, genreStorage);
-        filmService = new FilmService(filmDbStorage, userDbStorage, mpaStorage, filmLikeDbStorage, filmGenreStorage);
+        directorStorage = new DirectorDbStorage(jdbcTemplate);
+        filmDirectorStorage = new FilmDirectorDbStorage(jdbcTemplate);
+        eventStorage = new EventDbStorage(jdbcTemplate);
+        filmDbStorage = new FilmDbStorage(jdbcTemplate, mpaStorage, filmGenreStorage, genreStorage, directorStorage, filmDirectorStorage);
+        filmService = new FilmService(filmDbStorage, userDbStorage, mpaStorage, filmLikeDbStorage, filmGenreStorage,
+                directorStorage, eventStorage);
     }
 
     @AfterEach

@@ -1,3 +1,5 @@
+-- noinspection SqlNoDataSourceInspectionForFile
+
 -- Заполнение данными
 -- добавляем жанры
 INSERT INTO genres(genre_name)
@@ -75,9 +77,11 @@ VALUES ('user4@example.com', 'user4', 'login4', '2003-01-10');
 -- добавить лайки для фильма
 INSERT INTO public.film_like(user_id, film_id)
 VALUES (1, 1);
---INSERT INTO public.film_like(user_id, film_id) VALUES (1, 2);
---INSERT INTO public.film_like(user_id, film_id) VALUES (1, 3);
---INSERT INTO public.film_like(user_id, film_id) VALUES (2, 3);
+
+INSERT INTO public.film_like(user_id, film_id) VALUES (1, 2);
+INSERT INTO public.film_like(user_id, film_id) VALUES (1, 3);
+INSERT INTO public.film_like(user_id, film_id) VALUES (2, 3);
+INSERT INTO public.film_like(user_id, film_id) VALUES (2, 4);
 --INSERT INTO public.film_like(user_id, film_id) VALUES (3, 2);
 --INSERT INTO public.film_like(user_id, film_id) VALUES (3, 3);
 --INSERT INTO public.film_like(user_id, film_id) VALUES (3, 4);
@@ -92,3 +96,20 @@ INSERT INTO friends(user_id, friend_id)
 VALUES (2, 1);
 INSERT INTO friends(user_id, friend_id)
 VALUES (2, 3);
+
+-- добавить отзыв к фильму
+INSERT INTO reviews(content, is_positive, user_id, film_id)
+VALUES ('This film is sooo bad.', false, 1, 1);
+INSERT INTO reviews(content, is_positive, user_id, film_id)
+VALUES ('This film is sooo good.', true, 2, 2);
+
+-- добавить оценку пользователя к отзыву
+INSERT INTO review_user(review_id, user_id, like_it)
+VALUES (1, 3, 1);
+INSERT INTO review_user(review_id, user_id, like_it)
+VALUES (1, 4, 1);
+
+INSERT INTO review_user(review_id, user_id, like_it)
+VALUES (2, 3, -1);
+INSERT INTO review_user(review_id, user_id, like_it)
+VALUES (2, 4, -1);

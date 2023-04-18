@@ -8,8 +8,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Фильм
@@ -51,6 +50,8 @@ public class Film {
     private Mpa mpa;
 
     private List<Genre> genres;
+
+    private Collection<Director> directors = new TreeSet<>(Comparator.comparingInt(Director::getId));
 
     private Integer rate;
 
