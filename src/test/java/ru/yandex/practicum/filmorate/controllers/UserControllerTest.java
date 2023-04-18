@@ -5,11 +5,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.services.FilmService;
+import ru.yandex.practicum.filmorate.services.UserCleanupService;
 import ru.yandex.practicum.filmorate.services.UserService;
 import ru.yandex.practicum.filmorate.storage.director.DirectorDbStorage;
 import ru.yandex.practicum.filmorate.storage.event.EventDbStorage;
@@ -33,6 +35,7 @@ public class UserControllerTest {
 
     private EmbeddedDatabase embeddedDatabase;
     private JdbcTemplate jdbcTemplate;
+    private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
     private FilmDbStorage filmDbStorage;
     private MpaStorage mpaStorage;
     private FilmGenreStorage filmGenreStorage;
@@ -45,6 +48,7 @@ public class UserControllerTest {
     private DirectorDbStorage directorStorage;
     private FilmDirectorDbStorage filmDirectorStorage;
     private EventDbStorage eventStorage;
+    private UserCleanupService userCleanupService;
 
     @BeforeEach
     void setUp() {
@@ -54,7 +58,7 @@ public class UserControllerTest {
                 .setType(EmbeddedDatabaseType.H2)
                 .build();
         jdbcTemplate = new JdbcTemplate(embeddedDatabase);
-        filmGenreStorage = new FilmGenreDbStorage(jdbcTemplate);
+        filmGenreStorage = new FilmGenreDbStorage(jdbcTemplate, namedParameterJdbcTemplate);
         filmLikeStorage = new FilmLikeDbStorage(jdbcTemplate);
         genreStorage = new GenreDbStorage(jdbcTemplate);
         directorStorage = new DirectorDbStorage(jdbcTemplate);
@@ -65,7 +69,7 @@ public class UserControllerTest {
         eventStorage = new EventDbStorage(jdbcTemplate);
         userService = new UserService(userDbStorage, eventStorage);
         filmService = new FilmService(filmDbStorage, userDbStorage, mpaStorage, filmLikeStorage, filmGenreStorage, directorStorage, eventStorage);
-        userController = new UserController(userService, filmService);
+        userController = new UserController(userService, filmService, userCleanupService);
     }
 
     @Test
