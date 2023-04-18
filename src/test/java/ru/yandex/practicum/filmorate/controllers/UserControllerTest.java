@@ -21,8 +21,7 @@ import ru.yandex.practicum.filmorate.storage.mpa.MpaDbStorage;
 import ru.yandex.practicum.filmorate.storage.mpa.MpaStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
 import java.util.Collection;
-
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 public class UserControllerTest {

@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.event.EventStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import ru.yandex.practicum.filmorate.utils.ValidateUtil;
+
 import java.util.Collection;
 
 @Slf4j

@@ -247,7 +247,7 @@ public class FilmDbStorage implements FilmStorage {
                 "LIMIT 1) " +
                 "AND film_id NOT IN " +
                 "(SELECT film_id FROM film_like WHERE user_id = ?)) " +
-                "AS uf ON uf.film_id = f.film_id "+
+                "AS uf ON uf.film_id = f.film_id " +
                 "ORDER BY rate DESC";
         Collection<Film> films = jdbcTemplate.query(sql, this::makeFilm, userId, userId, userId);
         return films;
