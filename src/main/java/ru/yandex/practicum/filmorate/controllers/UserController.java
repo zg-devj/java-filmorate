@@ -20,8 +20,8 @@ import java.util.Collection;
 @RequestMapping("/users")
 public class UserController {
     private final UserService userService;
-    private final UserCleanupService userCleanupService;
     private final FilmService filmService;
+    private final UserCleanupService userCleanupService;
 
     @GetMapping
     public Collection<User> findAllUsers() {
