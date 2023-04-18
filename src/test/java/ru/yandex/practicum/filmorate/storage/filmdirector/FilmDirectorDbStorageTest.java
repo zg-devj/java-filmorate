@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage.mpa;
+package ru.yandex.practicum.filmorate.storage.filmdirector;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
@@ -6,19 +6,23 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
-import ru.yandex.practicum.filmorate.model.Mpa;
+import ru.yandex.practicum.filmorate.model.Director;
+import ru.yandex.practicum.filmorate.model.dto.FilmDirectorDto;
 
 import java.util.Collection;
-import java.util.Optional;
+import java.util.List;
 
 @SpringBootTest
-class MpaDbStorageTest {
+class FilmDirectorDbStorageTest {
+
     private EmbeddedDatabase embeddedDatabase;
     private JdbcTemplate jdbcTemplate;
-    private MpaStorage mpaDbStorage;
+    private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+    private FilmDirectorStorage filmDirectorStorage;
 
     @BeforeEach
     void setUp() {
@@ -28,7 +32,8 @@ class MpaDbStorageTest {
                 .setType(EmbeddedDatabaseType.H2)
                 .build();
         jdbcTemplate = new JdbcTemplate(embeddedDatabase);
-        mpaDbStorage = new MpaDbStorage(jdbcTemplate);
+        namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(embeddedDatabase);
+        filmDirectorStorage = new FilmDirectorDbStorage(jdbcTemplate, namedParameterJdbcTemplate);
     }
 
     @AfterEach
@@ -37,30 +42,18 @@ class MpaDbStorageTest {
     }
 
     @Test
-    void findAllMpas_Normal() {
-        Collection<Mpa> users = mpaDbStorage.findAllMpas();
+    void getFilmDirectors() {
+        Collection<Director> directorList = filmDirectorStorage.getFilmDirectors(1L);
 
-        Assertions.assertThat(users)
-                .hasSize(5);
+        Assertions.assertThat(directorList)
+                .hasSize(2);
     }
 
     @Test
-    void findMpaById_Normal() {
-        Optional<Mpa> mpaOptional = mpaDbStorage.findMpaById(1);
-
-        Assertions.assertThat(mpaOptional)
-                .isPresent()
-                .hasValueSatisfying(user ->
-                        Assertions.assertThat(user).hasFieldOrPropertyWithValue("id", 1)
-                );
-    }
-
-    @Test
-    void findMpaById_WrongId() {
-        Optional<Mpa> mpaOptional = mpaDbStorage.findMpaById(999);
-
-        Assertions.assertThat(mpaOptional)
-                .isNotPresent()
-                .isEmpty();
+    void findFilmDirectorAll_TwoIds() {
+        List<Long> ids = List.of(1L, 2L);
+        List<FilmDirectorDto> list = filmDirectorStorage.findFilmDirectorAll(ids);
+        Assertions.assertThat(list)
+                .hasSize(4);
     }
 }

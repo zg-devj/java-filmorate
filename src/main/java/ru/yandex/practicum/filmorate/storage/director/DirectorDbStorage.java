@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.director;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
@@ -9,6 +10,7 @@ import ru.yandex.practicum.filmorate.model.Director;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
@@ -23,13 +25,17 @@ public class DirectorDbStorage implements DirectorStorage {
     }
 
     @Override
-    public Director getDirectorById(Integer directorId) {
+    public Optional<Director> getDirectorById(Integer directorId) {
         String statement = "select * from directors where director_id = ?";
-        return jdbcTemplate.queryForObject(statement, this::makeDirector, directorId);
+        try {
+            return Optional.of(jdbcTemplate.queryForObject(statement, this::makeDirector, directorId));
+        } catch (EmptyResultDataAccessException e) {
+            return Optional.empty();
+        }
     }
 
     @Override
-    public List<Director> getDirectorsById(Long filmId) {
+    public List<Director> getDirectorsByFilmId(Long filmId) {
         String statement = "select * from directors as d " +
                 "left join film_directors as fd " +
                 "on d.director_id = fd.director_id " +
@@ -69,19 +75,5 @@ public class DirectorDbStorage implements DirectorStorage {
 
     private Director makeDirector(ResultSet rs, int rowNum) throws SQLException {
         return Director.builder().id(rs.getInt("director_id")).name(rs.getString("director_name")).build();
-    }
-
-    public boolean isAllDirectorsExists(List<Integer> directorIds, Integer expectedIdsCount) {
-        String baseStatement = "SELECT COUNT (director_name) FROM directors WHERE id IN (";
-        StringBuilder queryBuilder = new StringBuilder(baseStatement);
-        for (int i = 0; i < directorIds.size(); i++) {
-            if (i == directorIds.size() - 1) {
-                queryBuilder.append(directorIds.get(i) + " )");
-            } else {
-                queryBuilder.append(directorIds.get(i) + ", ");
-            }
-        }
-        Integer dbCount = jdbcTemplate.queryForObject(queryBuilder.toString(), Integer.TYPE);
-        return dbCount == expectedIdsCount;
     }
 }

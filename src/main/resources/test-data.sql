@@ -27,6 +27,12 @@ VALUES ('R');
 INSERT INTO mpas(mpa_name)
 VALUES ('NC-17');
 
+-- добавляем режисеров
+INSERT INTO directors(director_name)
+VALUES ('Режисер 1');
+INSERT INTO directors(director_name)
+VALUES ('Режисер 2');
+
 -- добавляем фильмы
 INSERT INTO films(mpa_id, film_name, description, release_date, duration)
 VALUES (1, 'Комедия 1', 'Описание 1', '1990-11-12', 180);
@@ -60,6 +66,20 @@ INSERT INTO film_genre (film_id, genre_id)
 VALUES (4, 6);
 INSERT INTO film_genre (film_id, genre_id)
 VALUES (5, 5);
+
+-- указываем режисеров для фильмов
+INSERT INTO film_directors(director_id, film_id)
+values (1, 1);
+INSERT INTO film_directors(director_id, film_id)
+values (1, 2);
+INSERT INTO film_directors(director_id, film_id)
+values (2, 1);
+INSERT INTO film_directors(director_id, film_id)
+values (2, 2);
+INSERT INTO film_directors(director_id, film_id)
+values (2, 3);
+INSERT INTO film_directors(director_id, film_id)
+values (1, 5);
 
 -- добавляем пользователей
 INSERT INTO users(email, user_name, login, birthday)

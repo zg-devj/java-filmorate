@@ -225,7 +225,7 @@ public class FilmDbStorage implements FilmStorage {
                 .duration(rs.getInt("duration"))
                 .mpa(new Mpa(rs.getInt("mpa_id"), rs.getString("mpa_name")))
                 .genres(genreStorage.findGenresByFilmId(filmId))
-                .directors(directorStorage.getDirectorsById(filmId))
+                .directors(directorStorage.getDirectorsByFilmId(filmId))
                 .build();
     }
 
@@ -272,21 +272,42 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Collection<Film> getAllFilmsSorted(Integer directorId, String sortBy) {
-
+//        String sort;
+//
+//        StringBuilder statement = new StringBuilder("SELECT f.*, m.mpa_name, g2.genre_id, g2.genre_name, d.director_id, d.director_name," +
+//                " COALESCE(s.count_like, 0) AS rate " +
+//                "FROM films AS f " +
+//                "LEFT JOIN mpas AS m on m.mpa_id = f.mpa_id " +
+//                "LEFT JOIN (SELECT fl.film_id, " +
+//                "COUNT(fl.user_id) AS count_like " +
+//                "FROM film_like AS fl " +
+//                "GROUP BY fl.film_id) AS s ON f.film_id=s.film_id " +
+//                "LEFT JOIN film_genre AS fg on f.film_id = fg.film_id " +
+//                "LEFT JOIN genres AS g2 on g2.genre_id = fg.genre_id " +
+//                "left join film_directors as fd on f.film_id = fd.film_id " +
+//                "left join directors as d on fd.director_id = d.director_id " +
+//                "where fd.director_id = ? ");
+//        if (sortBy.contentEquals("year")) {
+//            statement.append("order by year");
+//        } else {
+//            statement.append("order by release_date");
+//        }
+//
+//        return jdbcTemplate.query(statement.toString(), getListResultSetExtractor(), directorId);
         String statement = null;
         if (sortBy.contentEquals("year")) {
             statement = "SELECT f.*, m.mpa_name, g2.genre_id, g2.genre_name, d.director_id, d.director_name," +
                     " COALESCE(s.count_like, 0) AS rate " +
                     "FROM films AS f " +
                     "LEFT JOIN mpas AS m on m.mpa_id = f.mpa_id " +
-                    "LEFT JOIN film_genre AS fg on f.film_id = fg.film_id " +
-                    "LEFT JOIN genres AS g2 on g2.genre_id = fg.genre_id " +
-                    "left join film_directors as fd on f.film_id = fd.film_id " +
-                    "left join directors as d on fd.director_id = d.director_id " +
                     "LEFT JOIN (SELECT fl.film_id, " +
                     "COUNT(fl.user_id) AS count_like " +
                     "FROM film_like AS fl " +
                     "GROUP BY fl.film_id) AS s ON f.film_id=s.film_id " +
+                    "LEFT JOIN film_genre AS fg on f.film_id = fg.film_id " +
+                    "LEFT JOIN genres AS g2 on g2.genre_id = fg.genre_id " +
+                    "left join film_directors as fd on f.film_id = fd.film_id " +
+                    "left join directors as d on fd.director_id = d.director_id " +
                     "where fd.director_id = ? order by release_date";
 
         } else {
@@ -294,18 +315,16 @@ public class FilmDbStorage implements FilmStorage {
                     "COALESCE(s.count_like, 0) AS rate " +
                     "FROM films AS f " +
                     "LEFT JOIN mpas AS m on m.mpa_id = f.mpa_id " +
-                    "LEFT JOIN film_genre AS fg on f.film_id = fg.film_id " +
-                    "LEFT JOIN genres AS g2 on g2.genre_id = fg.genre_id " +
-                    "left join film_directors as fd on f.film_id = fd.film_id " +
-                    "left join directors as d on fd.director_id = d.director_id " +
                     "LEFT JOIN (SELECT fl.film_id, " +
                     "COUNT(fl.user_id) AS count_like " +
                     "FROM film_like AS fl " +
                     "GROUP BY fl.film_id) AS s ON f.film_id=s.film_id " +
+                    "LEFT JOIN film_genre AS fg on f.film_id = fg.film_id " +
+                    "LEFT JOIN genres AS g2 on g2.genre_id = fg.genre_id " +
+                    "left join film_directors as fd on f.film_id = fd.film_id " +
+                    "left join directors as d on fd.director_id = d.director_id " +
                     "where fd.director_id = ? order by rate";
         }
-
-        Collection<Film> list = jdbcTemplate.query(statement, this::makeFilm, directorId);
-        return list;
+        return jdbcTemplate.query(statement, getListResultSetExtractor(), directorId);
     }
 }

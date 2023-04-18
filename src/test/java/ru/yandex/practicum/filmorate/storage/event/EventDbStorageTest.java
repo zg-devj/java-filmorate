@@ -20,9 +20,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.catchException;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-
 @SpringBootTest
 public class EventDbStorageTest {
     private EmbeddedDatabase embeddedDatabase;

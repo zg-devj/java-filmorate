@@ -2,7 +2,7 @@ package ru.yandex.practicum.filmorate.storage.reviewuser;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.DuplicateKeyException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
@@ -20,8 +20,8 @@ public class ReviewUserDbStorage implements ReviewUserStorage {
                 + "VALUES (?, ?, ?)";
         try {
             jdbcTemplate.update(sql, reviewId, userId, 1);
-        } catch (DuplicateKeyException e) {
-            throw new ValidationException("Невозможно поставить лайк отзыву");
+        } catch (DataIntegrityViolationException e) {
+            throw new ValidationException("Невозможно поставить лайк отзыву.");
         }
     }
 
@@ -32,8 +32,8 @@ public class ReviewUserDbStorage implements ReviewUserStorage {
                 + "VALUES (?, ?, ?)";
         try {
             jdbcTemplate.update(sql, reviewId, userId, -1);
-        } catch (DuplicateKeyException e) {
-            throw new ValidationException("Невозможно поставить дизлайк отзыву");
+        } catch (DataIntegrityViolationException e) {
+            throw new ValidationException("Невозможно поставить дизлайк отзыву.");
         }
     }
 

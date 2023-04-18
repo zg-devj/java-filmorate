@@ -31,9 +31,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.catchException;
-
 @SpringBootTest
 class FilmDbStorageTest {
     private EmbeddedDatabase embeddedDatabase;
@@ -83,7 +80,9 @@ class FilmDbStorageTest {
     void findFilmById_Normal() {
         Optional<Film> filmOptional = filmDbStorage.findFilmById(1L);
 
-        Assertions.assertThat(filmOptional).isPresent().hasValueSatisfying(film -> Assertions.assertThat(film).hasFieldOrPropertyWithValue("id", 1L));
+        Assertions.assertThat(filmOptional).isPresent()
+                .hasValueSatisfying(film -> Assertions.assertThat(film)
+                        .hasFieldOrPropertyWithValue("id", 1L));
     }
 
     @Test

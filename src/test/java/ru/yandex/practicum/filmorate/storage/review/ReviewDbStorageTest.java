@@ -17,9 +17,6 @@ import ru.yandex.practicum.filmorate.storage.reviewuser.ReviewUserStorage;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.catchException;
-
 @SpringBootTest
 class ReviewDbStorageTest {
     private EmbeddedDatabase embeddedDatabase;

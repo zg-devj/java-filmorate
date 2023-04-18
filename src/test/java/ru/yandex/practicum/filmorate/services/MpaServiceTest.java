@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage.mpa;
+package ru.yandex.practicum.filmorate.services;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
@@ -9,16 +9,20 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Mpa;
+import ru.yandex.practicum.filmorate.storage.mpa.MpaDbStorage;
+import ru.yandex.practicum.filmorate.storage.mpa.MpaStorage;
 
 import java.util.Collection;
-import java.util.Optional;
 
 @SpringBootTest
-class MpaDbStorageTest {
+class MpaServiceTest {
+
     private EmbeddedDatabase embeddedDatabase;
     private JdbcTemplate jdbcTemplate;
-    private MpaStorage mpaDbStorage;
+    private MpaStorage mpaStorage;
+    private MpaService mpaService;
 
     @BeforeEach
     void setUp() {
@@ -28,7 +32,8 @@ class MpaDbStorageTest {
                 .setType(EmbeddedDatabaseType.H2)
                 .build();
         jdbcTemplate = new JdbcTemplate(embeddedDatabase);
-        mpaDbStorage = new MpaDbStorage(jdbcTemplate);
+        mpaStorage = new MpaDbStorage(jdbcTemplate);
+        mpaService = new MpaService(mpaStorage);
     }
 
     @AfterEach
@@ -38,29 +43,25 @@ class MpaDbStorageTest {
 
     @Test
     void findAllMpas_Normal() {
-        Collection<Mpa> users = mpaDbStorage.findAllMpas();
-
-        Assertions.assertThat(users)
+        Collection<Mpa> mpas = mpaService.findAllMpas();
+        Assertions.assertThat(mpas)
                 .hasSize(5);
     }
 
     @Test
     void findMpaById_Normal() {
-        Optional<Mpa> mpaOptional = mpaDbStorage.findMpaById(1);
-
-        Assertions.assertThat(mpaOptional)
-                .isPresent()
-                .hasValueSatisfying(user ->
-                        Assertions.assertThat(user).hasFieldOrPropertyWithValue("id", 1)
-                );
+        Mpa mpa = mpaService.findMpaById(1);
+        Assertions.assertThat(mpa)
+                .hasFieldOrPropertyWithValue("id", 1)
+                .hasFieldOrPropertyWithValue("name", "G");
     }
 
     @Test
     void findMpaById_WrongId() {
-        Optional<Mpa> mpaOptional = mpaDbStorage.findMpaById(999);
+        Throwable thrown = Assertions.catchException(() -> mpaService.findMpaById(999));
 
-        Assertions.assertThat(mpaOptional)
-                .isNotPresent()
-                .isEmpty();
+        Assertions.assertThat(thrown)
+                .isInstanceOf(NotFoundException.class)
+                .hasMessageContaining(String.format("Рейтинг с %d не найден.", 999));
     }
 }
