@@ -108,6 +108,18 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
+    public void removeFriendsByUserId(Long userId) {
+        String sql = "DELETE FROM friends WHERE user_id=? OR friend_id=?";
+        jdbcTemplate.update(sql, userId, userId);
+    }
+
+    @Override
+    public void removeUser(Long userId) {
+        String sql = "DELETE FROM users WHERE user_id=?";
+        jdbcTemplate.update(sql, userId);
+    }
+
+    @Override
     public Collection<User> findFriends(Long userId) {
         String sql = "SELECT * FROM users " +
                 "WHERE user_id IN " +

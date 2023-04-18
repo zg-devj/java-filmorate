@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
@@ -32,6 +33,7 @@ import static org.assertj.core.api.Assertions.catchException;
 class UserDbStorageTest {
     private EmbeddedDatabase embeddedDatabase;
     private JdbcTemplate jdbcTemplate;
+    private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
     private UserDbStorage userDbStorage;
     private FilmDbStorage filmDbStorage;
     private MpaStorage mpaStorage;
@@ -48,7 +50,7 @@ class UserDbStorageTest {
                 .setType(EmbeddedDatabaseType.H2)
                 .build();
         jdbcTemplate = new JdbcTemplate(embeddedDatabase);
-        filmGenreStorage = new FilmGenreDbStorage(jdbcTemplate);
+        filmGenreStorage = new FilmGenreDbStorage(jdbcTemplate, namedParameterJdbcTemplate);
         genreStorage = new GenreDbStorage(jdbcTemplate);
         mpaStorage = new MpaDbStorage(jdbcTemplate);
         directorStorage = new DirectorDbStorage(jdbcTemplate);

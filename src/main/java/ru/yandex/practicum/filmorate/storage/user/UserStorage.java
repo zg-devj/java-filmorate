@@ -24,4 +24,7 @@ public interface UserStorage {
 
     Boolean checkUser(Long userId);
 
+    void removeFriendsByUserId(Long userId);
+
+    void removeUser(Long userId);
 }

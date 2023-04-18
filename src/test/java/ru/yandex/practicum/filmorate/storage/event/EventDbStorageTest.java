@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
@@ -37,6 +38,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 public class EventDbStorageTest {
     private EmbeddedDatabase embeddedDatabase;
     private JdbcTemplate jdbcTemplate;
+    private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
     private EventStorage eventStorage;
     private UserStorage userStorage;
     private MpaStorage mpaStorage;
@@ -55,7 +57,7 @@ public class EventDbStorageTest {
         jdbcTemplate = new JdbcTemplate(embeddedDatabase);
         eventStorage = new EventDbStorage(jdbcTemplate);
         mpaStorage = new MpaDbStorage(jdbcTemplate);
-        filmGenreStorage = new FilmGenreDbStorage(jdbcTemplate);
+        filmGenreStorage = new FilmGenreDbStorage(jdbcTemplate, namedParameterJdbcTemplate);
         genreStorage = new GenreDbStorage(jdbcTemplate);
         directorStorage = new DirectorDbStorage(jdbcTemplate);
         filmDirectorStorage = new FilmDirectorDbStorage(jdbcTemplate);

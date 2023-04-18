@@ -87,20 +87,33 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public List<Film> findPopularFilms(int limit) {
-        String sql = "SELECT f.*, m.mpa_name, g2.genre_id, " +
-                "g2.genre_name, d.director_id, d.director_name, COALESCE(s.count_like, 0) AS rate " +
+//        String sql = "SELECT f.*, m.mpa_name, g2.genre_id, " +
+//                "g2.genre_name, d.director_id, d.director_name, COALESCE(s.count_like, 0) AS rate " +
+//                "FROM films as f " +
+//                "LEFT JOIN mpas AS m on f.mpa_id = m.mpa_id " +
+//                "LEFT JOIN film_genre AS fg on f.film_id = fg.film_id " +
+//                "LEFT JOIN genres AS g2 on g2.genre_id = fg.genre_id " +
+//                "left join film_directors as fd on f.film_id = fd.film_id " +
+//                "left join directors as d on fd.director_id = d.director_id " +
+//                "LEFT JOIN (SELECT fl.film_id, COUNT(fl.user_id) AS count_like " +
+//                "FROM film_like AS fl " +
+//                "GROUP BY fl.film_id " +
+//                "LIMIT ?) AS s ON f.film_id = s.film_id " +
+//                "ORDER BY rate DESC LIMIT ?";
+//        return jdbcTemplate.query(sql, getListResultSetExtractor(), limit, limit);
+        StringBuilder sql = new StringBuilder("SELECT f.*, " +
+                "m.mpa_name, " +
+                "COALESCE(s.count_like, 0) AS rate " +
                 "FROM films as f " +
                 "LEFT JOIN mpas AS m on f.mpa_id = m.mpa_id " +
-                "LEFT JOIN film_genre AS fg on f.film_id = fg.film_id " +
-                "LEFT JOIN genres AS g2 on g2.genre_id = fg.genre_id " +
-                "left join film_directors as fd on f.film_id = fd.film_id " +
-                "left join directors as d on fd.director_id = d.director_id " +
                 "LEFT JOIN (SELECT fl.film_id, COUNT(fl.user_id) AS count_like " +
                 "FROM film_like AS fl " +
-                "GROUP BY fl.film_id " +
-                "LIMIT ?) AS s ON f.film_id = s.film_id " +
-                "ORDER BY rate DESC LIMIT ?";
-        return jdbcTemplate.query(sql, getListResultSetExtractor(), limit, limit);
+                "GROUP BY fl.film_id) AS s ON f.film_id = s.film_id " +
+                "LEFT JOIN film_genre AS fg on f.film_id = fg.film_id ");
+        sql.append("GROUP BY f.film_id " +
+                "ORDER BY rate DESC " +
+                "LIMIT ?");
+        return jdbcTemplate.query(sql.toString(), this::makeFilmEmp, limit);
     }
 
     @Override
@@ -224,6 +237,21 @@ public class FilmDbStorage implements FilmStorage {
                 .build();
     }
 
+    private Film makeFilmEmp(ResultSet rs, int rowNum) throws SQLException {
+        Long filmId = rs.getLong("film_id");
+        return Film.builder()
+                .id(filmId)
+                .name(rs.getString("film_name"))
+                .description(rs.getString("description"))
+                .releaseDate(rs.getDate("release_date").toLocalDate())
+                .rate(rs.getInt("rate"))
+                .duration(rs.getInt("duration"))
+                .mpa(new Mpa(rs.getInt("mpa_id"), rs.getString("mpa_name")))
+                .genres(new ArrayList<>())
+                .directors(new HashSet<>())
+                .build();
+    }
+
     @Override
     public Collection<Film> getRecommendations(Long userId) {
         //uf - user films table
@@ -319,6 +347,19 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
+    public void deleteLikesByFilmId(Long id) {
+        String sql = "DELETE FROM film_like "
+                + "WHERE film_id=?";
+        jdbcTemplate.update(sql, id);
+    }
+
+    @Override
+    public void deleteFilm(Long id) {
+        String sql = "DELETE FROM films "
+                + "WHERE film_id=?";
+        jdbcTemplate.update(sql, id);
+    }
+
     public List<Film> searchForMoviesByDescription(String query, String by) {
         List<Film> films = new ArrayList<>();
 

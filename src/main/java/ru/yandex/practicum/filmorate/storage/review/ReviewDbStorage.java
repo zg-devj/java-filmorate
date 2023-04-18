@@ -119,6 +119,13 @@ public class ReviewDbStorage implements ReviewStorage {
         jdbcTemplate.update(sql, userId);
     }
 
+    @Override
+    public void deleteAllReviewByFilmId(Long filmId) {
+        String sql = "DELETE FROM reviews "
+                + "WHERE film_id=?";
+        jdbcTemplate.update(sql, filmId);
+    }
+
     private Review makeReview(ResultSet rs, int rowNum) throws SQLException {
         return Review.builder()
                 .reviewId(rs.getLong("review_id"))
