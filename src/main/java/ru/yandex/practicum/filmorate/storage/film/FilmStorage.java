@@ -20,10 +20,11 @@ public interface FilmStorage {
 
     Boolean checkFilm(Long filmId);
 
+    Collection<Film> getRecommendations(Long userId);
+
     List<Film> sharedUserMovies(Long userId, Long friendId);
 
     Collection<Film> getAllFilmsSorted(Integer directorId, String sortBy);
 
     List<Film> searchForMoviesByDescription(String title, String director);
-
 }

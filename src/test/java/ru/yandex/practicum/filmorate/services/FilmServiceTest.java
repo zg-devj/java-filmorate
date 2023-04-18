@@ -31,6 +31,7 @@ import java.util.Collection;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchException;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 class FilmServiceTest {
@@ -57,7 +58,7 @@ class FilmServiceTest {
         jdbcTemplate = new JdbcTemplate(embeddedDatabase);
         mpaStorage = new MpaDbStorage(jdbcTemplate);
         filmGenreStorage = new FilmGenreDbStorage(jdbcTemplate);
-        userDbStorage = new UserDbStorage(jdbcTemplate);
+        userDbStorage = new UserDbStorage(jdbcTemplate, filmDbStorage);
         genreStorage = new GenreDbStorage(jdbcTemplate);
         filmLikeDbStorage = new FilmLikeDbStorage(jdbcTemplate);
         directorStorage = new DirectorDbStorage(jdbcTemplate);
@@ -71,6 +72,12 @@ class FilmServiceTest {
     @AfterEach
     void tearDown() {
         embeddedDatabase.shutdown();
+    }
+
+    @Test
+    void shouldReturnFilmsCollectionSize1() {
+        Collection<Film> films = filmService.getRecommendations(1L);
+        assertEquals(1, films.size());
     }
 
     @Test
