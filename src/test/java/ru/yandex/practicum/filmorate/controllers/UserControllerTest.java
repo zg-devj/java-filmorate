@@ -11,7 +11,12 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.services.FilmService;
 import ru.yandex.practicum.filmorate.services.UserService;
+import ru.yandex.practicum.filmorate.storage.director.DirectorDbStorage;
+import ru.yandex.practicum.filmorate.storage.director.DirectorStorage;
+import ru.yandex.practicum.filmorate.storage.event.EventDbStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
+import ru.yandex.practicum.filmorate.storage.filmdirector.FilmDirectorDbStorage;
+import ru.yandex.practicum.filmorate.storage.filmdirector.FilmDirectorStorage;
 import ru.yandex.practicum.filmorate.storage.filmganre.FilmGenreDbStorage;
 import ru.yandex.practicum.filmorate.storage.filmganre.FilmGenreStorage;
 import ru.yandex.practicum.filmorate.storage.filmlike.FilmLikeDbStorage;
@@ -37,6 +42,9 @@ public class UserControllerTest {
     private FilmService filmService;
     private FilmLikeDbStorage filmLikeStorage;
     private UserController userController;
+    private DirectorDbStorage directorStorage;
+    private FilmDirectorDbStorage filmDirectorStorage;
+    private EventDbStorage eventStorage;
 
     @BeforeEach
     void setUp() {
@@ -49,11 +57,14 @@ public class UserControllerTest {
         filmGenreStorage = new FilmGenreDbStorage(jdbcTemplate);
         filmLikeStorage = new FilmLikeDbStorage(jdbcTemplate);
         genreStorage = new GenreDbStorage(jdbcTemplate);
+        directorStorage = new DirectorDbStorage(jdbcTemplate);
+        filmDirectorStorage = new FilmDirectorDbStorage(jdbcTemplate);
         mpaStorage = new MpaDbStorage(jdbcTemplate);
-        filmDbStorage = new FilmDbStorage(jdbcTemplate, mpaStorage, filmGenreStorage, genreStorage);
+        filmDbStorage = new FilmDbStorage(jdbcTemplate, mpaStorage, filmGenreStorage, genreStorage, directorStorage, filmDirectorStorage);
         userDbStorage = new UserDbStorage(jdbcTemplate, filmDbStorage);
-        userService = new UserService(userDbStorage);
-        filmService = new FilmService(filmDbStorage, userDbStorage, mpaStorage, filmLikeStorage, filmGenreStorage);
+        eventStorage = new EventDbStorage(jdbcTemplate);
+        userService = new UserService(userDbStorage, eventStorage);
+        filmService = new FilmService(filmDbStorage, userDbStorage, mpaStorage, filmLikeStorage, filmGenreStorage, directorStorage, eventStorage);
         userController = new UserController(userService, filmService);
     }
 

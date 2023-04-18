@@ -11,7 +11,9 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.director.DirectorDbStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
+import ru.yandex.practicum.filmorate.storage.filmdirector.FilmDirectorDbStorage;
 import ru.yandex.practicum.filmorate.storage.filmganre.FilmGenreDbStorage;
 import ru.yandex.practicum.filmorate.storage.filmganre.FilmGenreStorage;
 import ru.yandex.practicum.filmorate.storage.genre.GenreDbStorage;
@@ -35,6 +37,8 @@ class UserDbStorageTest {
     private MpaStorage mpaStorage;
     private FilmGenreStorage filmGenreStorage;
     private GenreStorage genreStorage;
+    private DirectorDbStorage directorStorage;
+    private FilmDirectorDbStorage filmDirectorStorage;
 
     @BeforeEach
     void setUp() {
@@ -47,7 +51,9 @@ class UserDbStorageTest {
         filmGenreStorage = new FilmGenreDbStorage(jdbcTemplate);
         genreStorage = new GenreDbStorage(jdbcTemplate);
         mpaStorage = new MpaDbStorage(jdbcTemplate);
-        filmDbStorage = new FilmDbStorage(jdbcTemplate, mpaStorage, filmGenreStorage, genreStorage);
+        directorStorage = new DirectorDbStorage(jdbcTemplate);
+        filmDirectorStorage = new FilmDirectorDbStorage(jdbcTemplate);
+        filmDbStorage = new FilmDbStorage(jdbcTemplate, mpaStorage, filmGenreStorage, genreStorage, directorStorage, filmDirectorStorage);
         userDbStorage = new UserDbStorage(jdbcTemplate, filmDbStorage);
     }
 
