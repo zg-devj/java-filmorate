@@ -1,10 +1,12 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
@@ -36,7 +38,8 @@ import static org.assertj.core.api.Assertions.catchException;
 class FilmDbStorageTest {
     private EmbeddedDatabase embeddedDatabase;
     private JdbcTemplate jdbcTemplate;
-    private FilmDbStorage filmDbStorage;
+    private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+    private FilmStorage filmDbStorage;
     private MpaStorage mpaStorage;
     private FilmGenreStorage filmGenreStorage;
     private GenreStorage genreStorage;
@@ -48,11 +51,12 @@ class FilmDbStorageTest {
     void setUp() {
         embeddedDatabase = new EmbeddedDatabaseBuilder().addScript("schema.sql").addScript("test-data.sql").setType(EmbeddedDatabaseType.H2).build();
         jdbcTemplate = new JdbcTemplate(embeddedDatabase);
+        namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(embeddedDatabase);
         mpaStorage = new MpaDbStorage(jdbcTemplate);
-        filmGenreStorage = new FilmGenreDbStorage(jdbcTemplate);
+        filmGenreStorage = new FilmGenreDbStorage(jdbcTemplate, namedParameterJdbcTemplate);
         genreStorage = new GenreDbStorage(jdbcTemplate);
         directorStorage = new DirectorDbStorage(jdbcTemplate);
-        filmDirectorStorage = new FilmDirectorDbStorage(jdbcTemplate);
+        filmDirectorStorage = new FilmDirectorDbStorage(jdbcTemplate, namedParameterJdbcTemplate);
         filmDbStorage = new FilmDbStorage(jdbcTemplate, mpaStorage, filmGenreStorage, genreStorage, directorStorage, filmDirectorStorage);
     }
 
@@ -65,28 +69,28 @@ class FilmDbStorageTest {
     void findAllFilms_Normal() {
         Collection<Film> films = filmDbStorage.findAllFilms();
 
-        assertThat(films).hasSize(6);
+        Assertions.assertThat(films).hasSize(6);
     }
 
     @Test
     void findPopularFilms_Normal() {
-        Collection<Film> films = filmDbStorage.findPopularFilms(10);
+        Collection<Film> films = filmDbStorage.findPopularFilms(null, null, 10);
 
-        assertThat(films).hasSize(6).first().hasFieldOrPropertyWithValue("id", 3L);
+        Assertions.assertThat(films).hasSize(6).first().hasFieldOrPropertyWithValue("id", 3L);
     }
 
     @Test
     void findFilmById_Normal() {
         Optional<Film> filmOptional = filmDbStorage.findFilmById(1L);
 
-        assertThat(filmOptional).isPresent().hasValueSatisfying(film -> assertThat(film).hasFieldOrPropertyWithValue("id", 1L));
+        Assertions.assertThat(filmOptional).isPresent().hasValueSatisfying(film -> Assertions.assertThat(film).hasFieldOrPropertyWithValue("id", 1L));
     }
 
     @Test
     void findFilmById_WrongId() {
         Optional<Film> filmOptional = filmDbStorage.findFilmById(999L);
 
-        assertThat(filmOptional).isNotPresent().isEmpty();
+        Assertions.assertThat(filmOptional).isNotPresent().isEmpty();
     }
 
     @Test
@@ -98,10 +102,10 @@ class FilmDbStorageTest {
 
         Optional<Film> filmOptional = filmDbStorage.findFilmById(id);
 
-        assertThat(filmOptional).isPresent().hasValueSatisfying(film -> assertThat(film).hasFieldOrPropertyWithValue("id", 7L).hasFieldOrPropertyWithValue("name", "film"));
-        assertThat(filmOptional.get().getGenres()).hasSize(2);
+        Assertions.assertThat(filmOptional).isPresent().hasValueSatisfying(film -> Assertions.assertThat(film).hasFieldOrPropertyWithValue("id", 7L).hasFieldOrPropertyWithValue("name", "film"));
+        Assertions.assertThat(filmOptional.get().getGenres()).hasSize(2);
 
-        assertThat(filmOptional.get().getMpa()).hasFieldOrPropertyWithValue("id", 1);
+        Assertions.assertThat(filmOptional.get().getMpa()).hasFieldOrPropertyWithValue("id", 1);
     }
 
     @Test
@@ -117,10 +121,10 @@ class FilmDbStorageTest {
 
         Optional<Film> filmOptional = filmDbStorage.findFilmById(filmUpdated.getId());
 
-        assertThat(filmOptional).isPresent().hasValueSatisfying(film -> assertThat(film).hasFieldOrPropertyWithValue("id", 1L).hasFieldOrPropertyWithValue("name", "filmname"));
-        assertThat(filmOptional.get().getGenres()).hasSize(1).first().hasFieldOrPropertyWithValue("id", genre.getId());
+        Assertions.assertThat(filmOptional).isPresent().hasValueSatisfying(film -> Assertions.assertThat(film).hasFieldOrPropertyWithValue("id", 1L).hasFieldOrPropertyWithValue("name", "filmname"));
+        Assertions.assertThat(filmOptional.get().getGenres()).hasSize(1).first().hasFieldOrPropertyWithValue("id", genre.getId());
 
-        assertThat(filmOptional.get().getMpa()).hasFieldOrPropertyWithValue("id", mpa.getId());
+        Assertions.assertThat(filmOptional.get().getMpa()).hasFieldOrPropertyWithValue("id", mpa.getId());
     }
 
     @Test
@@ -128,9 +132,9 @@ class FilmDbStorageTest {
         Film filmUpdated = Film.builder().id(999L).name("name").description("description")
                 .releaseDate(LocalDate.of(2000, 1, 1))
                 .duration(100).mpa(mpaStorage.findMpaById(1).get()).build();
-        Throwable thrown = catchException(() -> filmDbStorage.updateFilm(filmUpdated));
+        Throwable thrown = Assertions.catchException(() -> filmDbStorage.updateFilm(filmUpdated));
 
-        assertThat(thrown).isInstanceOf(NotFoundException.class)
+        Assertions.assertThat(thrown).isInstanceOf(NotFoundException.class)
                 .hasMessageContaining(String.format("Фильм с id=%d не существует.", filmUpdated.getId()));
     }
 
@@ -138,21 +142,21 @@ class FilmDbStorageTest {
     void checkFilm_Normal() {
         Boolean result = filmDbStorage.checkFilm(1L);
 
-        assertThat(result).isTrue();
+        Assertions.assertThat(result).isTrue();
     }
 
     @Test
     void checkFilm_WrongId() {
         Boolean result = filmDbStorage.checkFilm(999L);
 
-        assertThat(result).isFalse();
+        Assertions.assertThat(result).isFalse();
     }
 
     @Test
     void sharedUserMovies_Normal() {
         List<Film> sharedMovies = filmDbStorage.sharedUserMovies(1L, 2L);
 
-        assertThat(sharedMovies)
+        Assertions.assertThat(sharedMovies)
                 .isNotEmpty()
                 .hasSize(1)
                 .first().hasFieldOrPropertyWithValue("id", 3L);

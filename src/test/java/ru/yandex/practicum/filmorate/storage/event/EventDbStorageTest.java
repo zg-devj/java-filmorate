@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.event;
 
 import org.assertj.core.api.Assertions;
+import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -55,12 +56,12 @@ public class EventDbStorageTest {
         userStorage.createUser(user);
         eventStorage.addEvent(1L, 2L, EventStorage.TypeName.FRIEND, EventStorage.OperationName.ADD);
         List<Event> events = eventStorage.getEventsByUserId(1L);
-        assertThat(events.get(0).getEntityId()).isEqualTo(2);
+        AssertionsForClassTypes.assertThat(events.get(0).getEntityId()).isEqualTo(2);
     }
 
     @Test
     public void testAddEventWithInvalidUserId() {
-        Throwable thrown = catchException(() -> eventStorage.addEvent(1L, 2L, EventStorage.TypeName.FRIEND,
+        Throwable thrown = Assertions.catchException(() -> eventStorage.addEvent(1L, 2L, EventStorage.TypeName.FRIEND,
                 EventStorage.OperationName.ADD));
 
         Assertions.assertThat(thrown)
@@ -79,9 +80,9 @@ public class EventDbStorageTest {
         eventStorage.addEvent(1L, 1L, EventStorage.TypeName.LIKE, EventStorage.OperationName.ADD);
         eventStorage.addEvent(1L, 6L, EventStorage.TypeName.REVIEW, EventStorage.OperationName.ADD);
         List<Event> events = eventStorage.getEventsByUserId(1L);
-        assertThat(events.get(0).getEntityId()).isEqualTo(3);
-        assertThat(events.get(1).getEntityId()).isEqualTo(1);
-        assertThat(events.get(2).getEntityId()).isEqualTo(6);
+        AssertionsForClassTypes.assertThat(events.get(0).getEntityId()).isEqualTo(3);
+        AssertionsForClassTypes.assertThat(events.get(1).getEntityId()).isEqualTo(1);
+        AssertionsForClassTypes.assertThat(events.get(2).getEntityId()).isEqualTo(6);
     }
 
     @Test
@@ -97,6 +98,6 @@ public class EventDbStorageTest {
         eventStorage.addEvent(1L, 6L, EventStorage.TypeName.REVIEW, EventStorage.OperationName.ADD);
         eventStorage.removeEventsByUserId(1L);
         List<Event> events = eventStorage.getEventsByUserId(1L);
-        assertThat(events).isEqualTo(new ArrayList<>());
+        AssertionsForClassTypes.assertThat(events).isEqualTo(new ArrayList<>());
     }
 }

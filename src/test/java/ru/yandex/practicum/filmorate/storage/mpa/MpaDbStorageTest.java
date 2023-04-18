@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.mpa;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class MpaDbStorageTest {
     private EmbeddedDatabase embeddedDatabase;
     private JdbcTemplate jdbcTemplate;
-    private MpaDbStorage mpaDbStorage;
+    private MpaStorage mpaDbStorage;
 
     @BeforeEach
     void setUp() {
@@ -41,7 +42,7 @@ class MpaDbStorageTest {
     void findAllMpas_Normal() {
         Collection<Mpa> users = mpaDbStorage.findAllMpas();
 
-        assertThat(users)
+        Assertions.assertThat(users)
                 .hasSize(5);
     }
 
@@ -49,10 +50,10 @@ class MpaDbStorageTest {
     void findMpaById_Normal() {
         Optional<Mpa> mpaOptional = mpaDbStorage.findMpaById(1);
 
-        assertThat(mpaOptional)
+        Assertions.assertThat(mpaOptional)
                 .isPresent()
                 .hasValueSatisfying(user ->
-                        assertThat(user).hasFieldOrPropertyWithValue("id", 1)
+                        Assertions.assertThat(user).hasFieldOrPropertyWithValue("id", 1)
                 );
     }
 
@@ -60,7 +61,7 @@ class MpaDbStorageTest {
     void findMpaById_WrongId() {
         Optional<Mpa> mpaOptional = mpaDbStorage.findMpaById(999);
 
-        assertThat(mpaOptional)
+        Assertions.assertThat(mpaOptional)
                 .isNotPresent()
                 .isEmpty();
     }

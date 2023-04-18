@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.genre;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class GenreDbStorageTest {
     private EmbeddedDatabase embeddedDatabase;
     private JdbcTemplate jdbcTemplate;
-    private GenreDbStorage genreDbStorage;
+    private GenreStorage genreDbStorage;
 
     @BeforeEach
     void setUp() {
@@ -41,7 +42,7 @@ class GenreDbStorageTest {
     void findAllGenres_Normal() {
         Collection<Genre> genres = genreDbStorage.findAllGenres();
 
-        assertThat(genres)
+        Assertions.assertThat(genres)
                 .hasSize(6);
     }
 
@@ -49,10 +50,10 @@ class GenreDbStorageTest {
     void findGenreById_Normal() {
         Optional<Genre> genreOptional = genreDbStorage.findGenreById(1);
 
-        assertThat(genreOptional)
+        Assertions.assertThat(genreOptional)
                 .isPresent()
                 .hasValueSatisfying(user ->
-                        assertThat(user).hasFieldOrPropertyWithValue("id", 1)
+                        Assertions.assertThat(user).hasFieldOrPropertyWithValue("id", 1)
                 );
     }
 
@@ -60,7 +61,7 @@ class GenreDbStorageTest {
     void findGenreById_WrongId() {
         Optional<Genre> genreOptional = genreDbStorage.findGenreById(999);
 
-        assertThat(genreOptional)
+        Assertions.assertThat(genreOptional)
                 .isNotPresent()
                 .isEmpty();
     }
@@ -71,7 +72,7 @@ class GenreDbStorageTest {
 
         Optional<Genre> genre = genreDbStorage.findGenreById(3);
 
-        assertThat(genres)
+        Assertions.assertThat(genres)
                 .hasSize(2)
                 .contains(genre.get());
     }
@@ -80,7 +81,7 @@ class GenreDbStorageTest {
     void findGenresByFilmId_WrongId() {
         Collection<Genre> genres = genreDbStorage.findGenresByFilmId(999L);
 
-        assertThat(genres)
+        Assertions.assertThat(genres)
                 .hasSize(0);
     }
 }

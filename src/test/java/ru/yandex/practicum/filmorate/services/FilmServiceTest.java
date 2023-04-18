@@ -1,11 +1,13 @@
 package ru.yandex.practicum.filmorate.services;
 
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
@@ -28,14 +30,14 @@ import ru.yandex.practicum.filmorate.storage.mpa.MpaStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
 
 import java.util.Collection;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.catchException;
+import java.util.List;
+import java.util.Optional;
 
 @SpringBootTest
 class FilmServiceTest {
     private EmbeddedDatabase embeddedDatabase;
     private JdbcTemplate jdbcTemplate;
+    private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
     private FilmDbStorage filmDbStorage;
     private UserDbStorage userDbStorage;
     private MpaStorage mpaStorage;
@@ -55,17 +57,18 @@ class FilmServiceTest {
                 .setType(EmbeddedDatabaseType.H2)
                 .build();
         jdbcTemplate = new JdbcTemplate(embeddedDatabase);
+        namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(embeddedDatabase);
         mpaStorage = new MpaDbStorage(jdbcTemplate);
-        filmGenreStorage = new FilmGenreDbStorage(jdbcTemplate);
+        filmGenreStorage = new FilmGenreDbStorage(jdbcTemplate, namedParameterJdbcTemplate);
         userDbStorage = new UserDbStorage(jdbcTemplate);
         genreStorage = new GenreDbStorage(jdbcTemplate);
         filmLikeDbStorage = new FilmLikeDbStorage(jdbcTemplate);
         directorStorage = new DirectorDbStorage(jdbcTemplate);
-        filmDirectorStorage = new FilmDirectorDbStorage(jdbcTemplate);
+        filmDirectorStorage = new FilmDirectorDbStorage(jdbcTemplate, namedParameterJdbcTemplate);
         eventStorage = new EventDbStorage(jdbcTemplate);
         filmDbStorage = new FilmDbStorage(jdbcTemplate, mpaStorage, filmGenreStorage, genreStorage, directorStorage, filmDirectorStorage);
         filmService = new FilmService(filmDbStorage, userDbStorage, mpaStorage, filmLikeDbStorage, filmGenreStorage,
-                directorStorage, eventStorage);
+                directorStorage, filmDirectorStorage, eventStorage);
     }
 
     @AfterEach
@@ -78,9 +81,10 @@ class FilmServiceTest {
         filmService.likeFilm(5L, 1L);
         filmService.likeFilm(5L, 2L);
 
-        Collection<Film> films = filmService.findPopularFilms(1);
+        Collection<Film> films = filmService.findPopularFilms(Optional.empty(),
+                Optional.empty(), 1);
 
-        assertThat(films)
+        Assertions.assertThat(films)
                 .hasSize(1)
                 .filteredOn(film -> film.getRate() == 2)
                 .filteredOn(film -> film.getId() == 5L);
@@ -90,16 +94,17 @@ class FilmServiceTest {
     void likeFilm_Exception_TwoLikeFromOneUser() {
         filmService.likeFilm(5L, 1L);
 
-        Collection<Film> films = filmService.findPopularFilms(1);
+        Collection<Film> films = filmService.findPopularFilms(Optional.empty(),
+                Optional.empty(), 1);
 
-        assertThat(films)
+        Assertions.assertThat(films)
                 .hasSize(1)
                 .filteredOn(film -> film.getRate() == 1)
                 .filteredOn(film -> film.getId() == 5L);
 
-        Throwable thrown = catchException(() -> filmService.likeFilm(5L, 1L));
+        Throwable thrown = Assertions.catchException(() -> filmService.likeFilm(5L, 1L));
 
-        assertThat(thrown)
+        Assertions.assertThat(thrown)
                 .isInstanceOf(ValidationException.class)
                 .hasMessageContaining("Пользователь уже поставил лайк к фильму.");
     }
@@ -108,9 +113,10 @@ class FilmServiceTest {
     void dislikeFilm_Normal() {
         filmService.dislikeFilm(1L, 1L);
 
-        Collection<Film> films = filmService.findPopularFilms(1);
+        Collection<Film> films = filmService.findPopularFilms(Optional.empty(),
+                Optional.empty(), 1);
 
-        assertThat(films)
+        Assertions.assertThat(films)
                 .hasSize(1)
                 .filteredOn(film -> film.getRate() == 0)
                 .filteredOn(film -> film.getId() == 1L);
@@ -120,10 +126,53 @@ class FilmServiceTest {
     void dislikeFilm_Exception_TwoDislike() {
         filmService.dislikeFilm(1L, 1L);
 
-        Throwable thrown = catchException(() -> filmService.dislikeFilm(1L, 1L));
+        Throwable thrown = Assertions.catchException(() -> filmService.dislikeFilm(1L, 1L));
 
-        assertThat(thrown)
+        Assertions.assertThat(thrown)
                 .isInstanceOf(ValidationException.class)
                 .hasMessageContaining("Пользователь уже отменил лайк к фильму.");
     }
+
+    @Test
+    void findPopularFilms_Top10() {
+        List<Film> films = filmService.findPopularFilms(Optional.empty(), Optional.empty(), 10);
+        Assertions.assertThat(films)
+                .hasSize(6)
+                .first()
+                .hasFieldOrPropertyWithValue("id", 3L);
+    }
+
+    @Test
+    void findPopularFilms_Top10_GenreId1_ReturnFilmId1() {
+        List<Film> films = filmService.findPopularFilms(
+                Optional.of(1), Optional.empty(), 10);
+
+        Assertions.assertThat(films)
+                .hasSize(1)
+                .first()
+                .hasFieldOrPropertyWithValue("id", 1L);
+    }
+
+    @Test
+    void findPopularFilms_Top10_Year2002_ReturnFilmId2() {
+        List<Film> films = filmService.findPopularFilms(
+                Optional.empty(), Optional.of(2002), 10);
+
+        Assertions.assertThat(films)
+                .hasSize(2)
+                .first()
+                .hasFieldOrPropertyWithValue("id", 2L);
+    }
+
+    @Test
+    void findPopularFilms_Top10_GenreId1_Year2002_ReturnFilmId2() {
+        List<Film> films = filmService.findPopularFilms(
+                Optional.of(2), Optional.of(2002), 10);
+
+        Assertions.assertThat(films)
+                .hasSize(1)
+                .first()
+                .hasFieldOrPropertyWithValue("id", 2L);
+    }
+
 }

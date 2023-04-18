@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.user;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,7 +24,7 @@ import static org.assertj.core.api.Assertions.catchException;
 class UserDbStorageTest {
     private EmbeddedDatabase embeddedDatabase;
     private JdbcTemplate jdbcTemplate;
-    private UserDbStorage userDbStorage;
+    private UserStorage userDbStorage;
 
     @BeforeEach
     void setUp() {
@@ -45,7 +46,7 @@ class UserDbStorageTest {
     void findAllUsers_Normal() {
         Collection<User> users = userDbStorage.findAllUsers();
 
-        assertThat(users)
+        Assertions.assertThat(users)
                 .hasSize(4);
     }
 
@@ -53,7 +54,7 @@ class UserDbStorageTest {
     void findBothUserFriends_Normal() {
         Collection<User> users = userDbStorage.findBothUserFriends(1L, 2L);
 
-        assertThat(users)
+        Assertions.assertThat(users)
                 .hasSize(1);
     }
 
@@ -61,7 +62,7 @@ class UserDbStorageTest {
     void findBothUserFriends_IsEmpty() {
         Collection<User> users = userDbStorage.findBothUserFriends(1L, 3L);
 
-        assertThat(users)
+        Assertions.assertThat(users)
                 .isEmpty();
     }
 
@@ -69,10 +70,10 @@ class UserDbStorageTest {
     void findUserById_Normal() {
         Optional<User> userOptional = userDbStorage.findUserById(1L);
 
-        assertThat(userOptional)
+        Assertions.assertThat(userOptional)
                 .isPresent()
                 .hasValueSatisfying(user ->
-                        assertThat(user).hasFieldOrPropertyWithValue("id", 1L)
+                        Assertions.assertThat(user).hasFieldOrPropertyWithValue("id", 1L)
                 );
     }
 
@@ -80,7 +81,7 @@ class UserDbStorageTest {
     void findUserById_WrongId() {
         Optional<User> userOptional = userDbStorage.findUserById(999L);
 
-        assertThat(userOptional)
+        Assertions.assertThat(userOptional)
                 .isNotPresent()
                 .isEmpty();
     }
@@ -97,10 +98,10 @@ class UserDbStorageTest {
 
         Optional<User> userOptional = userDbStorage.findUserById(id);
 
-        assertThat(userOptional)
+        Assertions.assertThat(userOptional)
                 .isPresent()
                 .hasValueSatisfying(user ->
-                        assertThat(user)
+                        Assertions.assertThat(user)
                                 .hasFieldOrPropertyWithValue("id", 5L)
                                 .hasFieldOrPropertyWithValue("email", "newuser@example.com")
                 );
@@ -119,10 +120,10 @@ class UserDbStorageTest {
 
         Optional<User> userOptional = userDbStorage.findUserById(user1.getId());
 
-        assertThat(userOptional)
+        Assertions.assertThat(userOptional)
                 .isPresent()
                 .hasValueSatisfying(user ->
-                        assertThat(user)
+                        Assertions.assertThat(user)
                                 .hasFieldOrPropertyWithValue("id", 4L)
                                 .hasFieldOrPropertyWithValue("email", "user4updated@example.com")
                                 .hasFieldOrPropertyWithValue("login", "login4updated")
@@ -139,8 +140,8 @@ class UserDbStorageTest {
                 .birthday(LocalDate.of(2000, 10, 12))
                 .build();
 
-        Throwable thrown = catchException(() -> userDbStorage.updateUser(user1));
-        assertThat(thrown)
+        Throwable thrown = Assertions.catchException(() -> userDbStorage.updateUser(user1));
+        Assertions.assertThat(thrown)
                 .isInstanceOf(NotFoundException.class)
                 .hasMessageContaining(String.format("Пользователя с id=%d не существует.", user1.getId()));
     }
@@ -151,15 +152,15 @@ class UserDbStorageTest {
 
         Collection<User> friends = userDbStorage.findFriends(1L);
 
-        assertThat(friends)
+        Assertions.assertThat(friends)
                 .hasSize(3);
     }
 
     @Test
     void addFriend_WrongFriendId() {
         Long friendId = 999L;
-        Throwable thrown = catchException(() -> userDbStorage.addFriend(1L, friendId));
-        assertThat(thrown)
+        Throwable thrown = Assertions.catchException(() -> userDbStorage.addFriend(1L, friendId));
+        Assertions.assertThat(thrown)
                 .isInstanceOf(ValidationException.class)
                 .hasMessageContaining("Нарушение ссылочной целостности");
 
@@ -169,15 +170,15 @@ class UserDbStorageTest {
     void removeFriend_Normal() {
         userDbStorage.removeFriend(1L, 2L);
         Collection<User> friends = userDbStorage.findFriends(1L);
-        assertThat(friends)
+        Assertions.assertThat(friends)
                 .hasSize(1);
     }
 
     @Test
     void removeFriend_WrongFriendId() {
         Long friendId = 999L;
-        Throwable thrown = catchException(() -> userDbStorage.removeFriend(1L, friendId));
-        assertThat(thrown)
+        Throwable thrown = Assertions.catchException(() -> userDbStorage.removeFriend(1L, friendId));
+        Assertions.assertThat(thrown)
                 .isInstanceOf(NotFoundException.class)
                 .hasMessageContaining(String.format("Пользователя с id=%d не существует.", friendId));
     }
@@ -188,7 +189,7 @@ class UserDbStorageTest {
 
         Optional<User> userOptional = userDbStorage.findUserById(2L);
 
-        assertThat(users)
+        Assertions.assertThat(users)
                 .hasSize(2)
                 .contains(userOptional.get());
     }
@@ -197,7 +198,7 @@ class UserDbStorageTest {
     void findFriends_Empty() {
         Collection<User> users = userDbStorage.findFriends(3L);
 
-        assertThat(users)
+        Assertions.assertThat(users)
                 .hasSize(0)
                 .isEmpty();
     }
@@ -206,13 +207,13 @@ class UserDbStorageTest {
     void checkUser_Normal() {
         Boolean result = userDbStorage.checkUser(1L);
 
-        assertThat(result).isTrue();
+        Assertions.assertThat(result).isTrue();
     }
 
     @Test
     void checkUser_WrongIf() {
         Boolean result = userDbStorage.checkUser(999L);
 
-        assertThat(result).isFalse();
+        Assertions.assertThat(result).isFalse();
     }
 }
