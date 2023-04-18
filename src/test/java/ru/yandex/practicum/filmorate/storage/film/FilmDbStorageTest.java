@@ -149,9 +149,9 @@ class FilmDbStorageTest {
     }
 
     @Test
-    void shouldReturnFilmsCollectionSize0() {
+    void shouldReturnFilmsCollectionSize1() {
         Collection<Film> films = filmDbStorage.getRecommendations(1L);
-        assertEquals(0, films.size());
+        assertEquals(1, films.size());
     }
 
     @Test

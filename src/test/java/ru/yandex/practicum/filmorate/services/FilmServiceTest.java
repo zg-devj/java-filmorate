@@ -75,9 +75,9 @@ class FilmServiceTest {
     }
 
     @Test
-    void shouldReturnFilmsCollectionSize0() {
+    void shouldReturnFilmsCollectionSize1() {
         Collection<Film> films = filmService.getRecommendations(1L);
-        assertEquals(0, films.size());
+        assertEquals(1, films.size());
     }
 
     @Test

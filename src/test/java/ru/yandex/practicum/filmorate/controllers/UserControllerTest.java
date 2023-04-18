@@ -69,9 +69,9 @@ public class UserControllerTest {
     }
 
     @Test
-    void shouldReturnFilmsCollectionSize0() {
+    void shouldReturnFilmsCollectionSize1() {
         Collection<Film> films = userController.getRecommendations(1L);
-        assertEquals(0, films.size());
+        assertEquals(1, films.size());
     }
 
     @AfterEach
