@@ -151,6 +151,16 @@ public class FilmService {
         }
     }
 
+
+    public Collection<Film> getRecommendations(Long userId) {
+        ValidateUtil.validNumberNotNull(userId, "id пользователя не должно быть null.");
+        if (!userStorage.checkUser(userId)) {
+            ValidateUtil.throwNotFound(String.format("Пользователь с %d не найден.", userId));
+        }
+        return filmStorage.getRecommendations(userId);
+    }
+
+
     public List<Film> sharedUserMovies(Long userId, Long friendId) { // получение общих фильмов пользователей
         ValidateUtil.validNumberNotNull(userId, "id пользователя не должно быть null.");
         ValidateUtil.validNumberNotNull(friendId, "id пользователя не должно быть null.");
@@ -161,5 +171,10 @@ public class FilmService {
             ValidateUtil.throwNotFound(String.format("Пользователь с %d не найден.", friendId));
         }
         return filmStorage.sharedUserMovies(userId, friendId);
+    }
+
+    public List<Film> searchForMoviesByDescription(String query, String by) {
+        log.info("Запрошен фильм по ключевым словам: {}", query);
+        return filmStorage.searchForMoviesByDescription(query, by);
     }
 }
