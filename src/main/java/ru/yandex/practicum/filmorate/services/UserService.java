@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.event.EventStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import ru.yandex.practicum.filmorate.utils.ValidateUtil;
 import java.util.Collection;
@@ -13,6 +14,7 @@ import java.util.Collection;
 @Service
 public class UserService {
     private final UserStorage userStorage;
+    private final EventStorage eventStorage;
 
     // вернуть всех пользователей
     public Collection<User> findAllUsers() {
@@ -64,6 +66,7 @@ public class UserService {
 
         userStorage.addFriend(userId, friendId);
         log.info("Пользователь с id={} добавил друга с id={}.", userId, friendId);
+        eventStorage.addEvent(userId, friendId, EventStorage.TypeName.FRIEND, EventStorage.OperationName.ADD);
     }
 
     // удаление из друзей
@@ -80,6 +83,7 @@ public class UserService {
 
         userStorage.removeFriend(userId, friendId);
         log.info("Пользователь с id={} удалил из друзей пользователя с id={}.", userId, friendId);
+        eventStorage.addEvent(userId, friendId, EventStorage.TypeName.FRIEND, EventStorage.OperationName.REMOVE);
     }
 
     // список друзей, общих с другим пользователем.

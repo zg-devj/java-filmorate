@@ -98,3 +98,20 @@ VALUES ('NC-17');
 -- VALUES (2, 1);
 -- INSERT INTO friends(user_id, friend_id)
 -- VALUES (2, 3);
+--
+-- -- добавить отзыв к фильму
+-- INSERT INTO reviews(content, is_positive, user_id, film_id)
+-- VALUES ('This film is sooo bad.', false, 1, 1);
+-- INSERT INTO reviews(content, is_positive, user_id, film_id)
+-- VALUES ('This film is sooo good.', true, 2, 2);
+--
+-- -- добавить оценку пользователя к отзыву
+-- INSERT INTO review_user(review_id, user_id, like_it)
+-- VALUES (1, 3, 1);
+-- INSERT INTO review_user(review_id, user_id, like_it)
+-- VALUES (1, 4, 1);
+--
+-- INSERT INTO review_user(review_id, user_id, like_it)
+-- VALUES (2, 3, -1);
+-- INSERT INTO review_user(review_id, user_id, like_it)
+-- VALUES (2, 4, -1);

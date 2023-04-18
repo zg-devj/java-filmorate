@@ -9,6 +9,7 @@ import ru.yandex.practicum.filmorate.model.MessageResponse;
 import ru.yandex.practicum.filmorate.services.FilmService;
 
 import javax.validation.Valid;
+import java.util.Collection;
 import java.util.List;
 
 @Slf4j
@@ -30,6 +31,13 @@ public class FilmController {
     ) {
         log.info("GET /films/{} - запрос фильма.", id);
         return filmService.findFilmById(id);
+    }
+
+    @GetMapping("/director/{directorId}")
+    public Collection<Film> getDirectorFilms(@PathVariable Integer directorId,
+                                             @RequestParam(required = true) String sortBy) {
+        log.info(String.format("Пришёл запрос на получение режиссера с id = %d, сортировка по %s", directorId, sortBy));
+        return filmService.getAllFilmsByDirectorSorted(directorId, sortBy);
     }
 
     @PostMapping
@@ -68,5 +76,22 @@ public class FilmController {
         log.info("PUT /films/{}/like/{} - запрос на удаление лайка.", id, userId);
         filmService.dislikeFilm(id, userId);
         return ResponseEntity.ok(new MessageResponse("Лайк удален!"));
+    }
+
+    @GetMapping("/common")
+    public List<Film> sharedUserMovies(
+            @RequestParam Long userId, Long friendId
+    ) {
+        log.info("GET /common - запрос общих фильмов пользователей");
+        return filmService.sharedUserMovies(userId, friendId);
+    }
+
+    @GetMapping("/search")
+    public List<Film> searchForMoviesByDescription(
+            @RequestParam String query,
+            @RequestParam(name = "by", required = false) String by
+    ) {
+        log.info("GET /films/search?query=" + query + "&by= " + by);
+        return filmService.searchForMoviesByDescription(query, by);
     }
 }

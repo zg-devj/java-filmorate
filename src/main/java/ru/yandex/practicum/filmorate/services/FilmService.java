@@ -6,11 +6,10 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
-import ru.yandex.practicum.filmorate.model.dto.FilmGenreDto;
+import ru.yandex.practicum.filmorate.storage.director.DirectorStorage;
+import ru.yandex.practicum.filmorate.storage.event.EventStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.filmganre.FilmGenreDbStorage;
 import ru.yandex.practicum.filmorate.storage.filmganre.FilmGenreStorage;
 import ru.yandex.practicum.filmorate.storage.filmlike.FilmLikeStorage;
 import ru.yandex.practicum.filmorate.storage.mpa.MpaStorage;
@@ -19,8 +18,6 @@ import ru.yandex.practicum.filmorate.utils.ValidateUtil;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -31,21 +28,12 @@ public class FilmService {
     private final MpaStorage mpaStorage;
     private final FilmLikeStorage likeStorage;
     private final FilmGenreStorage filmGenreDbStorage;
+    private final DirectorStorage directorStorage;
+    private final EventStorage eventStorage;
 
     // вернуть все фильмы
     public List<Film> findAllFilms() {
         List<Film> allFilms = filmStorage.findAllFilms();
-        List<FilmGenreDto> filmGenreList = filmGenreDbStorage.findFilmGenreAll();
-        for (Film film : allFilms) {
-            film.setGenres(
-                    filmGenreList.stream().filter(f -> Objects.equals(film.getId(), f.getFilmId()))
-                            .map(o -> Genre.builder()
-                                    .id(o.getGenreId())
-                                    .name(o.getGenreName())
-                                    .build())
-                            .collect(Collectors.toList())
-            );
-        }
         log.info("Запрошены все фильмы в количестве {}.", allFilms.size());
         return allFilms;
     }
@@ -90,6 +78,16 @@ public class FilmService {
         return filmStorage.findPopularFilms(count);
     }
 
+    public Collection<Film> getAllFilmsByDirectorSorted(Integer directorId, String sortBy) {
+        if (!directorStorage.isDirectorExists(directorId)) {
+            throw new NotFoundException("Режиссёр не найден");
+        }
+        if (sortBy == null || !(sortBy.contentEquals("year") || sortBy.contentEquals("likes"))) {
+            throw new NotFoundException("Недопустимый признак для сортировки");
+        }
+        return filmStorage.getAllFilmsSorted(directorId, sortBy);
+    }
+
     // пользователь ставит лайк фильму
     public void likeFilm(Long id, Long userId) {
         ValidateUtil.validNumberNotNull(id, "id фильма не должно быть null.");
@@ -103,6 +101,7 @@ public class FilmService {
         if (likeStorage.create(userId, id)) {
             // пользователь ставит лайк
             log.info("Пользователь с id={} поставил лайк фильму с id={}.", userId, id);
+            eventStorage.addEvent(userId, id, EventStorage.TypeName.LIKE, EventStorage.OperationName.ADD);
         } else {
             log.info("Пользователь с id={} уже ставил лайк фильму с id={}.", userId, id);
             throw new ValidationException("Пользователь уже поставил лайк к фильму.");
@@ -122,11 +121,13 @@ public class FilmService {
         if (likeStorage.delete(userId, id)) {
             // пользователь удаляет лайк
             log.info("Пользователь с id={} отменил лайк фильму с id={}.", userId, id);
+            eventStorage.addEvent(userId, id, EventStorage.TypeName.LIKE, EventStorage.OperationName.REMOVE);
         } else {
             log.info("У пользователя с id={} нет лайка к фильму с id={}. Нельзя отменить лайк.", userId, id);
             throw new ValidationException("Пользователь уже отменил лайк к фильму.");
         }
     }
+
 
     public Collection<Film> getRecommendations(Long userId) {
         ValidateUtil.validNumberNotNull(userId, "id пользователя не должно быть null.");
@@ -136,4 +137,21 @@ public class FilmService {
         return filmStorage.getRecommendations(userId);
     }
 
+
+    public List<Film> sharedUserMovies(Long userId, Long friendId) { // получение общих фильмов пользователей
+        ValidateUtil.validNumberNotNull(userId, "id пользователя не должно быть null.");
+        ValidateUtil.validNumberNotNull(friendId, "id пользователя не должно быть null.");
+        if (!userStorage.checkUser(userId)) {
+            ValidateUtil.throwNotFound(String.format("Пользователь с %d не найден.", userId));
+        }
+        if (!userStorage.checkUser(friendId)) {
+            ValidateUtil.throwNotFound(String.format("Пользователь с %d не найден.", friendId));
+        }
+        return filmStorage.sharedUserMovies(userId, friendId);
+    }
+
+    public List<Film> searchForMoviesByDescription(String query, String by) {
+        log.info("Запрошен фильм по ключевым словам: {}", query);
+        return filmStorage.searchForMoviesByDescription(query, by);
+    }
 }
