@@ -48,10 +48,11 @@ class ReviewUserDbStorageTest {
         Optional<Review> reviewOptional = reviewStorage.findReviewById(1L);
         Assertions.assertThat(reviewOptional)
                 .isPresent()
-                .hasValueSatisfying(review ->
-                        {
-                            Assertions.assertThat(review).hasFieldOrPropertyWithValue("reviewId", 1L);
-                            Assertions.assertThat(review).hasFieldOrPropertyWithValue("useful", 3L);
+                .hasValueSatisfying(review -> {
+                            Assertions.assertThat(review)
+                                    .hasFieldOrPropertyWithValue("reviewId", 1L);
+                            Assertions.assertThat(review)
+                                    .hasFieldOrPropertyWithValue("useful", 3L);
                         }
                 );
     }
@@ -89,10 +90,11 @@ class ReviewUserDbStorageTest {
         Optional<Review> reviewOptional = reviewStorage.findReviewById(1L);
         Assertions.assertThat(reviewOptional)
                 .isPresent()
-                .hasValueSatisfying(review ->
-                        {
-                            Assertions.assertThat(review).hasFieldOrPropertyWithValue("reviewId", 1L);
-                            Assertions.assertThat(review).hasFieldOrPropertyWithValue("useful", 1L);
+                .hasValueSatisfying(review -> {
+                            Assertions.assertThat(review)
+                                    .hasFieldOrPropertyWithValue("reviewId", 1L);
+                            Assertions.assertThat(review)
+                                    .hasFieldOrPropertyWithValue("useful", 1L);
                         }
                 );
     }
@@ -130,10 +132,11 @@ class ReviewUserDbStorageTest {
         Optional<Review> reviewOptional = reviewStorage.findReviewById(1L);
         Assertions.assertThat(reviewOptional)
                 .isPresent()
-                .hasValueSatisfying(review ->
-                        {
-                            Assertions.assertThat(review).hasFieldOrPropertyWithValue("reviewId", 1L);
-                            Assertions.assertThat(review).hasFieldOrPropertyWithValue("useful", 1L);
+                .hasValueSatisfying(review -> {
+                            Assertions.assertThat(review)
+                                    .hasFieldOrPropertyWithValue("reviewId", 1L);
+                            Assertions.assertThat(review)
+                                    .hasFieldOrPropertyWithValue("useful", 1L);
                         }
                 );
     }
