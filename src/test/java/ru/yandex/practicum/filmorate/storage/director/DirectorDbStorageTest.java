@@ -115,8 +115,10 @@ public class DirectorDbStorageTest {
                 .isPresent()
                 .hasValueSatisfying(director ->
                         {
-                            Assertions.assertThat(director).hasFieldOrPropertyWithValue("id", 1);
-                            Assertions.assertThat(director).hasFieldOrPropertyWithValue("name", "Режисер с именем");
+                            Assertions.assertThat(director)
+                                    .hasFieldOrPropertyWithValue("id", 1);
+                            Assertions.assertThat(director)
+                                    .hasFieldOrPropertyWithValue("name", "Режисер с именем");
                         }
                 );
 
