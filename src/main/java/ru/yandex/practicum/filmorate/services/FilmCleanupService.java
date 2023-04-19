@@ -38,7 +38,7 @@ public class FilmCleanupService {
         filmDirectorStorage.deleteRecords(id);
 
         //удалить события
-        eventStorage.removeEventsByFilmEntityId(id);
+        //eventStorage.removeEventsByFilmEntityId(id);
 
         //Удалить фильм
         filmStorage.deleteFilm(id);

@@ -38,10 +38,10 @@ public class UserCleanupService {
         reviewStorage.deleteAllReviewByUserId(id);
 
         //удалить ленту событий пользователя
-        eventStorage.removeEventsByUserId(id);
+        //eventStorage.removeEventsByUserId(id);
 
         //удалить пользователя из лент событий других пользователей
-        eventStorage.removeEventsByUserEntityId(id);
+        //eventStorage.removeEventsByUserEntityId(id);
 
         //удалить пользователя
         userStorage.removeUser(id);

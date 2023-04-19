@@ -14,6 +14,7 @@ public class FilmLikeDbStorage implements FilmLikeStorage {
 
     @Override
     public boolean create(Long userId, Long filmId) {
+        delete(userId, filmId);
         String sql = "INSERT INTO film_like "
                 + "(user_id, film_id) "
                 + "VALUES (?,?)";
