@@ -30,7 +30,7 @@ public class ReviewService {
             reviews = reviewStorage.findAllReviews(limit);
             log.info("Возвращаем {} отзывово всех фильмом", limit);
         } else {
-            validFilm(filmId.get());
+            checkFilm(filmId.get());
             reviews = reviewStorage.findAllReviewsByFilmId(filmId.get(), limit);
             log.info("Возвращаем {} отзывово на фильм {}", limit, filmId.get());
         }
@@ -50,8 +50,8 @@ public class ReviewService {
     }
 
     public Review createReview(Review review) {
-        validUser(review.getUserId());
-        validFilm(review.getFilmId());
+        checkUser(review.getUserId());
+        checkFilm(review.getFilmId());
         Review created = reviewStorage.createReview(review);
         log.info("Отзыв с id={} добавлен.", created.getReviewId());
         eventStorage.addEvent(review.getUserId(), review.getReviewId(), EventStorage.TypeName.REVIEW,
@@ -60,9 +60,9 @@ public class ReviewService {
     }
 
     public Review updateReview(Review review) {
-        validReview(review.getReviewId());
-        validUser(review.getUserId());
-        validFilm(review.getFilmId());
+        checkReview(review.getReviewId());
+        checkUser(review.getUserId());
+        checkFilm(review.getFilmId());
         Review updated = reviewStorage.updateReview(review);
         log.info("Отзыв с id={} обновлен.", updated.getReviewId());
         eventStorage.addEvent(updated.getUserId(), updated.getReviewId(), EventStorage.TypeName.REVIEW,
@@ -81,40 +81,40 @@ public class ReviewService {
     }
 
     public void likeReview(Long reviewId, Long userId) {
-        validReview(reviewId);
-        validUser(userId);
+        checkReview(reviewId);
+        checkUser(userId);
         reviewUserStorage.delete(reviewId, userId);
         reviewUserStorage.createLike(reviewId, userId);
     }
 
     public void dislikeReview(Long reviewId, Long userId) {
-        validReview(reviewId);
-        validUser(userId);
+        checkReview(reviewId);
+        checkUser(userId);
         reviewUserStorage.delete(reviewId, userId);
         reviewUserStorage.createDislike(reviewId, userId);
     }
 
     public void deleteLikeDislikeReview(Long reviewId, Long userId) {
-        validReview(reviewId);
-        validUser(userId);
+        checkReview(reviewId);
+        checkUser(userId);
         reviewUserStorage.delete(reviewId, userId);
     }
 
-    private void validReview(Long reviewId) {
+    private void checkReview(Long reviewId) {
         ValidateUtil.validNumberNotNull(reviewId, "id отзыва не должно быть null.");
         if (!reviewStorage.checkReview(reviewId)) {
             ValidateUtil.throwNotFound(String.format("Отзыв с %d не найден.", reviewId));
         }
     }
 
-    private void validUser(Long userId) {
+    private void checkUser(Long userId) {
         ValidateUtil.validNumberNotNull(userId, "id пользователя не должно быть null.");
         if (!userStorage.checkUser(userId)) {
             ValidateUtil.throwNotFound(String.format("Пользователь с %d не найден.", userId));
         }
     }
 
-    private void validFilm(Long filmId) {
+    private void checkFilm(Long filmId) {
         ValidateUtil.validNumberNotNull(filmId, "id фильма не должно быть null.");
         if (!filmStorage.checkFilm(filmId)) {
             ValidateUtil.throwNotFound(String.format("Фильм с %d не найден.", filmId));

@@ -37,10 +37,6 @@ public class FilmCleanupService {
         //удалить информацию о режиссерах
         filmDirectorStorage.deleteRecords(id);
 
-        // TODO: 19.04.2023 DEL
-        //удалить события
-        //eventStorage.removeEventsByFilmEntityId(id);
-
         //Удалить фильм
         filmStorage.deleteFilm(id);
     }

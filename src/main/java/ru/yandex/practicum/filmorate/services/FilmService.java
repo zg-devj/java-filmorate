@@ -125,14 +125,8 @@ public class FilmService {
 
     // пользователь ставит лайк фильму
     public void likeFilm(Long id, Long userId) {
-        ValidateUtil.validNumberNotNull(id, "id фильма не должно быть null.");
-        ValidateUtil.validNumberNotNull(userId, "id пользователя не должно быть null.");
-        if (!filmStorage.checkFilm(id)) {
-            ValidateUtil.throwNotFound(String.format("Фильм с %d не найден.", id));
-        }
-        if (!userStorage.checkUser(userId)) {
-            ValidateUtil.throwNotFound(String.format("Пользователь с %d не найден.", userId));
-        }
+        checkFilm(id);
+        checkUser(userId);
         if (likeStorage.create(userId, id)) {
             // пользователь ставит лайк
             log.info("Пользователь с id={} поставил лайк фильму с id={}.", userId, id);
@@ -145,14 +139,8 @@ public class FilmService {
 
     // пользователь удаляет лайк
     public void dislikeFilm(Long id, Long userId) {
-        ValidateUtil.validNumberNotNull(id, "id фильма не должно быть null.");
-        ValidateUtil.validNumberNotNull(userId, "id пользователя не должно быть null.");
-        if (!filmStorage.checkFilm(id)) {
-            ValidateUtil.throwNotFound(String.format("Фильм с %d не найден.", id));
-        }
-        if (!userStorage.checkUser(userId)) {
-            ValidateUtil.throwNotFound(String.format("Пользователь с %d не найден.", userId));
-        }
+        checkFilm(id);
+        checkUser(userId);
         if (likeStorage.delete(userId, id)) {
             // пользователь удаляет лайк
             log.info("Пользователь с id={} отменил лайк фильму с id={}.", userId, id);
@@ -165,28 +153,33 @@ public class FilmService {
 
 
     public Collection<Film> getRecommendations(Long userId) {
-        ValidateUtil.validNumberNotNull(userId, "id пользователя не должно быть null.");
-        if (!userStorage.checkUser(userId)) {
-            ValidateUtil.throwNotFound(String.format("Пользователь с %d не найден.", userId));
-        }
+        checkUser(userId);
         return filmStorage.getRecommendations(userId);
     }
 
 
     public List<Film> sharedUserMovies(Long userId, Long friendId) { // получение общих фильмов пользователей
-        ValidateUtil.validNumberNotNull(userId, "id пользователя не должно быть null.");
-        ValidateUtil.validNumberNotNull(friendId, "id пользователя не должно быть null.");
-        if (!userStorage.checkUser(userId)) {
-            ValidateUtil.throwNotFound(String.format("Пользователь с %d не найден.", userId));
-        }
-        if (!userStorage.checkUser(friendId)) {
-            ValidateUtil.throwNotFound(String.format("Пользователь с %d не найден.", friendId));
-        }
+        checkUser(userId);
+        checkUser(friendId);
         return filmStorage.sharedUserMovies(userId, friendId);
     }
 
     public List<Film> searchForMoviesByDescription(String query, String by) {
         log.info("Запрошен фильм по ключевым словам: {}", query);
         return filmStorage.searchForMoviesByDescription(query, by);
+    }
+
+    private void checkFilm(Long filmId) {
+        ValidateUtil.validNumberNotNull(filmId, "id фильма не должно быть null.");
+        if (!filmStorage.checkFilm(filmId)) {
+            ValidateUtil.throwNotFound(String.format("Фильм с %d не найден.", filmId));
+        }
+    }
+
+    private void checkUser(Long userId) {
+        ValidateUtil.validNumberNotNull(userId, "id пользователя не должно быть null.");
+        if (!userStorage.checkUser(userId)) {
+            ValidateUtil.throwNotFound(String.format("Пользователь с %d не найден.", userId));
+        }
     }
 }

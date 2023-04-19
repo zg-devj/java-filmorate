@@ -37,7 +37,7 @@ public class UserController {
         return userService.findUserById(id);
     }
 
-    @GetMapping ("/{id}/recommendations")
+    @GetMapping("/{id}/recommendations")
     public Collection<Film> getRecommendations(@PathVariable Long id) {
         log.info("GET /{}/recommendations - запрос рекомендаций для пользователя.", id);
         return filmService.getRecommendations(id);
@@ -57,7 +57,7 @@ public class UserController {
 
     // удалить пользователя
     @DeleteMapping("/{id}")
-    public ResponseEntity removeUser(@PathVariable Long id) {
+    public ResponseEntity<MessageResponse> removeUser(@PathVariable Long id) {
         log.info("DELETE /users/{} - запрос на удаление пользователя.", id);
         userCleanupService.removeUserById(id);
         return ResponseEntity.ok(new MessageResponse("Пользователь удален."));
@@ -65,7 +65,7 @@ public class UserController {
 
     // добавление в друзья
     @PutMapping("/{id}/friends/{friendId}")
-    public ResponseEntity addFriend(
+    public ResponseEntity<MessageResponse> addFriend(
             @PathVariable Long id,
             @PathVariable Long friendId
 
@@ -77,7 +77,7 @@ public class UserController {
 
     // удаление из друзей
     @DeleteMapping("/{id}/friends/{friendId}")
-    public ResponseEntity removeFriend(
+    public ResponseEntity<MessageResponse> removeFriend(
             @PathVariable Long id,
             @PathVariable Long friendId
 
