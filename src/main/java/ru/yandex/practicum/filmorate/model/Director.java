@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,8 +17,9 @@ import java.util.Map;
 public class Director {
 
     private Integer id;
-    @NotNull
-    @NotBlank
+
+    @NotBlank(message = "Имя директора не может быть пустым.")
+    @Size(max = 50, message = "Длина имени режисера не должна быть больше 50 символов.")
     private String name;
 
     public Map<String, Object> toMap() {

@@ -1,13 +1,16 @@
 package ru.yandex.practicum.filmorate.services;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.storage.director.DirectorStorage;
+import ru.yandex.practicum.filmorate.utils.ValidateUtil;
 
 import java.util.Collection;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class DirectorService {
@@ -19,10 +22,15 @@ public class DirectorService {
     }
 
     public Director getDirectorById(Integer id) {
-        if (!directorStorage.isDirectorExists(id)) {
-            throw new NotFoundException(String.format("Режиссера с id %d нет в базе", id));
-        }
-        return directorStorage.getDirectorById(id);
+        ValidateUtil.validNumberNotNull(id, "id жанра не должно быть null.");
+        Director director = directorStorage.getDirectorById(id).orElseThrow(
+                () -> {
+                    ValidateUtil.throwNotFound(String.format("Режиссера с id %d нет в базе", id));
+                    return null;
+                }
+        );
+        log.info("Запрошен фильм c id={}.", id);
+        return director;
     }
 
     public Director createDirector(Director director) {

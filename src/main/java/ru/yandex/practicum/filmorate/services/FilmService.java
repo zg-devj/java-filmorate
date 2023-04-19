@@ -5,23 +5,23 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
+import ru.yandex.practicum.filmorate.model.dto.FilmDirectorDto;
 import ru.yandex.practicum.filmorate.model.dto.FilmGenreDto;
 import ru.yandex.practicum.filmorate.storage.director.DirectorStorage;
 import ru.yandex.practicum.filmorate.storage.event.EventStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.filmdirector.FilmDirectorStorage;
 import ru.yandex.practicum.filmorate.storage.filmganre.FilmGenreStorage;
 import ru.yandex.practicum.filmorate.storage.filmlike.FilmLikeStorage;
 import ru.yandex.practicum.filmorate.storage.mpa.MpaStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import ru.yandex.practicum.filmorate.utils.ValidateUtil;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -34,6 +34,7 @@ public class FilmService {
     private final FilmLikeStorage likeStorage;
     private final FilmGenreStorage filmGenreDbStorage;
     private final DirectorStorage directorStorage;
+    private final FilmDirectorStorage filmDirectorStorage;
     private final EventStorage eventStorage;
 
     // вернуть все фильмы
@@ -75,17 +76,21 @@ public class FilmService {
     }
 
     // вернуть популярные фильмы
-    public List<Film> findPopularFilms(int count) {
+    public List<Film> findPopularFilms(Optional<Integer> genreId, Optional<Integer> year, int count) {
         if (count <= 0) {
             throw new ValidationException("Значение count не может быть <=0");
         }
-        List<Film> allFilms = filmStorage.findPopularFilms(count);
+        List<Film> allFilms = filmStorage.findPopularFilms(genreId.orElse(null), year.orElse(null), count);
+        log.info("Запрошены {} популярных фильмов. Возвращено {}. genreId={}, release_date={}",
+                count, allFilms.size(),
+                genreId.orElse(null), year.orElse(null));
 
         List<Long> idS = allFilms.stream()
                 .map(Film::getId)
                 .collect(Collectors.toCollection(ArrayList::new));
 
         List<FilmGenreDto> filmGenreList = filmGenreDbStorage.findFilmGenreAll(idS);
+        List<FilmDirectorDto> filmDirectorList = filmDirectorStorage.findFilmDirectorAll(idS);
 
         for (Film film : allFilms) {
             film.setGenres(
@@ -93,6 +98,14 @@ public class FilmService {
                             .map(o -> Genre.builder()
                                     .id(o.getGenreId())
                                     .name(o.getGenreName())
+                                    .build())
+                            .collect(Collectors.toList())
+            );
+            film.setDirectors(
+                    filmDirectorList.stream().filter(f -> Objects.equals(film.getId(), f.getFilmId()))
+                            .map(o -> Director.builder()
+                                    .id(o.getDirectorId())
+                                    .name(o.getDirectorName())
                                     .build())
                             .collect(Collectors.toList())
             );

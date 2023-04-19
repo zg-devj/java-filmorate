@@ -1,5 +1,6 @@
-package ru.yandex.practicum.filmorate.controllers;
+package ru.yandex.practicum.filmorate.services;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -9,46 +10,47 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.services.FilmService;
-import ru.yandex.practicum.filmorate.services.UserCleanupService;
-import ru.yandex.practicum.filmorate.services.UserService;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
+import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.storage.director.DirectorDbStorage;
+import ru.yandex.practicum.filmorate.storage.director.DirectorStorage;
 import ru.yandex.practicum.filmorate.storage.event.EventDbStorage;
+import ru.yandex.practicum.filmorate.storage.event.EventStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
+import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.filmdirector.FilmDirectorDbStorage;
+import ru.yandex.practicum.filmorate.storage.filmdirector.FilmDirectorStorage;
 import ru.yandex.practicum.filmorate.storage.filmganre.FilmGenreDbStorage;
 import ru.yandex.practicum.filmorate.storage.filmganre.FilmGenreStorage;
 import ru.yandex.practicum.filmorate.storage.filmlike.FilmLikeDbStorage;
+import ru.yandex.practicum.filmorate.storage.filmlike.FilmLikeStorage;
 import ru.yandex.practicum.filmorate.storage.genre.GenreDbStorage;
 import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.mpa.MpaDbStorage;
 import ru.yandex.practicum.filmorate.storage.mpa.MpaStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
-import java.util.Collection;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import java.util.List;
 
 @SpringBootTest
-public class UserControllerTest {
+class EventServiceTest {
 
     private EmbeddedDatabase embeddedDatabase;
     private JdbcTemplate jdbcTemplate;
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
-    private FilmDbStorage filmDbStorage;
+    private FilmStorage filmStorage;
+    private UserStorage userStorage;
     private MpaStorage mpaStorage;
     private FilmGenreStorage filmGenreStorage;
     private GenreStorage genreStorage;
-    private UserDbStorage userDbStorage;
+    private FilmLikeStorage filmLikeStorage;
+    private DirectorStorage directorStorage;
+    private FilmDirectorStorage filmDirectorStorage;
+    private EventStorage eventStorage;
+
     private UserService userService;
-    private FilmService filmService;
-    private FilmLikeDbStorage filmLikeStorage;
-    private UserController userController;
-    private DirectorDbStorage directorStorage;
-    private FilmDirectorDbStorage filmDirectorStorage;
-    private EventDbStorage eventStorage;
-    private UserCleanupService userCleanupService;
+    private EventService eventService;
 
     @BeforeEach
     void setUp() {
@@ -58,24 +60,19 @@ public class UserControllerTest {
                 .setType(EmbeddedDatabaseType.H2)
                 .build();
         jdbcTemplate = new JdbcTemplate(embeddedDatabase);
-        filmGenreStorage = new FilmGenreDbStorage(jdbcTemplate, namedParameterJdbcTemplate);
-        filmLikeStorage = new FilmLikeDbStorage(jdbcTemplate);
-        genreStorage = new GenreDbStorage(jdbcTemplate);
-        directorStorage = new DirectorDbStorage(jdbcTemplate);
-        filmDirectorStorage = new FilmDirectorDbStorage(jdbcTemplate);
+        namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(embeddedDatabase);
         mpaStorage = new MpaDbStorage(jdbcTemplate);
-        filmDbStorage = new FilmDbStorage(jdbcTemplate, mpaStorage, filmGenreStorage, genreStorage, directorStorage, filmDirectorStorage);
-        userDbStorage = new UserDbStorage(jdbcTemplate, filmDbStorage);
+        filmGenreStorage = new FilmGenreDbStorage(jdbcTemplate, namedParameterJdbcTemplate);
+        genreStorage = new GenreDbStorage(jdbcTemplate);
+        filmLikeStorage = new FilmLikeDbStorage(jdbcTemplate);
+        directorStorage = new DirectorDbStorage(jdbcTemplate);
+        filmDirectorStorage = new FilmDirectorDbStorage(jdbcTemplate, namedParameterJdbcTemplate);
         eventStorage = new EventDbStorage(jdbcTemplate);
-        userService = new UserService(userDbStorage, eventStorage);
-        filmService = new FilmService(filmDbStorage, userDbStorage, mpaStorage, filmLikeStorage, filmGenreStorage, directorStorage, eventStorage);
-        userController = new UserController(userService, filmService, userCleanupService);
-    }
+        filmStorage = new FilmDbStorage(jdbcTemplate, mpaStorage, filmGenreStorage, genreStorage, directorStorage, filmDirectorStorage);
+        userStorage = new UserDbStorage(jdbcTemplate, filmStorage);
 
-    @Test
-    void shouldReturnFilmsCollectionSize1() {
-        Collection<Film> films = userController.getRecommendations(1L);
-        assertEquals(1, films.size());
+        userService = new UserService(userStorage, eventStorage);
+        eventService = new EventService(eventStorage, userStorage);
     }
 
     @AfterEach
@@ -83,4 +80,21 @@ public class UserControllerTest {
         embeddedDatabase.shutdown();
     }
 
+    @Test
+    void getEventsByUserId_Normal() {
+        userService.addFriend(3L, 1L);
+        userService.addFriend(3L, 2L);
+        List<Event> eventList = eventService.getEventsByUserId(3L);
+        Assertions.assertThat(eventList)
+                .hasSize(2);
+    }
+
+    @Test
+    void getEventsByUserId_WrongId() {
+        Throwable thrown = Assertions.catchException(() -> eventService.getEventsByUserId(999L));
+
+        Assertions.assertThat(thrown)
+                .isInstanceOf(NotFoundException.class)
+                .hasMessageContaining(String.format("Пользователь с %d не найден.", 999));
+    }
 }

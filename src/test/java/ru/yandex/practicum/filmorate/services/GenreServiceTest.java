@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage.genre;
+package ru.yandex.practicum.filmorate.services;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
@@ -9,16 +9,20 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.storage.genre.GenreDbStorage;
+import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
 
 import java.util.Collection;
-import java.util.Optional;
 
 @SpringBootTest
-class GenreDbStorageTest {
+class GenreServiceTest {
+
     private EmbeddedDatabase embeddedDatabase;
     private JdbcTemplate jdbcTemplate;
     private GenreStorage genreStorage;
+    private GenreService genreService;
 
     @BeforeEach
     void setUp() {
@@ -29,6 +33,7 @@ class GenreDbStorageTest {
                 .build();
         jdbcTemplate = new JdbcTemplate(embeddedDatabase);
         genreStorage = new GenreDbStorage(jdbcTemplate);
+        genreService = new GenreService(genreStorage);
     }
 
     @AfterEach
@@ -38,48 +43,25 @@ class GenreDbStorageTest {
 
     @Test
     void findAllGenres_Normal() {
-        Collection<Genre> genres = genreStorage.findAllGenres();
-
+        Collection<Genre> genres = genreService.findAllGenres();
         Assertions.assertThat(genres)
                 .hasSize(6);
     }
 
     @Test
     void findGenreById_Normal() {
-        Optional<Genre> genreOptional = genreStorage.findGenreById(1);
-
-        Assertions.assertThat(genreOptional)
-                .isPresent()
-                .hasValueSatisfying(user ->
-                        Assertions.assertThat(user).hasFieldOrPropertyWithValue("id", 1)
-                );
+        Genre genre = genreService.findGenreById(1);
+        Assertions.assertThat(genre)
+                .hasFieldOrPropertyWithValue("id", 1)
+                .hasFieldOrPropertyWithValue("name", "Комедия");
     }
 
     @Test
     void findGenreById_WrongId() {
-        Optional<Genre> genreOptional = genreStorage.findGenreById(999);
+        Throwable thrown = Assertions.catchException(() -> genreService.findGenreById(999));
 
-        Assertions.assertThat(genreOptional)
-                .isNotPresent()
-                .isEmpty();
-    }
-
-    @Test
-    void findGenresByFilmId_Normal() {
-        Collection<Genre> genres = genreStorage.findGenresByFilmId(1L);
-
-        Optional<Genre> genre = genreStorage.findGenreById(3);
-
-        Assertions.assertThat(genres)
-                .hasSize(2)
-                .contains(genre.get());
-    }
-
-    @Test
-    void findGenresByFilmId_WrongId() {
-        Collection<Genre> genres = genreStorage.findGenresByFilmId(999L);
-
-        Assertions.assertThat(genres)
-                .hasSize(0);
+        Assertions.assertThat(thrown)
+                .isInstanceOf(NotFoundException.class)
+                .hasMessageContaining(String.format("Жанр с %d не найден.", 999));
     }
 }

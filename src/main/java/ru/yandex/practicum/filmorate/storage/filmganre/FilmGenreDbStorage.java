@@ -32,7 +32,6 @@ public class FilmGenreDbStorage implements FilmGenreStorage {
 
         List<Genre> noDublicateList =
                 new ArrayList<>(new LinkedHashSet<>(genres));
-
         jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
             @Override
             public void setValues(PreparedStatement ps, int i) throws SQLException {

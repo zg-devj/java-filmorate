@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.event;
 
 import org.assertj.core.api.Assertions;
+import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,6 +17,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.director.DirectorDbStorage;
 import ru.yandex.practicum.filmorate.storage.director.DirectorStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
+import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.filmdirector.FilmDirectorDbStorage;
 import ru.yandex.practicum.filmorate.storage.filmdirector.FilmDirectorStorage;
 import ru.yandex.practicum.filmorate.storage.filmganre.FilmGenreDbStorage;
@@ -31,9 +33,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.catchException;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-
 @SpringBootTest
 public class EventDbStorageTest {
     private EmbeddedDatabase embeddedDatabase;
@@ -46,7 +45,7 @@ public class EventDbStorageTest {
     private GenreStorage genreStorage;
     private DirectorStorage directorStorage;
     private FilmDirectorStorage filmDirectorStorage;
-    private FilmDbStorage filmDbStorage;
+    private FilmStorage filmStorage;
 
     @BeforeEach
     void setUp() {
@@ -55,14 +54,15 @@ public class EventDbStorageTest {
                 .setType(EmbeddedDatabaseType.H2)
                 .build();
         jdbcTemplate = new JdbcTemplate(embeddedDatabase);
+        namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(embeddedDatabase);
         eventStorage = new EventDbStorage(jdbcTemplate);
         mpaStorage = new MpaDbStorage(jdbcTemplate);
         filmGenreStorage = new FilmGenreDbStorage(jdbcTemplate, namedParameterJdbcTemplate);
         genreStorage = new GenreDbStorage(jdbcTemplate);
         directorStorage = new DirectorDbStorage(jdbcTemplate);
-        filmDirectorStorage = new FilmDirectorDbStorage(jdbcTemplate);
-        filmDbStorage = new FilmDbStorage(jdbcTemplate, mpaStorage, filmGenreStorage, genreStorage, directorStorage, filmDirectorStorage);
-        userStorage = new UserDbStorage(jdbcTemplate, filmDbStorage);
+        filmDirectorStorage = new FilmDirectorDbStorage(jdbcTemplate, namedParameterJdbcTemplate);
+        filmStorage = new FilmDbStorage(jdbcTemplate, mpaStorage, filmGenreStorage, genreStorage, directorStorage, filmDirectorStorage);
+        userStorage = new UserDbStorage(jdbcTemplate, filmStorage);
     }
 
     @AfterEach
@@ -80,12 +80,12 @@ public class EventDbStorageTest {
         userStorage.createUser(user);
         eventStorage.addEvent(1L, 2L, EventStorage.TypeName.FRIEND, EventStorage.OperationName.ADD);
         List<Event> events = eventStorage.getEventsByUserId(1L);
-        assertThat(events.get(0).getEntityId()).isEqualTo(2);
+        AssertionsForClassTypes.assertThat(events.get(0).getEntityId()).isEqualTo(2);
     }
 
     @Test
     public void testAddEventWithInvalidUserId() {
-        Throwable thrown = catchException(() -> eventStorage.addEvent(1L, 2L, EventStorage.TypeName.FRIEND,
+        Throwable thrown = Assertions.catchException(() -> eventStorage.addEvent(1L, 2L, EventStorage.TypeName.FRIEND,
                 EventStorage.OperationName.ADD));
 
         Assertions.assertThat(thrown)
@@ -104,9 +104,9 @@ public class EventDbStorageTest {
         eventStorage.addEvent(1L, 1L, EventStorage.TypeName.LIKE, EventStorage.OperationName.ADD);
         eventStorage.addEvent(1L, 6L, EventStorage.TypeName.REVIEW, EventStorage.OperationName.ADD);
         List<Event> events = eventStorage.getEventsByUserId(1L);
-        assertThat(events.get(0).getEntityId()).isEqualTo(3);
-        assertThat(events.get(1).getEntityId()).isEqualTo(1);
-        assertThat(events.get(2).getEntityId()).isEqualTo(6);
+        AssertionsForClassTypes.assertThat(events.get(0).getEntityId()).isEqualTo(3);
+        AssertionsForClassTypes.assertThat(events.get(1).getEntityId()).isEqualTo(1);
+        AssertionsForClassTypes.assertThat(events.get(2).getEntityId()).isEqualTo(6);
     }
 
     @Test
@@ -122,6 +122,6 @@ public class EventDbStorageTest {
         eventStorage.addEvent(1L, 6L, EventStorage.TypeName.REVIEW, EventStorage.OperationName.ADD);
         eventStorage.removeEventsByUserId(1L);
         List<Event> events = eventStorage.getEventsByUserId(1L);
-        assertThat(events).isEqualTo(new ArrayList<>());
+        AssertionsForClassTypes.assertThat(events).isEqualTo(new ArrayList<>());
     }
 }

@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.review;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,9 +16,6 @@ import ru.yandex.practicum.filmorate.storage.reviewuser.ReviewUserStorage;
 
 import java.util.List;
 import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.catchException;
 
 @SpringBootTest
 class ReviewDbStorageTest {
@@ -47,7 +45,7 @@ class ReviewDbStorageTest {
     void findAllReviews_AllFilms_Count10_WhereRecordIs2() {
         List<Review> reviews = reviewStorage.findAllReviews(10);
 
-        assertThat(reviews)
+        Assertions.assertThat(reviews)
                 .hasSize(2);
     }
 
@@ -55,7 +53,7 @@ class ReviewDbStorageTest {
     void findAllReviewsByFilmId_FilmId1_Count10() {
         List<Review> reviews = reviewStorage.findAllReviewsByFilmId(1L, 10);
 
-        assertThat(reviews)
+        Assertions.assertThat(reviews)
                 .hasSize(1);
     }
 
@@ -63,24 +61,24 @@ class ReviewDbStorageTest {
     void findAllReviewsByFilmId_WrongFilmId999_Count10() {
         List<Review> reviews = reviewStorage.findAllReviewsByFilmId(999L, 10);
 
-        assertThat(reviews)
+        Assertions.assertThat(reviews)
                 .hasSize(0);
     }
 
     @Test
     void findReviewById_Normal_ReviewId1() {
         Optional<Review> reviewOptional = reviewStorage.findReviewById(1L);
-        assertThat(reviewOptional)
+        Assertions.assertThat(reviewOptional)
                 .isPresent()
                 .hasValueSatisfying(review ->
-                        assertThat(review).hasFieldOrPropertyWithValue("reviewId", 1L)
+                        Assertions.assertThat(review).hasFieldOrPropertyWithValue("reviewId", 1L)
                 );
     }
 
     @Test
     void findReviewById_WrongId999() {
         Optional<Review> reviewOptional = reviewStorage.findReviewById(999L);
-        assertThat(reviewOptional)
+        Assertions.assertThat(reviewOptional)
                 .isNotPresent()
                 .isEmpty();
     }
@@ -88,13 +86,13 @@ class ReviewDbStorageTest {
     @Test
     void checkReview_Normal() {
         Boolean check = reviewStorage.checkReview(1L);
-        assertThat(check).isTrue();
+        Assertions.assertThat(check).isTrue();
     }
 
     @Test
     void checkReview_WrongId999() {
         Boolean check = reviewStorage.checkReview(999L);
-        assertThat(check).isFalse();
+        Assertions.assertThat(check).isFalse();
     }
 
     @Test
@@ -110,10 +108,10 @@ class ReviewDbStorageTest {
 
         Optional<Review> reviewOptional = reviewStorage.findReviewById(id);
 
-        assertThat(reviewOptional)
+        Assertions.assertThat(reviewOptional)
                 .isPresent()
                 .hasValueSatisfying(film ->
-                        assertThat(film)
+                        Assertions.assertThat(film)
                                 .hasFieldOrPropertyWithValue("reviewId", 3L)
                                 .hasFieldOrPropertyWithValue("content", "review content")
                                 .hasFieldOrPropertyWithValue("isPositive", true)
@@ -132,10 +130,10 @@ class ReviewDbStorageTest {
 
         Optional<Review> reviewOptional = reviewStorage.findReviewById(reviewUpdated.getReviewId());
 
-        assertThat(reviewOptional)
+        Assertions.assertThat(reviewOptional)
                 .isPresent()
                 .hasValueSatisfying(review ->
-                        assertThat(review)
+                        Assertions.assertThat(review)
                                 .hasFieldOrPropertyWithValue("reviewId", 1L)
                                 .hasFieldOrPropertyWithValue("content", "new content")
                                 .hasFieldOrPropertyWithValue("userId", 1L)
@@ -152,9 +150,9 @@ class ReviewDbStorageTest {
                 .userId(1L)
                 .filmId(1L)
                 .build();
-        Throwable thrown = catchException(() -> reviewStorage.updateReview(reviewUpdated));
+        Throwable thrown = Assertions.catchException(() -> reviewStorage.updateReview(reviewUpdated));
 
-        assertThat(thrown)
+        Assertions.assertThat(thrown)
                 .isInstanceOf(NotFoundException.class)
                 .hasMessageContaining(String.format("Отзыва с id=%d не существует.", reviewUpdated.getReviewId()));
     }
@@ -165,7 +163,7 @@ class ReviewDbStorageTest {
         reviewStorage.deleteReview(1L);
 
         Optional<Review> reviewOptional = reviewStorage.findReviewById(1L);
-        assertThat(reviewOptional)
+        Assertions.assertThat(reviewOptional)
                 .isNotPresent()
                 .isEmpty();
     }
@@ -177,7 +175,7 @@ class ReviewDbStorageTest {
 
         List<Review> reviews = reviewStorage.findAllReviews(10);
 
-        assertThat(reviews)
+        Assertions.assertThat(reviews)
                 .hasSize(2);
     }
 
@@ -186,7 +184,7 @@ class ReviewDbStorageTest {
         reviewStorage.deleteAllReviewByUserId(1L);
         List<Review> reviews = reviewStorage.findAllReviews(10);
 
-        assertThat(reviews)
+        Assertions.assertThat(reviews)
                 .hasSize(1);
     }
 
@@ -195,7 +193,7 @@ class ReviewDbStorageTest {
         reviewStorage.deleteAllReviewByUserId(999L);
         List<Review> reviews = reviewStorage.findAllReviews(10);
 
-        assertThat(reviews)
+        Assertions.assertThat(reviews)
                 .hasSize(2);
     }
 }

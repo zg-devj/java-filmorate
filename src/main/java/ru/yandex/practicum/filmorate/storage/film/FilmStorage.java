@@ -10,7 +10,7 @@ public interface FilmStorage {
 
     List<Film> findAllFilms();
 
-    List<Film> findPopularFilms(int limit);
+    List<Film> findPopularFilms(Integer genreId, Integer year, int limit);
 
     Optional<Film> findFilmById(Long filmId);
 
