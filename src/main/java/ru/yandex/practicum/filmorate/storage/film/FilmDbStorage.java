@@ -244,21 +244,6 @@ public class FilmDbStorage implements FilmStorage {
                 .build();
     }
 
-    private Film makeFilmEmp(ResultSet rs, int rowNum) throws SQLException {
-        Long filmId = rs.getLong("film_id");
-        return Film.builder()
-                .id(filmId)
-                .name(rs.getString("film_name"))
-                .description(rs.getString("description"))
-                .releaseDate(rs.getDate("release_date").toLocalDate())
-                .rate(rs.getInt("rate"))
-                .duration(rs.getInt("duration"))
-                .mpa(new Mpa(rs.getInt("mpa_id"), rs.getString("mpa_name")))
-                .genres(new ArrayList<>())
-                .directors(new HashSet<>())
-                .build();
-    }
-
     @Override
     public Collection<Film> getRecommendations(Long userId) {
         //uf - user films table
