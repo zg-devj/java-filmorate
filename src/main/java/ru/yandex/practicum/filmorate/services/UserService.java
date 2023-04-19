@@ -55,16 +55,8 @@ public class UserService {
 
     // добавление в друзья
     public void addFriend(Long userId, Long friendId) {
-        ValidateUtil.validNumberNotNull(userId, "id пользователя не должно быть null.");
-        ValidateUtil.validNumberNotNull(friendId, "id друга пользователя не должно быть null.");
-
-        if (!userStorage.checkUser(userId)) {
-            ValidateUtil.throwNotFound(String.format("Пользователь с %d не найден.", userId));
-        }
-        if (!userStorage.checkUser(friendId)) {
-            ValidateUtil.throwNotFound(String.format("Друг с %d не найден.", friendId));
-        }
-
+        checkUser(userId);
+        checkUser(friendId);
         userStorage.addFriend(userId, friendId);
         log.info("Пользователь с id={} добавил друга с id={}.", userId, friendId);
         eventStorage.addEvent(userId, friendId, EventStorage.TypeName.FRIEND, EventStorage.OperationName.ADD);
@@ -72,16 +64,8 @@ public class UserService {
 
     // удаление из друзей
     public void removeFriend(Long userId, Long friendId) {
-        ValidateUtil.validNumberNotNull(userId, "id пользователя не должно быть null.");
-        ValidateUtil.validNumberNotNull(friendId, "id друга пользователя не должно быть null.");
-
-        if (!userStorage.checkUser(userId)) {
-            ValidateUtil.throwNotFound(String.format("Пользователь с %d не найден.", userId));
-        }
-        if (!userStorage.checkUser(friendId)) {
-            ValidateUtil.throwNotFound(String.format("Друг с %d не найден.", friendId));
-        }
-
+        checkUser(userId);
+        checkUser(friendId);
         userStorage.removeFriend(userId, friendId);
         log.info("Пользователь с id={} удалил из друзей пользователя с id={}.", userId, friendId);
         eventStorage.addEvent(userId, friendId, EventStorage.TypeName.FRIEND, EventStorage.OperationName.REMOVE);
@@ -89,16 +73,8 @@ public class UserService {
 
     // список друзей, общих с другим пользователем.
     public Collection<User> commonFriend(Long userId, Long otherId) {
-        ValidateUtil.validNumberNotNull(userId, "id пользователя не должно быть null.");
-        ValidateUtil.validNumberNotNull(otherId, "id другого пользователя не должно быть null.");
-
-        if (!userStorage.checkUser(userId)) {
-            ValidateUtil.throwNotFound(String.format("Пользователь с %d не найден.", userId));
-        }
-        if (!userStorage.checkUser(otherId)) {
-            ValidateUtil.throwNotFound(String.format("Другой пользователь с %d не найден.", otherId));
-        }
-
+        checkUser(userId);
+        checkUser(otherId);
         Collection<User> commons = userStorage.findBothUserFriends(userId, otherId);
         log.info("У пользователей с id={} и id={}, {} общих друзей.",
                 userId, otherId, commons.size());
@@ -107,11 +83,15 @@ public class UserService {
 
     // возвращаем список пользователей, являющихся его друзьями.
     public Collection<User> findFriends(Long userId) {
+        checkUser(userId);
+        return userStorage.findFriends(userId);
+    }
+
+    private void checkUser(Long userId) {
         ValidateUtil.validNumberNotNull(userId, "id пользователя не должно быть null.");
         if (!userStorage.checkUser(userId)) {
             ValidateUtil.throwNotFound(String.format("Пользователь с %d не найден.", userId));
         }
-        return userStorage.findFriends(userId);
     }
 
     private String ifStringIsNullOrEmpty(String param, String toParam) {

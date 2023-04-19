@@ -109,6 +109,7 @@ class DirectorServiceTest {
                 .id(999)
                 .name("Режисер")
                 .build();
+
         Throwable thrown = Assertions.catchException(() -> directorService.updateDirector(wrong));
 
         Assertions.assertThat(thrown)
