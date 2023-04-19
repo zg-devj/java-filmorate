@@ -18,7 +18,7 @@ import java.util.Optional;
 class GenreDbStorageTest {
     private EmbeddedDatabase embeddedDatabase;
     private JdbcTemplate jdbcTemplate;
-    private GenreStorage genreDbStorage;
+    private GenreStorage genreStorage;
 
     @BeforeEach
     void setUp() {
@@ -28,7 +28,7 @@ class GenreDbStorageTest {
                 .setType(EmbeddedDatabaseType.H2)
                 .build();
         jdbcTemplate = new JdbcTemplate(embeddedDatabase);
-        genreDbStorage = new GenreDbStorage(jdbcTemplate);
+        genreStorage = new GenreDbStorage(jdbcTemplate);
     }
 
     @AfterEach
@@ -38,7 +38,7 @@ class GenreDbStorageTest {
 
     @Test
     void findAllGenres_Normal() {
-        Collection<Genre> genres = genreDbStorage.findAllGenres();
+        Collection<Genre> genres = genreStorage.findAllGenres();
 
         Assertions.assertThat(genres)
                 .hasSize(6);
@@ -46,7 +46,7 @@ class GenreDbStorageTest {
 
     @Test
     void findGenreById_Normal() {
-        Optional<Genre> genreOptional = genreDbStorage.findGenreById(1);
+        Optional<Genre> genreOptional = genreStorage.findGenreById(1);
 
         Assertions.assertThat(genreOptional)
                 .isPresent()
@@ -57,7 +57,7 @@ class GenreDbStorageTest {
 
     @Test
     void findGenreById_WrongId() {
-        Optional<Genre> genreOptional = genreDbStorage.findGenreById(999);
+        Optional<Genre> genreOptional = genreStorage.findGenreById(999);
 
         Assertions.assertThat(genreOptional)
                 .isNotPresent()
@@ -66,9 +66,9 @@ class GenreDbStorageTest {
 
     @Test
     void findGenresByFilmId_Normal() {
-        Collection<Genre> genres = genreDbStorage.findGenresByFilmId(1L);
+        Collection<Genre> genres = genreStorage.findGenresByFilmId(1L);
 
-        Optional<Genre> genre = genreDbStorage.findGenreById(3);
+        Optional<Genre> genre = genreStorage.findGenreById(3);
 
         Assertions.assertThat(genres)
                 .hasSize(2)
@@ -77,7 +77,7 @@ class GenreDbStorageTest {
 
     @Test
     void findGenresByFilmId_WrongId() {
-        Collection<Genre> genres = genreDbStorage.findGenresByFilmId(999L);
+        Collection<Genre> genres = genreStorage.findGenresByFilmId(999L);
 
         Assertions.assertThat(genres)
                 .hasSize(0);

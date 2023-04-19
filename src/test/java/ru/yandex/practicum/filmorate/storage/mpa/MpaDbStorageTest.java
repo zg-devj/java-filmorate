@@ -18,7 +18,7 @@ import java.util.Optional;
 class MpaDbStorageTest {
     private EmbeddedDatabase embeddedDatabase;
     private JdbcTemplate jdbcTemplate;
-    private MpaStorage mpaDbStorage;
+    private MpaStorage mpaStorage;
 
     @BeforeEach
     void setUp() {
@@ -28,7 +28,7 @@ class MpaDbStorageTest {
                 .setType(EmbeddedDatabaseType.H2)
                 .build();
         jdbcTemplate = new JdbcTemplate(embeddedDatabase);
-        mpaDbStorage = new MpaDbStorage(jdbcTemplate);
+        mpaStorage = new MpaDbStorage(jdbcTemplate);
     }
 
     @AfterEach
@@ -38,7 +38,7 @@ class MpaDbStorageTest {
 
     @Test
     void findAllMpas_Normal() {
-        Collection<Mpa> users = mpaDbStorage.findAllMpas();
+        Collection<Mpa> users = mpaStorage.findAllMpas();
 
         Assertions.assertThat(users)
                 .hasSize(5);
@@ -46,7 +46,7 @@ class MpaDbStorageTest {
 
     @Test
     void findMpaById_Normal() {
-        Optional<Mpa> mpaOptional = mpaDbStorage.findMpaById(1);
+        Optional<Mpa> mpaOptional = mpaStorage.findMpaById(1);
 
         Assertions.assertThat(mpaOptional)
                 .isPresent()
@@ -57,7 +57,7 @@ class MpaDbStorageTest {
 
     @Test
     void findMpaById_WrongId() {
-        Optional<Mpa> mpaOptional = mpaDbStorage.findMpaById(999);
+        Optional<Mpa> mpaOptional = mpaStorage.findMpaById(999);
 
         Assertions.assertThat(mpaOptional)
                 .isNotPresent()

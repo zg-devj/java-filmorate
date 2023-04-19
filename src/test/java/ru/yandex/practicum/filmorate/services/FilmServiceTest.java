@@ -48,10 +48,11 @@ class FilmServiceTest {
     private FilmGenreStorage filmGenreStorage;
     private GenreStorage genreStorage;
     private FilmLikeStorage filmLikeStorage;
-    private FilmService filmService;
     private DirectorStorage directorStorage;
     private FilmDirectorStorage filmDirectorStorage;
     private EventStorage eventStorage;
+
+    private FilmService filmService;
 
     @BeforeEach
     void setUp() {
@@ -64,13 +65,14 @@ class FilmServiceTest {
         namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(embeddedDatabase);
         mpaStorage = new MpaDbStorage(jdbcTemplate);
         filmGenreStorage = new FilmGenreDbStorage(jdbcTemplate, namedParameterJdbcTemplate);
-        userStorage = new UserDbStorage(jdbcTemplate);
         genreStorage = new GenreDbStorage(jdbcTemplate);
         filmLikeStorage = new FilmLikeDbStorage(jdbcTemplate);
         directorStorage = new DirectorDbStorage(jdbcTemplate);
         filmDirectorStorage = new FilmDirectorDbStorage(jdbcTemplate, namedParameterJdbcTemplate);
         eventStorage = new EventDbStorage(jdbcTemplate);
         filmStorage = new FilmDbStorage(jdbcTemplate, mpaStorage, filmGenreStorage, genreStorage, directorStorage, filmDirectorStorage);
+        userStorage = new UserDbStorage(jdbcTemplate, filmStorage);
+
         filmService = new FilmService(filmStorage, userStorage, mpaStorage, filmLikeStorage, filmGenreStorage,
                 directorStorage, filmDirectorStorage, eventStorage);
     }
@@ -126,10 +128,10 @@ class FilmServiceTest {
 
     @Test
     void updateFilm_Normal() {
-        Film film  = filmService.findFilmById(1L);
+        Film film = filmService.findFilmById(1L);
         film.setName("New Name");
 
-        Film updated =  filmService.updateFilm(film);
+        Film updated = filmService.updateFilm(film);
 
         Assertions.assertThat(updated)
                 .hasFieldOrPropertyWithValue("name", "New Name");

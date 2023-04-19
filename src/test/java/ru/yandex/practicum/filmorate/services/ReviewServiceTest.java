@@ -67,13 +67,13 @@ class ReviewServiceTest {
         mpaStorage = new MpaDbStorage(jdbcTemplate);
         genreStorage = new GenreDbStorage(jdbcTemplate);
         reviewStorage = new ReviewDbStorage(jdbcTemplate, reviewUserStorage);
-        userStorage = new UserDbStorage(jdbcTemplate);
         eventStorage = new EventDbStorage(jdbcTemplate);
         filmGenreStorage = new FilmGenreDbStorage(jdbcTemplate, namedParameterJdbcTemplate);
         directorStorage = new DirectorDbStorage(jdbcTemplate);
         filmDirectorStorage = new FilmDirectorDbStorage(jdbcTemplate, namedParameterJdbcTemplate);
         filmStorage = new FilmDbStorage(jdbcTemplate, mpaStorage, filmGenreStorage,
                 genreStorage, directorStorage, filmDirectorStorage);
+        userStorage = new UserDbStorage(jdbcTemplate, filmStorage);
         reviewService = new ReviewService(reviewStorage, reviewUserStorage,
                 userStorage, filmStorage, eventStorage);
 

@@ -14,7 +14,9 @@ import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.director.DirectorDbStorage;
+import ru.yandex.practicum.filmorate.storage.director.DirectorStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
+import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.filmdirector.FilmDirectorDbStorage;
 import ru.yandex.practicum.filmorate.storage.filmganre.FilmGenreDbStorage;
 import ru.yandex.practicum.filmorate.storage.filmganre.FilmGenreStorage;
@@ -31,14 +33,13 @@ import java.util.Optional;
 class UserDbStorageTest {
     private EmbeddedDatabase embeddedDatabase;
     private JdbcTemplate jdbcTemplate;
-    private UserStorage userDbStorage;
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
-    private UserDbStorage userDbStorage;
-    private FilmDbStorage filmDbStorage;
+    private UserStorage userStorage;
+    private FilmStorage filmStorage;
     private MpaStorage mpaStorage;
     private FilmGenreStorage filmGenreStorage;
     private GenreStorage genreStorage;
-    private DirectorDbStorage directorStorage;
+    private DirectorStorage directorStorage;
     private FilmDirectorDbStorage filmDirectorStorage;
 
     @BeforeEach
@@ -49,13 +50,14 @@ class UserDbStorageTest {
                 .setType(EmbeddedDatabaseType.H2)
                 .build();
         jdbcTemplate = new JdbcTemplate(embeddedDatabase);
+        namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(embeddedDatabase);
         filmGenreStorage = new FilmGenreDbStorage(jdbcTemplate, namedParameterJdbcTemplate);
         genreStorage = new GenreDbStorage(jdbcTemplate);
         mpaStorage = new MpaDbStorage(jdbcTemplate);
         directorStorage = new DirectorDbStorage(jdbcTemplate);
-        filmDirectorStorage = new FilmDirectorDbStorage(jdbcTemplate);
-        filmDbStorage = new FilmDbStorage(jdbcTemplate, mpaStorage, filmGenreStorage, genreStorage, directorStorage, filmDirectorStorage);
-        userDbStorage = new UserDbStorage(jdbcTemplate, filmDbStorage);
+        filmDirectorStorage = new FilmDirectorDbStorage(jdbcTemplate, namedParameterJdbcTemplate);
+        filmStorage = new FilmDbStorage(jdbcTemplate, mpaStorage, filmGenreStorage, genreStorage, directorStorage, filmDirectorStorage);
+        userStorage = new UserDbStorage(jdbcTemplate, filmStorage);
     }
 
     @AfterEach
@@ -65,7 +67,7 @@ class UserDbStorageTest {
 
     @Test
     void findAllUsers_Normal() {
-        Collection<User> users = userDbStorage.findAllUsers();
+        Collection<User> users = userStorage.findAllUsers();
 
         Assertions.assertThat(users)
                 .hasSize(4);
@@ -73,7 +75,7 @@ class UserDbStorageTest {
 
     @Test
     void findBothUserFriends_Normal() {
-        Collection<User> users = userDbStorage.findBothUserFriends(1L, 2L);
+        Collection<User> users = userStorage.findBothUserFriends(1L, 2L);
 
         Assertions.assertThat(users)
                 .hasSize(1);
@@ -81,7 +83,7 @@ class UserDbStorageTest {
 
     @Test
     void findBothUserFriends_IsEmpty() {
-        Collection<User> users = userDbStorage.findBothUserFriends(1L, 3L);
+        Collection<User> users = userStorage.findBothUserFriends(1L, 3L);
 
         Assertions.assertThat(users)
                 .isEmpty();
@@ -89,7 +91,7 @@ class UserDbStorageTest {
 
     @Test
     void findUserById_Normal() {
-        Optional<User> userOptional = userDbStorage.findUserById(1L);
+        Optional<User> userOptional = userStorage.findUserById(1L);
 
         Assertions.assertThat(userOptional)
                 .isPresent()
@@ -100,7 +102,7 @@ class UserDbStorageTest {
 
     @Test
     void findUserById_WrongId() {
-        Optional<User> userOptional = userDbStorage.findUserById(999L);
+        Optional<User> userOptional = userStorage.findUserById(999L);
 
         Assertions.assertThat(userOptional)
                 .isNotPresent()
@@ -115,9 +117,9 @@ class UserDbStorageTest {
                 .email("newuser@example.com")
                 .birthday(LocalDate.of(2000, 10, 12))
                 .build();
-        Long id = userDbStorage.createUser(newUser).getId();
+        Long id = userStorage.createUser(newUser).getId();
 
-        Optional<User> userOptional = userDbStorage.findUserById(id);
+        Optional<User> userOptional = userStorage.findUserById(id);
 
         Assertions.assertThat(userOptional)
                 .isPresent()
@@ -137,9 +139,9 @@ class UserDbStorageTest {
                 .email("user4updated@example.com")
                 .birthday(LocalDate.of(2000, 10, 12))
                 .build();
-        userDbStorage.updateUser(user1);
+        userStorage.updateUser(user1);
 
-        Optional<User> userOptional = userDbStorage.findUserById(user1.getId());
+        Optional<User> userOptional = userStorage.findUserById(user1.getId());
 
         Assertions.assertThat(userOptional)
                 .isPresent()
@@ -161,7 +163,7 @@ class UserDbStorageTest {
                 .birthday(LocalDate.of(2000, 10, 12))
                 .build();
 
-        Throwable thrown = Assertions.catchException(() -> userDbStorage.updateUser(user1));
+        Throwable thrown = Assertions.catchException(() -> userStorage.updateUser(user1));
         Assertions.assertThat(thrown)
                 .isInstanceOf(NotFoundException.class)
                 .hasMessageContaining(String.format("Пользователя с id=%d не существует.", user1.getId()));
@@ -169,9 +171,9 @@ class UserDbStorageTest {
 
     @Test
     void addFriend_Normal() {
-        userDbStorage.addFriend(1L, 4L);
+        userStorage.addFriend(1L, 4L);
 
-        Collection<User> friends = userDbStorage.findFriends(1L);
+        Collection<User> friends = userStorage.findFriends(1L);
 
         Assertions.assertThat(friends)
                 .hasSize(3);
@@ -180,7 +182,7 @@ class UserDbStorageTest {
     @Test
     void addFriend_WrongFriendId() {
         Long friendId = 999L;
-        Throwable thrown = Assertions.catchException(() -> userDbStorage.addFriend(1L, friendId));
+        Throwable thrown = Assertions.catchException(() -> userStorage.addFriend(1L, friendId));
         Assertions.assertThat(thrown)
                 .isInstanceOf(ValidationException.class)
                 .hasMessageContaining("Нарушение ссылочной целостности");
@@ -189,8 +191,8 @@ class UserDbStorageTest {
 
     @Test
     void removeFriend_Normal() {
-        userDbStorage.removeFriend(1L, 2L);
-        Collection<User> friends = userDbStorage.findFriends(1L);
+        userStorage.removeFriend(1L, 2L);
+        Collection<User> friends = userStorage.findFriends(1L);
         Assertions.assertThat(friends)
                 .hasSize(1);
     }
@@ -198,7 +200,7 @@ class UserDbStorageTest {
     @Test
     void removeFriend_WrongFriendId() {
         Long friendId = 999L;
-        Throwable thrown = Assertions.catchException(() -> userDbStorage.removeFriend(1L, friendId));
+        Throwable thrown = Assertions.catchException(() -> userStorage.removeFriend(1L, friendId));
         Assertions.assertThat(thrown)
                 .isInstanceOf(NotFoundException.class)
                 .hasMessageContaining(String.format("Пользователя с id=%d не существует.", friendId));
@@ -206,9 +208,9 @@ class UserDbStorageTest {
 
     @Test
     void findFriends_Normal() {
-        Collection<User> users = userDbStorage.findFriends(1L);
+        Collection<User> users = userStorage.findFriends(1L);
 
-        Optional<User> userOptional = userDbStorage.findUserById(2L);
+        Optional<User> userOptional = userStorage.findUserById(2L);
 
         Assertions.assertThat(users)
                 .hasSize(2)
@@ -217,7 +219,7 @@ class UserDbStorageTest {
 
     @Test
     void findFriends_Empty() {
-        Collection<User> users = userDbStorage.findFriends(3L);
+        Collection<User> users = userStorage.findFriends(3L);
 
         Assertions.assertThat(users)
                 .hasSize(0)
@@ -226,14 +228,14 @@ class UserDbStorageTest {
 
     @Test
     void checkUser_Normal() {
-        Boolean result = userDbStorage.checkUser(1L);
+        Boolean result = userStorage.checkUser(1L);
 
         Assertions.assertThat(result).isTrue();
     }
 
     @Test
     void checkUser_WrongIf() {
-        Boolean result = userDbStorage.checkUser(999L);
+        Boolean result = userStorage.checkUser(999L);
 
         Assertions.assertThat(result).isFalse();
     }
