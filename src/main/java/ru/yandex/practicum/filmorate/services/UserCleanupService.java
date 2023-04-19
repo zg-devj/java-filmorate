@@ -37,6 +37,7 @@ public class UserCleanupService {
         //удалить ревью пользователя
         reviewStorage.deleteAllReviewByUserId(id);
 
+        // TODO: 19.04.2023 DEL
         //удалить ленту событий пользователя
         //eventStorage.removeEventsByUserId(id);
 

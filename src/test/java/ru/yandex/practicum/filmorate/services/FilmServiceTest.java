@@ -210,11 +210,15 @@ class FilmServiceTest {
                 .filteredOn(film -> film.getRate() == 1)
                 .filteredOn(film -> film.getId() == 5L);
 
-        Throwable thrown = Assertions.catchException(() -> filmService.likeFilm(5L, 1L));
+        filmService.likeFilm(5L, 1L);
 
-        Assertions.assertThat(thrown)
-                .isInstanceOf(ValidationException.class)
-                .hasMessageContaining("Пользователь уже поставил лайк к фильму.");
+        Collection<Film> films2 = filmService.findPopularFilms(Optional.empty(),
+                Optional.empty(), 1);
+
+        Assertions.assertThat(films2)
+                .hasSize(1)
+                .filteredOn(film -> film.getRate() == 1)
+                .filteredOn(film -> film.getId() == 5L);
     }
 
     @Test

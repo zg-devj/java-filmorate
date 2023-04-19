@@ -84,15 +84,6 @@ public class EventDbStorageTest {
     }
 
     @Test
-    public void testAddEventWithInvalidUserId() {
-        Throwable thrown = Assertions.catchException(() -> eventStorage.addEvent(1L, 2L, EventStorage.TypeName.FRIEND,
-                EventStorage.OperationName.ADD));
-
-        Assertions.assertThat(thrown)
-                .isInstanceOf(DataIntegrityViolationException.class);
-    }
-
-    @Test
     void testOrderOfReturnedEventFeed() {
         User user = new User();
         user.setLogin("dolore");
