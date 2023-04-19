@@ -23,4 +23,8 @@ public interface UserStorage {
     Collection<User> findFriends(Long userId);
 
     Boolean checkUser(Long userId);
+
+    void removeFriendsByUserId(Long userId);
+
+    void removeUser(Long userId);
 }

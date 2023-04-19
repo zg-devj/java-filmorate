@@ -6,12 +6,22 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.director.DirectorDbStorage;
+import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
+import ru.yandex.practicum.filmorate.storage.filmdirector.FilmDirectorDbStorage;
+import ru.yandex.practicum.filmorate.storage.filmganre.FilmGenreDbStorage;
+import ru.yandex.practicum.filmorate.storage.filmganre.FilmGenreStorage;
+import ru.yandex.practicum.filmorate.storage.genre.GenreDbStorage;
+import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
+import ru.yandex.practicum.filmorate.storage.mpa.MpaDbStorage;
+import ru.yandex.practicum.filmorate.storage.mpa.MpaStorage;
 
 import java.time.LocalDate;
 import java.util.Collection;
@@ -22,6 +32,14 @@ class UserDbStorageTest {
     private EmbeddedDatabase embeddedDatabase;
     private JdbcTemplate jdbcTemplate;
     private UserStorage userDbStorage;
+    private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+    private UserDbStorage userDbStorage;
+    private FilmDbStorage filmDbStorage;
+    private MpaStorage mpaStorage;
+    private FilmGenreStorage filmGenreStorage;
+    private GenreStorage genreStorage;
+    private DirectorDbStorage directorStorage;
+    private FilmDirectorDbStorage filmDirectorStorage;
 
     @BeforeEach
     void setUp() {
@@ -31,7 +49,13 @@ class UserDbStorageTest {
                 .setType(EmbeddedDatabaseType.H2)
                 .build();
         jdbcTemplate = new JdbcTemplate(embeddedDatabase);
-        userDbStorage = new UserDbStorage(jdbcTemplate);
+        filmGenreStorage = new FilmGenreDbStorage(jdbcTemplate, namedParameterJdbcTemplate);
+        genreStorage = new GenreDbStorage(jdbcTemplate);
+        mpaStorage = new MpaDbStorage(jdbcTemplate);
+        directorStorage = new DirectorDbStorage(jdbcTemplate);
+        filmDirectorStorage = new FilmDirectorDbStorage(jdbcTemplate);
+        filmDbStorage = new FilmDbStorage(jdbcTemplate, mpaStorage, filmGenreStorage, genreStorage, directorStorage, filmDirectorStorage);
+        userDbStorage = new UserDbStorage(jdbcTemplate, filmDbStorage);
     }
 
     @AfterEach
@@ -213,4 +237,5 @@ class UserDbStorageTest {
 
         Assertions.assertThat(result).isFalse();
     }
+
 }

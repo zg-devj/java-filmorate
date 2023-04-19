@@ -25,4 +25,6 @@ public interface ReviewStorage {
 
     // Удалить все отзывы пользователя
     void deleteAllReviewByUserId(Long userId);
+
+    void deleteAllReviewByFilmId(Long filmId);
 }

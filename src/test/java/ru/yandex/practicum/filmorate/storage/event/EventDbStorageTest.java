@@ -8,11 +8,23 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.director.DirectorDbStorage;
+import ru.yandex.practicum.filmorate.storage.director.DirectorStorage;
+import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
+import ru.yandex.practicum.filmorate.storage.filmdirector.FilmDirectorDbStorage;
+import ru.yandex.practicum.filmorate.storage.filmdirector.FilmDirectorStorage;
+import ru.yandex.practicum.filmorate.storage.filmganre.FilmGenreDbStorage;
+import ru.yandex.practicum.filmorate.storage.filmganre.FilmGenreStorage;
+import ru.yandex.practicum.filmorate.storage.genre.GenreDbStorage;
+import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
+import ru.yandex.practicum.filmorate.storage.mpa.MpaDbStorage;
+import ru.yandex.practicum.filmorate.storage.mpa.MpaStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
@@ -24,8 +36,15 @@ import java.util.List;
 public class EventDbStorageTest {
     private EmbeddedDatabase embeddedDatabase;
     private JdbcTemplate jdbcTemplate;
+    private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
     private EventStorage eventStorage;
     private UserStorage userStorage;
+    private MpaStorage mpaStorage;
+    private FilmGenreStorage filmGenreStorage;
+    private GenreStorage genreStorage;
+    private DirectorStorage directorStorage;
+    private FilmDirectorStorage filmDirectorStorage;
+    private FilmDbStorage filmDbStorage;
 
     @BeforeEach
     void setUp() {
@@ -35,7 +54,13 @@ public class EventDbStorageTest {
                 .build();
         jdbcTemplate = new JdbcTemplate(embeddedDatabase);
         eventStorage = new EventDbStorage(jdbcTemplate);
-        userStorage = new UserDbStorage(jdbcTemplate);
+        mpaStorage = new MpaDbStorage(jdbcTemplate);
+        filmGenreStorage = new FilmGenreDbStorage(jdbcTemplate, namedParameterJdbcTemplate);
+        genreStorage = new GenreDbStorage(jdbcTemplate);
+        directorStorage = new DirectorDbStorage(jdbcTemplate);
+        filmDirectorStorage = new FilmDirectorDbStorage(jdbcTemplate);
+        filmDbStorage = new FilmDbStorage(jdbcTemplate, mpaStorage, filmGenreStorage, genreStorage, directorStorage, filmDirectorStorage);
+        userStorage = new UserDbStorage(jdbcTemplate, filmDbStorage);
     }
 
     @AfterEach

@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.MessageResponse;
+import ru.yandex.practicum.filmorate.services.FilmCleanupService;
 import ru.yandex.practicum.filmorate.services.FilmService;
 
 import javax.validation.Valid;
@@ -19,6 +20,7 @@ import java.util.Optional;
 @RequestMapping("/films")
 public class FilmController {
     private final FilmService filmService;
+    private final FilmCleanupService filmCleanupService;
 
     @GetMapping
     public List<Film> allFilms() {
@@ -83,11 +85,27 @@ public class FilmController {
         return ResponseEntity.ok(new MessageResponse("Лайк удален!"));
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<MessageResponse> deleteFilm(@PathVariable Long id) {
+        log.info("DELETE /films/{} - запрос на удаление фильма.", id);
+        filmCleanupService.removeFilmById(id);
+        return ResponseEntity.ok(new MessageResponse("Фильм удален!"));
+    }
+
     @GetMapping("/common")
     public List<Film> sharedUserMovies(
             @RequestParam Long userId, Long friendId
     ) {
         log.info("GET /common - запрос общих фильмов пользователей");
         return filmService.sharedUserMovies(userId, friendId);
+    }
+
+    @GetMapping("/search")
+    public List<Film> searchForMoviesByDescription(
+            @RequestParam String query,
+            @RequestParam(name = "by", required = false) String by
+    ) {
+        log.info("GET /films/search?query=" + query + "&by= " + by);
+        return filmService.searchForMoviesByDescription(query, by);
     }
 }
