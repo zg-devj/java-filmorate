@@ -106,15 +106,11 @@ public class DirectorDbStorageTest {
                 .id(1)
                 .name("Режисер с именем")
                 .build();
-
         directorStorage.updateDirector(updatedDirector);
-
         Optional<Director> directorOptional = directorStorage.getDirectorById(1);
-
         Assertions.assertThat(directorOptional)
                 .isPresent()
-                .hasValueSatisfying(director ->
-                        {
+                .hasValueSatisfying(director -> {
                             Assertions.assertThat(director)
                                     .hasFieldOrPropertyWithValue("id", 1);
                             Assertions.assertThat(director)
@@ -127,9 +123,7 @@ public class DirectorDbStorageTest {
     @Test
     void deleteDirector_Normal() {
         directorStorage.deleteDirector(2);
-
         Optional<Director> directorOptional = directorStorage.getDirectorById(2);
-
         Assertions.assertThat(directorOptional)
                 .isNotPresent()
                 .isEmpty();
