@@ -1,11 +1,12 @@
 package ru.yandex.practicum.filmorate.storage.reviewuser;
 
+import ru.yandex.practicum.filmorate.model.LikeDislike;
+
 public interface ReviewUserStorage {
     // Пользователь ставит лайк отзыву
-    void createLike(Long reviewId, Long userId);
-
     // Ползователь ставит дизлайк отзыву
-    void createDislike(Long reviewId, Long userId);
+    void createLikeDislike(Long reviewId, Long userId, LikeDislike likeDislike);
+
 
     // удаление лайка/дизлайка
     void delete(Long reviewId, Long userId);

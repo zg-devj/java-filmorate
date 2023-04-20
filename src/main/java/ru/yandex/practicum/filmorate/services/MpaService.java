@@ -22,8 +22,6 @@ public class MpaService {
     }
 
     public Mpa findMpaById(Integer mpaId) {
-        ValidateUtil.validNumberNotNull(mpaId, "id рейтинга не должно быть null.");
-
         Mpa mpa = mpaStorage.findMpaById(mpaId).orElseThrow(
                 () -> {
                     ValidateUtil.throwNotFound(String.format("Рейтинг с %d не найден.", mpaId));

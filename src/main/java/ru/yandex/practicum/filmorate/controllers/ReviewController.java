@@ -22,10 +22,10 @@ public class ReviewController {
 
     @GetMapping
     public List<Review> findAllReviews(
-            @RequestParam Optional<Long> filmId,
+            @RequestParam(required = false) Long filmId,
             @RequestParam(defaultValue = "10") int count
     ) {
-        log.info("GET /reviews?filmId={}&count={} - запрос всех отзовов.", filmId.orElseGet(() -> Long.valueOf("0")), count);
+        log.info("GET /reviews?filmId={}&count={} - запрос всех отзовов.", filmId, count);
         return reviewService.findAllReviews(filmId, count);
     }
 

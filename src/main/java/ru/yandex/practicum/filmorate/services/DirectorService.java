@@ -22,7 +22,6 @@ public class DirectorService {
     }
 
     public Director getDirectorById(Integer id) {
-        ValidateUtil.validNumberNotNull(id, "id жанра не должно быть null.");
         Director director = directorStorage.getDirectorById(id).orElseThrow(
                 () -> {
                     ValidateUtil.throwNotFound(String.format("Режиссера с id %d нет в базе", id));

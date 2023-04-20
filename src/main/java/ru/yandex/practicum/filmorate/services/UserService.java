@@ -26,7 +26,6 @@ public class UserService {
 
     // вернуть пользователя по id
     public User findUserById(Long id) {
-        ValidateUtil.validNumberNotNull(id, "id пользователя не должно быть null.");
         User user = userStorage.findUserById(id).orElseThrow(
                 () -> {
                     ValidateUtil.throwNotFound(String.format("Пользователь с %d не найден.", id));

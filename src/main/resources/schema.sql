@@ -72,7 +72,8 @@ CREATE TABLE reviews
     content     CHARACTER VARYING(255) NOT NULL,
     is_positive BOOLEAN                NOT NULL,
     user_id     BIGINT REFERENCES users (user_id),
-    film_id     BIGINT REFERENCES films (film_id)
+    film_id     BIGINT REFERENCES films (film_id),
+    UNIQUE (user_id, film_id)
 );
 
 CREATE TABLE review_user
@@ -104,7 +105,7 @@ CREATE TABLE events
     event_type CHARACTER VARYING(6),
     operation  CHARACTER VARYING(6),
     user_id    BIGINT,
-        --REFERENCES users (user_id),
+    --REFERENCES users (user_id),
     entity_id  BIGINT,
     CONSTRAINT check_event_type CHECK
         (event_type IN ('LIKE', 'REVIEW', 'FRIEND')),

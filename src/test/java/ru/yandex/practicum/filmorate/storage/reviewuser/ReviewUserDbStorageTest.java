@@ -10,6 +10,7 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
+import ru.yandex.practicum.filmorate.model.LikeDislike;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.storage.review.ReviewDbStorage;
 import ru.yandex.practicum.filmorate.storage.review.ReviewStorage;
@@ -44,7 +45,7 @@ class ReviewUserDbStorageTest {
 
     @Test
     void createLike_Normal_Useful3() {
-        reviewUserStorage.createLike(1L, 1L);
+        reviewUserStorage.createLikeDislike(1L, 1L, LikeDislike.LIKE);
         Optional<Review> reviewOptional = reviewStorage.findReviewById(1L);
         Assertions.assertThat(reviewOptional)
                 .isPresent()
@@ -59,7 +60,8 @@ class ReviewUserDbStorageTest {
 
     @Test
     void createLike_WrongReviewId() {
-        Throwable thrown = Assertions.catchException(() -> reviewUserStorage.createLike(999L, 1L));
+        Throwable thrown = Assertions.catchException(() -> reviewUserStorage.createLikeDislike(999L,
+                1L, LikeDislike.LIKE));
 
         Assertions.assertThat(thrown)
                 .isInstanceOf(ValidationException.class)
@@ -68,7 +70,8 @@ class ReviewUserDbStorageTest {
 
     @Test
     void createLike_WrongUserId() {
-        Throwable thrown = Assertions.catchException(() -> reviewUserStorage.createLike(1L, 999L));
+        Throwable thrown = Assertions.catchException(() -> reviewUserStorage.createLikeDislike(1L,
+                999L, LikeDislike.LIKE));
 
         Assertions.assertThat(thrown)
                 .isInstanceOf(ValidationException.class)
@@ -77,7 +80,8 @@ class ReviewUserDbStorageTest {
 
     @Test
     void createLike_Exception_DoubleLike() {
-        Throwable thrown = Assertions.catchException(() -> reviewUserStorage.createLike(1L, 3L));
+        Throwable thrown = Assertions.catchException(() -> reviewUserStorage.createLikeDislike(1L,
+                3L, LikeDislike.LIKE));
 
         Assertions.assertThat(thrown)
                 .isInstanceOf(ValidationException.class)
@@ -86,7 +90,7 @@ class ReviewUserDbStorageTest {
 
     @Test
     void createDislike_Normal() {
-        reviewUserStorage.createDislike(1L, 1L);
+        reviewUserStorage.createLikeDislike(1L, 1L, LikeDislike.DISLIKE);
         Optional<Review> reviewOptional = reviewStorage.findReviewById(1L);
         Assertions.assertThat(reviewOptional)
                 .isPresent()
@@ -101,7 +105,8 @@ class ReviewUserDbStorageTest {
 
     @Test
     void createDislike_WrongReviewId() {
-        Throwable thrown = Assertions.catchException(() -> reviewUserStorage.createDislike(999L, 1L));
+        Throwable thrown = Assertions.catchException(() -> reviewUserStorage.createLikeDislike(999L,
+                1L, LikeDislike.DISLIKE));
 
         Assertions.assertThat(thrown)
                 .isInstanceOf(ValidationException.class)
@@ -110,7 +115,8 @@ class ReviewUserDbStorageTest {
 
     @Test
     void createDislike_WrongUserId() {
-        Throwable thrown = Assertions.catchException(() -> reviewUserStorage.createDislike(1L, 999L));
+        Throwable thrown = Assertions.catchException(() -> reviewUserStorage.createLikeDislike(1L,
+                999L, LikeDislike.DISLIKE));
 
         Assertions.assertThat(thrown)
                 .isInstanceOf(ValidationException.class)
@@ -119,7 +125,8 @@ class ReviewUserDbStorageTest {
 
     @Test
     void createDislike_Exception_DoubleDislike() {
-        Throwable thrown = Assertions.catchException(() -> reviewUserStorage.createLike(1L, 3L));
+        Throwable thrown = Assertions.catchException(() -> reviewUserStorage.createLikeDislike(1L,
+                3L,LikeDislike.LIKE));
 
         Assertions.assertThat(thrown)
                 .isInstanceOf(ValidationException.class)

@@ -22,7 +22,6 @@ public class GenreService {
     }
 
     public Genre findGenreById(Integer genreId) {
-        ValidateUtil.validNumberNotNull(genreId, "id жанра не должно быть null.");
         Genre genre = genreStorage.findGenreById(genreId).orElseThrow(
                 () -> {
                     ValidateUtil.throwNotFound(String.format("Жанр с %d не найден.", genreId));

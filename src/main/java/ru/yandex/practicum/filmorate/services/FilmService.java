@@ -46,7 +46,6 @@ public class FilmService {
 
     // вернуть фильм по id
     public Film findFilmById(Long id) {
-        ValidateUtil.validNumberNotNull(id, "id фильма не должно быть null.");
         Film film = filmStorage.findFilmById(id).orElseThrow(
                 () -> {
                     ValidateUtil.throwNotFound(String.format("Фильма с id=%d не существует.", id));
@@ -76,14 +75,13 @@ public class FilmService {
     }
 
     // вернуть популярные фильмы
-    public List<Film> findPopularFilms(Optional<Integer> genreId, Optional<Integer> year, int count) {
+    public List<Film> findPopularFilms(Integer genreId, Integer year, int count) {
         if (count <= 0) {
             throw new ValidationException("Значение count не может быть <=0");
         }
-        List<Film> allFilms = filmStorage.findPopularFilms(genreId.orElse(null), year.orElse(null), count);
+        List<Film> allFilms = filmStorage.findPopularFilms(genreId, year, count);
         log.info("Запрошены {} популярных фильмов. Возвращено {}. genreId={}, release_date={}",
-                count, allFilms.size(),
-                genreId.orElse(null), year.orElse(null));
+                count, allFilms.size(), genreId, year);
 
         List<Long> idS = allFilms.stream()
                 .map(Film::getId)

@@ -6,6 +6,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
+import ru.yandex.practicum.filmorate.model.LikeDislike;
 
 @Slf4j
 @Component
@@ -14,26 +15,18 @@ public class ReviewUserDbStorage implements ReviewUserStorage {
     private final JdbcTemplate jdbcTemplate;
 
     @Override
-    public void createLike(Long reviewId, Long userId) {
+    public void createLikeDislike(Long reviewId, Long userId, LikeDislike likeDislike) {
         String sql = "INSERT INTO review_user "
                 + "(review_id, user_id, like_it) "
                 + "VALUES (?, ?, ?)";
         try {
-            jdbcTemplate.update(sql, reviewId, userId, 1);
+            jdbcTemplate.update(sql, reviewId, userId, likeDislike.getValue());
         } catch (DataIntegrityViolationException e) {
-            throw new ValidationException("Невозможно поставить лайк отзыву.");
-        }
-    }
-
-    @Override
-    public void createDislike(Long reviewId, Long userId) {
-        String sql = "INSERT INTO review_user "
-                + "(review_id, user_id, like_it) "
-                + "VALUES (?, ?, ?)";
-        try {
-            jdbcTemplate.update(sql, reviewId, userId, -1);
-        } catch (DataIntegrityViolationException e) {
-            throw new ValidationException("Невозможно поставить дизлайк отзыву.");
+            if (likeDislike.getValue() == 1) {
+                throw new ValidationException("Невозможно поставить лайк отзыву.");
+            } else {
+                throw new ValidationException("Невозможно поставить дизлайк отзыву.");
+            }
         }
     }
 

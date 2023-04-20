@@ -86,7 +86,7 @@ class ReviewServiceTest {
 
     @Test
     void findAllReviews_Normal_AllFilms_Limit10() {
-        List<Review> reviews = reviewService.findAllReviews(Optional.empty(), 10);
+        List<Review> reviews = reviewService.findAllReviews(null, 10);
 
         Assertions.assertThat(reviews)
                 .hasSize(2);
@@ -94,7 +94,7 @@ class ReviewServiceTest {
 
     @Test
     void findAllReviews_Normal_Films_Limit10() {
-        List<Review> reviews = reviewService.findAllReviews(Optional.of(1L), 10);
+        List<Review> reviews = reviewService.findAllReviews(1L, 10);
 
         Assertions.assertThat(reviews)
                 .hasSize(1);
@@ -129,7 +129,7 @@ class ReviewServiceTest {
                 .build();
         Review added = reviewService.createReview(newReview);
 
-        List<Review> reviews = reviewService.findAllReviews(Optional.empty(), 10);
+        List<Review> reviews = reviewService.findAllReviews(null, 10);
         Assertions.assertThat(reviews)
                 .hasSize(3)
                 .contains(added);

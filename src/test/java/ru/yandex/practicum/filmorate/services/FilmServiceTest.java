@@ -139,8 +139,7 @@ class FilmServiceTest {
 
     @Test
     void findPopularFilms_Normal_FistFilmWithId3() {
-        List<Film> films = filmService.findPopularFilms(Optional.empty(),
-                Optional.empty(), 10);
+        List<Film> films = filmService.findPopularFilms(null, null, 10);
 
         Assertions.assertThat(films)
                 .hasSize(6)
@@ -189,8 +188,7 @@ class FilmServiceTest {
         filmService.likeFilm(5L, 1L);
         filmService.likeFilm(5L, 2L);
 
-        Collection<Film> films = filmService.findPopularFilms(Optional.empty(),
-                Optional.empty(), 1);
+        Collection<Film> films = filmService.findPopularFilms(null, null, 1);
 
         Assertions.assertThat(films)
                 .hasSize(1)
@@ -202,8 +200,7 @@ class FilmServiceTest {
     void likeFilm_Exception_TwoLikeFromOneUser() {
         filmService.likeFilm(5L, 1L);
 
-        Collection<Film> films = filmService.findPopularFilms(Optional.empty(),
-                Optional.empty(), 1);
+        Collection<Film> films = filmService.findPopularFilms(null, null, 1);
 
         Assertions.assertThat(films)
                 .hasSize(1)
@@ -212,8 +209,7 @@ class FilmServiceTest {
 
         filmService.likeFilm(5L, 1L);
 
-        Collection<Film> films2 = filmService.findPopularFilms(Optional.empty(),
-                Optional.empty(), 1);
+        Collection<Film> films2 = filmService.findPopularFilms(null, null, 1);
 
         Assertions.assertThat(films2)
                 .hasSize(1)
@@ -225,8 +221,7 @@ class FilmServiceTest {
     void dislikeFilm_Normal() {
         filmService.dislikeFilm(1L, 1L);
 
-        Collection<Film> films = filmService.findPopularFilms(Optional.empty(),
-                Optional.empty(), 1);
+        Collection<Film> films = filmService.findPopularFilms(null, null, 1);
 
         Assertions.assertThat(films)
                 .hasSize(1)
@@ -247,7 +242,7 @@ class FilmServiceTest {
 
     @Test
     void findPopularFilms_Top10() {
-        List<Film> films = filmService.findPopularFilms(Optional.empty(), Optional.empty(), 10);
+        List<Film> films = filmService.findPopularFilms(null, null, 10);
         Assertions.assertThat(films)
                 .hasSize(6)
                 .first()
@@ -256,8 +251,7 @@ class FilmServiceTest {
 
     @Test
     void findPopularFilms_Top10_GenreId1_ReturnFilmId1() {
-        List<Film> films = filmService.findPopularFilms(
-                Optional.of(1), Optional.empty(), 10);
+        List<Film> films = filmService.findPopularFilms(1, null, 10);
 
         Assertions.assertThat(films)
                 .hasSize(1)
@@ -267,8 +261,7 @@ class FilmServiceTest {
 
     @Test
     void findPopularFilms_Top10_Year2002_ReturnFilmId2() {
-        List<Film> films = filmService.findPopularFilms(
-                Optional.empty(), Optional.of(2002), 10);
+        List<Film> films = filmService.findPopularFilms(null, 2002, 10);
 
         Assertions.assertThat(films)
                 .hasSize(2)
@@ -278,8 +271,7 @@ class FilmServiceTest {
 
     @Test
     void findPopularFilms_Top10_GenreId1_Year2002_ReturnFilmId2() {
-        List<Film> films = filmService.findPopularFilms(
-                Optional.of(2), Optional.of(2002), 10);
+        List<Film> films = filmService.findPopularFilms(2, 2002, 10);
 
         Assertions.assertThat(films)
                 .hasSize(1)

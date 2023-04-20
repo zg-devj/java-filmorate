@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.services;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.model.LikeDislike;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.storage.event.EventStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
@@ -24,21 +25,20 @@ public class ReviewService {
     private final FilmStorage filmStorage;
     private final EventStorage eventStorage;
 
-    public List<Review> findAllReviews(Optional<Long> filmId, int limit) {
+    public List<Review> findAllReviews(Long filmId, int limit) {
         List<Review> reviews;
-        if (filmId.isEmpty()) {
+        if (filmId == null) {
             reviews = reviewStorage.findAllReviews(limit);
             log.info("Возвращаем {} отзывово всех фильмом", limit);
         } else {
-            checkFilm(filmId.get());
-            reviews = reviewStorage.findAllReviewsByFilmId(filmId.get(), limit);
-            log.info("Возвращаем {} отзывово на фильм {}", limit, filmId.get());
+            checkFilm(filmId);
+            reviews = reviewStorage.findAllReviewsByFilmId(filmId, limit);
+            log.info("Возвращаем {} отзывово на фильм {}", limit, filmId);
         }
         return reviews;
     }
 
     public Review findReviewById(Long id) {
-        ValidateUtil.validNumberNotNull(id, "id отзыва не должно быть null.");
         Review review = reviewStorage.findReviewById(id).orElseThrow(
                 () -> {
                     ValidateUtil.throwNotFound(String.format("Отзыв с id=%d не существует.", id));
@@ -84,14 +84,14 @@ public class ReviewService {
         checkReview(reviewId);
         checkUser(userId);
         reviewUserStorage.delete(reviewId, userId);
-        reviewUserStorage.createLike(reviewId, userId);
+        reviewUserStorage.createLikeDislike(reviewId, userId, LikeDislike.LIKE);
     }
 
     public void dislikeReview(Long reviewId, Long userId) {
         checkReview(reviewId);
         checkUser(userId);
         reviewUserStorage.delete(reviewId, userId);
-        reviewUserStorage.createDislike(reviewId, userId);
+        reviewUserStorage.createLikeDislike(reviewId, userId, LikeDislike.DISLIKE);
     }
 
     public void deleteLikeDislikeReview(Long reviewId, Long userId) {
