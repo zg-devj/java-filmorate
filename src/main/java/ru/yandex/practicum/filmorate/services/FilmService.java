@@ -17,7 +17,9 @@ import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.filmdirector.FilmDirectorStorage;
 import ru.yandex.practicum.filmorate.storage.filmganre.FilmGenreStorage;
 import ru.yandex.practicum.filmorate.storage.filmlike.FilmLikeStorage;
+import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.mpa.MpaStorage;
+import ru.yandex.practicum.filmorate.storage.review.ReviewStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import ru.yandex.practicum.filmorate.utils.ValidateUtil;
 
@@ -35,6 +37,8 @@ public class FilmService {
     private final FilmGenreStorage filmGenreDbStorage;
     private final DirectorStorage directorStorage;
     private final FilmDirectorStorage filmDirectorStorage;
+    private final GenreStorage genreStorage;
+    private final ReviewStorage reviewStorage;
     private final EventStorage eventStorage;
 
     // вернуть все фильмы
@@ -181,5 +185,26 @@ public class FilmService {
         if (!userStorage.checkUser(userId)) {
             ValidateUtil.throwNotFound(String.format("Пользователь с %d не найден.", userId));
         }
+    }
+
+    public void removeFilmById(Long id) {
+        if (!filmStorage.checkFilm(id)) {
+            ValidateUtil.throwNotFound(String.format("Фильм с id=%d не найден.", id));
+        }
+
+        //Удалить жанры фильма
+        genreStorage.deleteFilmGenresByFilmId(id);
+
+        //удалить лайки фильма
+        filmStorage.deleteLikesByFilmId(id);
+
+        //удалить ревью
+        reviewStorage.deleteAllReviewByFilmId(id);
+
+        //удалить информацию о режиссерах
+        filmDirectorStorage.deleteRecords(id);
+
+        //Удалить фильм
+        filmStorage.deleteFilm(id);
     }
 }

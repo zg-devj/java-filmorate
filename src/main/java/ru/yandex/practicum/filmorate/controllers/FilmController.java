@@ -6,7 +6,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.MessageResponse;
-import ru.yandex.practicum.filmorate.services.FilmCleanupService;
 import ru.yandex.practicum.filmorate.services.FilmService;
 
 import javax.validation.Valid;
@@ -20,7 +19,6 @@ import java.util.Optional;
 @RequestMapping("/films")
 public class FilmController {
     private final FilmService filmService;
-    private final FilmCleanupService filmCleanupService;
 
     @GetMapping
     public List<Film> allFilms() {
@@ -89,7 +87,7 @@ public class FilmController {
     @DeleteMapping("/{id}")
     public ResponseEntity<MessageResponse> deleteFilm(@PathVariable Long id) {
         log.info("DELETE /films/{} - запрос на удаление фильма.", id);
-        filmCleanupService.removeFilmById(id);
+        filmService.removeFilmById(id);
         return ResponseEntity.ok(new MessageResponse("Фильм удален!"));
     }
 

@@ -31,6 +31,10 @@ import ru.yandex.practicum.filmorate.storage.genre.GenreDbStorage;
 import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.mpa.MpaDbStorage;
 import ru.yandex.practicum.filmorate.storage.mpa.MpaStorage;
+import ru.yandex.practicum.filmorate.storage.review.ReviewDbStorage;
+import ru.yandex.practicum.filmorate.storage.review.ReviewStorage;
+import ru.yandex.practicum.filmorate.storage.reviewuser.ReviewUserDbStorage;
+import ru.yandex.practicum.filmorate.storage.reviewuser.ReviewUserStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
@@ -50,6 +54,8 @@ class FilmServiceTest {
     private FilmLikeStorage filmLikeStorage;
     private DirectorStorage directorStorage;
     private FilmDirectorStorage filmDirectorStorage;
+    private ReviewStorage reviewStorage;
+    private ReviewUserStorage reviewUserStorage;
     private EventStorage eventStorage;
 
     private FilmService filmService;
@@ -72,9 +78,11 @@ class FilmServiceTest {
         eventStorage = new EventDbStorage(jdbcTemplate);
         filmStorage = new FilmDbStorage(jdbcTemplate, mpaStorage, filmGenreStorage, genreStorage, directorStorage, filmDirectorStorage);
         userStorage = new UserDbStorage(jdbcTemplate, filmStorage);
+        reviewUserStorage = new ReviewUserDbStorage(jdbcTemplate);
+        reviewStorage = new ReviewDbStorage(jdbcTemplate, reviewUserStorage);
 
         filmService = new FilmService(filmStorage, userStorage, mpaStorage, filmLikeStorage, filmGenreStorage,
-                directorStorage, filmDirectorStorage, eventStorage);
+                directorStorage, filmDirectorStorage, genreStorage, reviewStorage, eventStorage);
     }
 
     @AfterEach
