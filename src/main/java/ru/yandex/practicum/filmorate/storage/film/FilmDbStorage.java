@@ -194,9 +194,9 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public List<Film> sharedUserMovies(Long userId, Long friendId) {   //получение общих фильмов пользователей
+    public List<Film> commonUserMovies(Long userId, Long friendId) {   //получение общих фильмов пользователей
         String sql = "SELECT f.*, m.mpa_name, g2.genre_id, g2.genre_name, COALESCE(s.count_like, 0) AS rate, " +
-                "d.director_id, d.director_name " +
+                "       d.director_id, d.director_name " +
                 "FROM films AS f " +
                 "JOIN film_like AS fl1 ON f.film_id = fl1.film_id AND fl1.user_id = ? " +
                 "JOIN film_like AS fl2 ON f.film_id = fl2.film_id AND fl2.user_id = ? " +
@@ -207,11 +207,12 @@ public class FilmDbStorage implements FilmStorage {
                 "LEFT JOIN directors AS d ON fd.director_id = d.director_id " +
                 "LEFT JOIN (SELECT fl.film_id, COUNT(fl.user_id) AS count_like " +
                 "           FROM film_like AS fl " +
-                "           GROUP BY fl.film_id " +
-                "          ) AS s ON f.film_id = s.film_id " +
+                "           GROUP BY fl.film_id) AS s ON f.film_id = s.film_id " +
+                "JOIN film_like AS fl3 ON f.film_id = fl3.film_id AND fl3.user_id = ?" +
+                "JOIN film_like AS fl4 ON f.film_id = fl4.film_id AND fl4.user_id = ?" +
                 "ORDER BY rate DESC";
 
-        return jdbcTemplate.query(sql, getListResultSetExtractor(), userId, friendId);
+        return jdbcTemplate.query(sql, getListResultSetExtractor(), userId, friendId, userId, friendId);
     }
 
     private Film makeFilm(ResultSet rs, int rowNum) throws SQLException {
@@ -337,9 +338,8 @@ public class FilmDbStorage implements FilmStorage {
         jdbcTemplate.update(sql, id);
     }
 
-    public List<Film> searchForMoviesByDescription(String query, String by) {
-        List<Film> films = new ArrayList<>();
-
+    @Override
+    public List<Film> searchForMoviesByTitle(String query) {
         String sql = "SELECT f.*, m.mpa_name, g2.genre_id, g2.genre_name, COALESCE(s.count_like, 0) AS rate, " +
                 "d.director_id, d.director_name " +
                 "FROM films AS f " +
@@ -351,27 +351,33 @@ public class FilmDbStorage implements FilmStorage {
                 "LEFT JOIN (SELECT fl.film_id, COUNT(fl.user_id) AS count_like " +
                 "           FROM film_like AS fl " +
                 "           GROUP BY fl.film_id " +
-                "          ) AS s ON f.film_id = s.film_id ";
+                "          ) AS s ON f.film_id = s.film_id " +
+                "WHERE LOWER(f.film_name) LIKE LOWER(CONCAT('%', ?, '%')) " +
+                "ORDER BY rate DESC";
 
-        String[] params = by.split(",");
-        if (params.length == 2) {
-            sql += "WHERE 1=1 AND (LOWER(d.director_name) LIKE LOWER(CONCAT('%', ?, '%')) " +
-                    "OR LOWER(f.film_name) LIKE LOWER(CONCAT('%', ?, '%')))" +
-                    "ORDER BY rate DESC";
-            films = jdbcTemplate.query(sql, getListResultSetExtractor(), query, query);
-        } else if (params.length == 1 && params[0].equals("director")) {
-            sql += "WHERE LOWER(d.director_name) LIKE LOWER(CONCAT('%', ?, '%')) " +
-                    "AND f.film_id IN (" +
-                    "  SELECT film_id FROM film_directors " +
-                    "  JOIN directors ON film_directors.director_id = directors.director_id " +
-                    "  WHERE LOWER(director_name) LIKE LOWER(CONCAT('%', ?, '%'))) " +
-                    "ORDER BY rate DESC";
-            films = jdbcTemplate.query(sql, getListResultSetExtractor(), query, query);
-        } else {
-            sql += "WHERE LOWER(f.film_name) LIKE LOWER(CONCAT('%', ?, '%')) " +
-                    "ORDER BY rate DESC";
-            films = jdbcTemplate.query(sql, getListResultSetExtractor(), query);
-        }
-        return films;
+        return jdbcTemplate.query(sql, getListResultSetExtractor(), query);
+    }
+
+    public List<Film> searchForMoviesByDirector(String query) {
+        String sql = "SELECT f.*, m.mpa_name, g2.genre_id, g2.genre_name, COALESCE(s.count_like, 0) AS rate, " +
+                "d.director_id, d.director_name " +
+                "FROM films AS f " +
+                "LEFT JOIN mpas AS m ON f.mpa_id = m.mpa_id " +
+                "LEFT JOIN film_genre AS fg ON f.film_id = fg.film_id " +
+                "LEFT JOIN genres AS g2 ON g2.genre_id = fg.genre_id " +
+                "LEFT JOIN film_directors AS fd ON f.film_id = fd.film_id " +
+                "LEFT JOIN directors AS d ON fd.director_id = d.director_id " +
+                "LEFT JOIN (SELECT fl.film_id, COUNT(fl.user_id) AS count_like " +
+                "           FROM film_like AS fl " +
+                "           GROUP BY fl.film_id " +
+                "          ) AS s ON f.film_id = s.film_id " +
+                "WHERE LOWER(d.director_name) LIKE LOWER(CONCAT('%', ?, '%')) " +
+                "AND f.film_id IN (" +
+                "  SELECT film_id FROM film_directors " +
+                "  JOIN directors ON film_directors.director_id = directors.director_id " +
+                "  WHERE LOWER(director_name) LIKE LOWER(CONCAT('%', ?, '%'))) " +
+                "ORDER BY rate DESC";
+
+        return jdbcTemplate.query(sql, getListResultSetExtractor(), query, query);
     }
 }

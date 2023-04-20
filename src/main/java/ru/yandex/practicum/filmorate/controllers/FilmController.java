@@ -13,6 +13,7 @@ import javax.validation.Valid;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -93,18 +94,20 @@ public class FilmController {
         return ResponseEntity.ok(new MessageResponse("Фильм удален!"));
     }
 
+
     @GetMapping("/common")
-    public List<Film> sharedUserMovies(
-            @RequestParam Long userId, Long friendId
+    public List<Film> commonUserMovies(
+            @RequestParam Long userId,
+            @RequestParam Long friendId
     ) {
         log.info("GET /common - запрос общих фильмов пользователей");
-        return filmService.sharedUserMovies(userId, friendId);
+        return filmService.commonUserMovies(userId, friendId);
     }
 
     @GetMapping("/search")
-    public List<Film> searchForMoviesByDescription(
+    public Set<Film> searchForMoviesByDescription(
             @RequestParam String query,
-            @RequestParam(name = "by", required = false) String by
+            @RequestParam String by
     ) {
         log.info("GET /films/search?query=" + query + "&by= " + by);
         return filmService.searchForMoviesByDescription(query, by);
