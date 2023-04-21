@@ -244,7 +244,9 @@ public class FilmDbStorage implements FilmStorage {
                 .genres(new ArrayList<>())
                 .directors(new HashSet<>())
                 .build();
-    };
+    }
+
+    ;
 
     @Override
     public Collection<Film> getRecommendations(Long userId) {
@@ -294,7 +296,7 @@ public class FilmDbStorage implements FilmStorage {
                 "(SELECT film_id " +
                 "FROM film_like " +
                 "WHERE user_id = ?)" +
-                "AS uf ON uf.film_id = f.film_id "+
+                "AS uf ON uf.film_id = f.film_id " +
                 "ORDER BY rate DESC";
         Collection<Film> films = jdbcTemplate.query(sql, this::makeFilm, userId);
         return films;
@@ -386,7 +388,7 @@ public class FilmDbStorage implements FilmStorage {
 
     public List<Film> searchForMoviesByDirector(String query) {
         String sql = "SELECT f.*, m.mpa_name, g2.genre_id, g2.genre_name, COALESCE(s.count_like, 0) AS rate, " +
-                "d.director_id, d.director_name " +
+                "       d.director_id, d.director_name " +
                 "FROM films AS f " +
                 "LEFT JOIN mpas AS m ON f.mpa_id = m.mpa_id " +
                 "LEFT JOIN film_genre AS fg ON f.film_id = fg.film_id " +
@@ -395,15 +397,12 @@ public class FilmDbStorage implements FilmStorage {
                 "LEFT JOIN directors AS d ON fd.director_id = d.director_id " +
                 "LEFT JOIN (SELECT fl.film_id, COUNT(fl.user_id) AS count_like " +
                 "           FROM film_like AS fl " +
-                "           GROUP BY fl.film_id " +
-                "          ) AS s ON f.film_id = s.film_id " +
-                "WHERE LOWER(d.director_name) LIKE LOWER(CONCAT('%', ?, '%')) " +
-                "AND f.film_id IN (" +
-                "  SELECT film_id FROM film_directors " +
-                "  JOIN directors ON film_directors.director_id = directors.director_id " +
-                "  WHERE LOWER(director_name) LIKE LOWER(CONCAT('%', ?, '%'))) " +
+                "           GROUP BY fl.film_id) AS s ON f.film_id = s.film_id " +
+                "JOIN film_directors AS fd2 ON f.film_id = fd2.film_id " +
+                "JOIN directors AS d2 ON fd2.director_id = d2.director_id " +
+                "       AND LOWER(d2.director_name) LIKE LOWER(CONCAT('%', ?, '%')) " +
                 "ORDER BY rate DESC";
 
-        return jdbcTemplate.query(sql, getListResultSetExtractor(), query, query);
+        return jdbcTemplate.query(sql, getListResultSetExtractor(), query);
     }
 }
