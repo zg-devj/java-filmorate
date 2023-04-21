@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage.filmdirector;
+package ru.yandex.practicum.filmorate.storage;
 
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.dto.FilmDirectorDto;

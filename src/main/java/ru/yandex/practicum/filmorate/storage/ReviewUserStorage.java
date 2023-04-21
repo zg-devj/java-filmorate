@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage.reviewuser;
+package ru.yandex.practicum.filmorate.storage;
 
 import ru.yandex.practicum.filmorate.model.LikeDislike;
 

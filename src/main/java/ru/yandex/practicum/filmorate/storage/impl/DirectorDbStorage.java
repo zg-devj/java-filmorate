@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage.director;
+package ru.yandex.practicum.filmorate.storage.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -6,6 +6,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Director;
+import ru.yandex.practicum.filmorate.storage.DirectorStorage;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

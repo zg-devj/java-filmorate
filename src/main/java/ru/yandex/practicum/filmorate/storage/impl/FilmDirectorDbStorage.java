@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage.filmdirector;
+package ru.yandex.practicum.filmorate.storage.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
@@ -10,6 +10,7 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.dto.FilmDirectorDto;
+import ru.yandex.practicum.filmorate.storage.FilmDirectorStorage;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;

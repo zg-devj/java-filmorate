@@ -12,6 +12,8 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.dto.FilmDirectorDto;
+import ru.yandex.practicum.filmorate.storage.FilmDirectorStorage;
+import ru.yandex.practicum.filmorate.storage.impl.FilmDirectorDbStorage;
 
 import java.util.Collection;
 import java.util.List;

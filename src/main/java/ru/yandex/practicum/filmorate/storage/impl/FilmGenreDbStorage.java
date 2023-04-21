@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage.filmganre;
+package ru.yandex.practicum.filmorate.storage.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,6 +10,7 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.dto.FilmGenreDto;
+import ru.yandex.practicum.filmorate.storage.FilmGenreStorage;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
