@@ -242,11 +242,45 @@ public class FilmDbStorage implements FilmStorage {
                 .genres(new ArrayList<>())
                 .directors(new HashSet<>())
                 .build();
-    }
+    };
 
     @Override
     public Collection<Film> getRecommendations(Long userId) {
-        //uf - user films table
+        Collection<Film> recommendedFilms = new ArrayList<>();
+        if (!isUserSetLike(userId)) return recommendedFilms;
+        Long anotherUser = findRecommendedUser(userId);
+        if (anotherUser == null) return recommendedFilms;
+        Collection<Film> anotherUserFilms = findUserFilms(anotherUser);
+        Collection<Film> userFilms = findUserFilms(userId);
+        for (Film film : anotherUserFilms) {
+            if (!userFilms.contains(film)) {
+                recommendedFilms.add(film);
+            }
+        }
+        return recommendedFilms;
+    }
+
+    private Long findRecommendedUser(Long userId) {
+        String findAnotherUser = "SELECT user_id FROM film_like WHERE film_id IN " +
+                "(SELECT film_id FROM film_like WHERE user_id = ?) " +
+                "AND user_id <> ? " +
+                "GROUP BY user_id " +
+                "ORDER BY COUNT(user_id) DESC " +
+                "LIMIT 1";
+        try {
+            return jdbcTemplate.queryForObject(findAnotherUser, Long.class, userId, userId);
+        } catch (Exception e) {
+            log.debug("Для пользователя с id={} не найден рекомендуемый пользователь", userId);
+            return null;
+        }
+    }
+
+    private Boolean isUserSetLike(Long userId) {
+        String findLike = "SELECT EXISTS(SELECT 1 FROM film_like WHERE user_id=?)";
+        return jdbcTemplate.queryForObject(findLike, (rs, rowNum) -> rs.getBoolean(1), userId);
+    }
+
+    private Collection<Film> findUserFilms(Long userId) {
         String sql = "SELECT f.*, m.mpa_name, COALESCE(s.count_like, 0) AS rate " +
                 "FROM films AS f " +
                 "LEFT JOIN mpas AS m on m.mpa_id = f.mpa_id " +
@@ -257,19 +291,10 @@ public class FilmDbStorage implements FilmStorage {
                 "INNER JOIN " +
                 "(SELECT film_id " +
                 "FROM film_like " +
-                "WHERE user_id = " +
-                "(SELECT user_id " +
-                "FROM film_like WHERE film_id IN " +
-                "(SELECT film_id FROM film_like WHERE user_id = ?) " +
-                "AND user_id <> ? " +
-                "GROUP BY user_id " +
-                "ORDER BY COUNT(user_id) DESC " +
-                "LIMIT 1) " +
-                "AND film_id NOT IN " +
-                "(SELECT film_id FROM film_like WHERE user_id = ?)) " +
-                "AS uf ON uf.film_id = f.film_id " +
+                "WHERE user_id = ?)" +
+                "AS uf ON uf.film_id = f.film_id "+
                 "ORDER BY rate DESC";
-        Collection<Film> films = jdbcTemplate.query(sql, this::makeFilm, userId, userId, userId);
+        Collection<Film> films = jdbcTemplate.query(sql, this::makeFilm, userId);
         return films;
     }
 
