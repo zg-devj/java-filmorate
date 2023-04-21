@@ -8,7 +8,6 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.MessageResponse;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.services.FilmService;
-import ru.yandex.practicum.filmorate.services.UserCleanupService;
 import ru.yandex.practicum.filmorate.services.UserService;
 
 import javax.validation.Valid;
@@ -21,7 +20,6 @@ import java.util.Collection;
 public class UserController {
     private final UserService userService;
     private final FilmService filmService;
-    private final UserCleanupService userCleanupService;
 
     @GetMapping
     public Collection<User> findAllUsers() {
@@ -59,7 +57,7 @@ public class UserController {
     @DeleteMapping("/{id}")
     public ResponseEntity<MessageResponse> removeUser(@PathVariable Long id) {
         log.info("DELETE /users/{} - запрос на удаление пользователя.", id);
-        userCleanupService.removeUserById(id);
+        userService.removeUserById(id);
         return ResponseEntity.ok(new MessageResponse("Пользователь удален."));
     }
 

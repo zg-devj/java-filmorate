@@ -5,6 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.event.EventStorage;
+import ru.yandex.practicum.filmorate.storage.filmlike.FilmLikeStorage;
+import ru.yandex.practicum.filmorate.storage.review.ReviewStorage;
+import ru.yandex.practicum.filmorate.storage.reviewuser.ReviewUserStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import ru.yandex.practicum.filmorate.utils.ValidateUtil;
 
@@ -15,6 +18,9 @@ import java.util.Collection;
 @Service
 public class UserService {
     private final UserStorage userStorage;
+    private final FilmLikeStorage filmLikeStorage;
+    private final ReviewStorage reviewStorage;
+    private final ReviewUserStorage reviewUserStorage;
     private final EventStorage eventStorage;
 
     // вернуть всех пользователей
@@ -99,6 +105,27 @@ public class UserService {
             return toParam;
         }
         return param;
+    }
+
+    public void removeUserById(Long id) {
+        if (!userStorage.checkUser(id)) {
+            ValidateUtil.throwNotFound(String.format("Пользователь с %d не найден.", id));
+        }
+
+        //удалить лайки пользователя
+        filmLikeStorage.deleteLikesByUserId(id);
+
+        //удалить друзей пользователя
+        userStorage.removeFriendsByUserId(id);
+
+        //удалить все реакции на ревью
+        reviewUserStorage.deleteAllByUserId(id);
+
+        //удалить ревью пользователя
+        reviewStorage.deleteAllReviewByUserId(id);
+
+        //удалить пользователя
+        userStorage.removeUser(id);
     }
 
 }
