@@ -10,7 +10,6 @@ import ru.yandex.practicum.filmorate.services.ReviewService;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor

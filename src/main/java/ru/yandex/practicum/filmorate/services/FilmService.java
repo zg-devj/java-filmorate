@@ -11,16 +11,7 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.model.dto.FilmDirectorDto;
 import ru.yandex.practicum.filmorate.model.dto.FilmGenreDto;
-import ru.yandex.practicum.filmorate.storage.DirectorStorage;
-import ru.yandex.practicum.filmorate.storage.EventStorage;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.FilmDirectorStorage;
-import ru.yandex.practicum.filmorate.storage.FilmGenreStorage;
-import ru.yandex.practicum.filmorate.storage.FilmLikeStorage;
-import ru.yandex.practicum.filmorate.storage.GenreStorage;
-import ru.yandex.practicum.filmorate.storage.MpaStorage;
-import ru.yandex.practicum.filmorate.storage.ReviewStorage;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.storage.*;
 import ru.yandex.practicum.filmorate.utils.ValidateUtil;
 
 import java.util.*;
