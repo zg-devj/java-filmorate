@@ -22,7 +22,7 @@ public interface FilmStorage {
 
     Collection<Film> getRecommendations(Long userId);
 
-    List<Film> sharedUserMovies(Long userId, Long friendId);
+    List<Film> commonUserMovies(Long userId, Long friendId);
 
     Collection<Film> getAllFilmsSorted(Integer directorId, String sortBy);
 
@@ -30,5 +30,7 @@ public interface FilmStorage {
 
     void deleteFilm(Long id);
 
-    List<Film> searchForMoviesByDescription(String title, String director);
+    public List<Film> searchForMoviesByDirector(String query);
+
+    public List<Film> searchForMoviesByTitle(String query);
 }

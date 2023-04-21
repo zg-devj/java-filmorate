@@ -178,15 +178,15 @@ class FilmServiceTest {
 
     @Test
     void sharedUserMovies_Normal() {
-        List<Film> films = filmService.sharedUserMovies(1L, 2L);
+        List<Film> films = filmService.commonUserMovies(1L, 2L);
         Assertions.assertThat(films)
                 .hasSize(1);
 
-        List<Film> films2 = filmService.sharedUserMovies(1L, 3L);
+        List<Film> films2 = filmService.commonUserMovies(1L, 3L);
         Assertions.assertThat(films2)
                 .hasSize(0);
 
-        List<Film> films3 = filmService.sharedUserMovies(3L, 4L);
+        List<Film> films3 = filmService.commonUserMovies(3L, 4L);
         Assertions.assertThat(films3)
                 .hasSize(0);
     }

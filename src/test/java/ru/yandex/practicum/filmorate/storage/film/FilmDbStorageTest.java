@@ -161,7 +161,7 @@ class FilmDbStorageTest {
 
     @Test
     void sharedUserMovies_Normal() {
-        List<Film> sharedMovies = filmDbStorage.sharedUserMovies(1L, 2L);
+        List<Film> sharedMovies = filmDbStorage.commonUserMovies(1L, 2L);
 
         Assertions.assertThat(sharedMovies)
                 .isNotEmpty()

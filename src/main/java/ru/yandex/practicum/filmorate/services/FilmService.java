@@ -160,15 +160,25 @@ public class FilmService {
     }
 
 
-    public List<Film> sharedUserMovies(Long userId, Long friendId) { // получение общих фильмов пользователей
+    public List<Film> commonUserMovies(Long userId, Long friendId) { // получение общих фильмов пользователей
         checkUser(userId);
         checkUser(friendId);
-        return filmStorage.sharedUserMovies(userId, friendId);
+        return filmStorage.commonUserMovies(userId, friendId);
     }
 
-    public List<Film> searchForMoviesByDescription(String query, String by) {
+    public Set<Film> searchForMoviesByDescription(String query, String by) {
+        Set<Film> films = new LinkedHashSet<>();
+        String[] param = by.split(",");
+        List<String> paramList = Arrays.asList(param);
+
+        if (paramList.contains("director")) {
+            films.addAll(filmStorage.searchForMoviesByDirector(query));
+        }
+        if (paramList.contains("title")) {
+            films.addAll(filmStorage.searchForMoviesByTitle(query));
+        }
         log.info("Запрошен фильм по ключевым словам: {}", query);
-        return filmStorage.searchForMoviesByDescription(query, by);
+        return films;
     }
 
     private void checkFilm(Long filmId) {
