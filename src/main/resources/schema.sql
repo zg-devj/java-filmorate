@@ -105,7 +105,6 @@ CREATE TABLE events
     event_type CHARACTER VARYING(6),
     operation  CHARACTER VARYING(6),
     user_id    BIGINT,
-    --REFERENCES users (user_id),
     entity_id  BIGINT,
     CONSTRAINT check_event_type CHECK
         (event_type IN ('LIKE', 'REVIEW', 'FRIEND')),

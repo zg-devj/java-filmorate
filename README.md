@@ -1,5 +1,8 @@
 # java-filmorate
 
+## Работа над функуионалом
+![worked.png](worked.png)
+
 ## Схемы базы данных
 ![java-filmorate.png](java-filmorate.png)
 ссылка: https://dbdiagram.io/d/640a318b296d97641d86c87d
