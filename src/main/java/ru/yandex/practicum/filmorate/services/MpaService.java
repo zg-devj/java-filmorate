@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Mpa;
-import ru.yandex.practicum.filmorate.storage.mpa.MpaStorage;
+import ru.yandex.practicum.filmorate.storage.MpaStorage;
 import ru.yandex.practicum.filmorate.utils.ValidateUtil;
 
 import java.util.Collection;
@@ -22,8 +22,6 @@ public class MpaService {
     }
 
     public Mpa findMpaById(Integer mpaId) {
-        ValidateUtil.validNumberNotNull(mpaId, "id рейтинга не должно быть null.");
-
         Mpa mpa = mpaStorage.findMpaById(mpaId).orElseThrow(
                 () -> {
                     ValidateUtil.throwNotFound(String.format("Рейтинг с %d не найден.", mpaId));

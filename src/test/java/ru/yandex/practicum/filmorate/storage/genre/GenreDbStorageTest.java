@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.genre;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -9,17 +10,17 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.storage.GenreStorage;
+import ru.yandex.practicum.filmorate.storage.impl.GenreDbStorage;
 
 import java.util.Collection;
 import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 class GenreDbStorageTest {
     private EmbeddedDatabase embeddedDatabase;
     private JdbcTemplate jdbcTemplate;
-    private GenreDbStorage genreDbStorage;
+    private GenreStorage genreStorage;
 
     @BeforeEach
     void setUp() {
@@ -29,7 +30,7 @@ class GenreDbStorageTest {
                 .setType(EmbeddedDatabaseType.H2)
                 .build();
         jdbcTemplate = new JdbcTemplate(embeddedDatabase);
-        genreDbStorage = new GenreDbStorage(jdbcTemplate);
+        genreStorage = new GenreDbStorage(jdbcTemplate);
     }
 
     @AfterEach
@@ -39,48 +40,48 @@ class GenreDbStorageTest {
 
     @Test
     void findAllGenres_Normal() {
-        Collection<Genre> genres = genreDbStorage.findAllGenres();
+        Collection<Genre> genres = genreStorage.findAllGenres();
 
-        assertThat(genres)
+        Assertions.assertThat(genres)
                 .hasSize(6);
     }
 
     @Test
     void findGenreById_Normal() {
-        Optional<Genre> genreOptional = genreDbStorage.findGenreById(1);
+        Optional<Genre> genreOptional = genreStorage.findGenreById(1);
 
-        assertThat(genreOptional)
+        Assertions.assertThat(genreOptional)
                 .isPresent()
                 .hasValueSatisfying(user ->
-                        assertThat(user).hasFieldOrPropertyWithValue("id", 1)
+                        Assertions.assertThat(user).hasFieldOrPropertyWithValue("id", 1)
                 );
     }
 
     @Test
     void findGenreById_WrongId() {
-        Optional<Genre> genreOptional = genreDbStorage.findGenreById(999);
+        Optional<Genre> genreOptional = genreStorage.findGenreById(999);
 
-        assertThat(genreOptional)
+        Assertions.assertThat(genreOptional)
                 .isNotPresent()
                 .isEmpty();
     }
 
     @Test
     void findGenresByFilmId_Normal() {
-        Collection<Genre> genres = genreDbStorage.findGenresByFilmId(1L);
+        Collection<Genre> genres = genreStorage.findGenresByFilmId(1L);
 
-        Optional<Genre> genre = genreDbStorage.findGenreById(3);
+        Optional<Genre> genre = genreStorage.findGenreById(3);
 
-        assertThat(genres)
+        Assertions.assertThat(genres)
                 .hasSize(2)
                 .contains(genre.get());
     }
 
     @Test
     void findGenresByFilmId_WrongId() {
-        Collection<Genre> genres = genreDbStorage.findGenresByFilmId(999L);
+        Collection<Genre> genres = genreStorage.findGenresByFilmId(999L);
 
-        assertThat(genres)
+        Assertions.assertThat(genres)
                 .hasSize(0);
     }
 }

@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
+import ru.yandex.practicum.filmorate.storage.GenreStorage;
 import ru.yandex.practicum.filmorate.utils.ValidateUtil;
 
 import java.util.Collection;
@@ -22,7 +22,6 @@ public class GenreService {
     }
 
     public Genre findGenreById(Integer genreId) {
-        ValidateUtil.validNumberNotNull(genreId, "id жанра не должно быть null.");
         Genre genre = genreStorage.findGenreById(genreId).orElseThrow(
                 () -> {
                     ValidateUtil.throwNotFound(String.format("Жанр с %d не найден.", genreId));

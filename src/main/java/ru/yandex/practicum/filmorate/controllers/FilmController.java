@@ -9,7 +9,9 @@ import ru.yandex.practicum.filmorate.model.MessageResponse;
 import ru.yandex.practicum.filmorate.services.FilmService;
 
 import javax.validation.Valid;
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -32,6 +34,14 @@ public class FilmController {
         return filmService.findFilmById(id);
     }
 
+    @GetMapping("/director/{directorId}")
+    public Collection<Film> getDirectorFilms(@PathVariable Integer directorId,
+                                             @RequestParam(required = true) String sortBy) {
+        log.info(String.format("Пришёл запрос на получение режиссера с id = %d, сортировка по %s",
+                directorId, sortBy));
+        return filmService.getAllFilmsByDirectorSorted(directorId, sortBy);
+    }
+
     @PostMapping
     public Film createFilm(@Valid @RequestBody Film film) {
         log.info("POST /films - запрос на создание нового фильма.");
@@ -45,9 +55,13 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public List<Film> findPopularFilms(@RequestParam(defaultValue = "10") int count) {
+    public List<Film> findPopularFilms(
+            @RequestParam(required = false) Integer genreId,
+            @RequestParam(required = false) Integer year,
+            @RequestParam(defaultValue = "10") int count
+    ) {
         log.info("GET /films/popular - запрос популярных фильмов");
-        return filmService.findPopularFilms(count);
+        return filmService.findPopularFilms(genreId, year, count);
     }
 
     @PutMapping("/{id}/like/{userId}")
@@ -68,5 +82,31 @@ public class FilmController {
         log.info("PUT /films/{}/like/{} - запрос на удаление лайка.", id, userId);
         filmService.dislikeFilm(id, userId);
         return ResponseEntity.ok(new MessageResponse("Лайк удален!"));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<MessageResponse> deleteFilm(@PathVariable Long id) {
+        log.info("DELETE /films/{} - запрос на удаление фильма.", id);
+        filmService.removeFilmById(id);
+        return ResponseEntity.ok(new MessageResponse("Фильм удален!"));
+    }
+
+
+    @GetMapping("/common")
+    public List<Film> commonUserMovies(
+            @RequestParam Long userId,
+            @RequestParam Long friendId
+    ) {
+        log.info("GET /common - запрос общих фильмов пользователей");
+        return filmService.commonUserMovies(userId, friendId);
+    }
+
+    @GetMapping("/search")
+    public Set<Film> searchForMoviesByDescription(
+            @RequestParam String query,
+            @RequestParam String by
+    ) {
+        log.info("GET /films/search?query=" + query + "&by= " + by);
+        return filmService.searchForMoviesByDescription(query, by);
     }
 }

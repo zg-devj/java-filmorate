@@ -1,10 +1,11 @@
-package ru.yandex.practicum.filmorate.storage.filmlike;
+package ru.yandex.practicum.filmorate.storage.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.storage.FilmLikeStorage;
 
 @Slf4j
 @Component
@@ -14,6 +15,7 @@ public class FilmLikeDbStorage implements FilmLikeStorage {
 
     @Override
     public boolean create(Long userId, Long filmId) {
+        delete(userId, filmId);
         String sql = "INSERT INTO film_like "
                 + "(user_id, film_id) "
                 + "VALUES (?,?)";
@@ -32,5 +34,12 @@ public class FilmLikeDbStorage implements FilmLikeStorage {
         String sql = "DELETE FROM film_like "
                 + "WHERE user_id=? AND film_id=?";
         return jdbcTemplate.update(sql, userId, filmId) == 1;
+    }
+
+    @Override
+    public void deleteLikesByUserId(Long userId) {
+        String sql = "DELETE FROM film_like "
+                + "WHERE user_id=?";
+        jdbcTemplate.update(sql, userId);
     }
 }

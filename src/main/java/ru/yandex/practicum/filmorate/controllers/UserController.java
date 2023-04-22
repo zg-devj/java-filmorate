@@ -4,8 +4,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.MessageResponse;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.services.FilmService;
 import ru.yandex.practicum.filmorate.services.UserService;
 
 import javax.validation.Valid;
@@ -17,6 +19,7 @@ import java.util.Collection;
 @RequestMapping("/users")
 public class UserController {
     private final UserService userService;
+    private final FilmService filmService;
 
     @GetMapping
     public Collection<User> findAllUsers() {
@@ -32,6 +35,12 @@ public class UserController {
         return userService.findUserById(id);
     }
 
+    @GetMapping("/{id}/recommendations")
+    public Collection<Film> getRecommendations(@PathVariable Long id) {
+        log.info("GET /{}/recommendations - запрос рекомендаций для пользователя.", id);
+        return filmService.getRecommendations(id);
+    }
+
     @PostMapping
     public User createUser(@Valid @RequestBody User user) {
         log.info("POST /users - создание пользователя");
@@ -44,9 +53,17 @@ public class UserController {
         return userService.updateUser(user);
     }
 
+    // удалить пользователя
+    @DeleteMapping("/{id}")
+    public ResponseEntity<MessageResponse> removeUser(@PathVariable Long id) {
+        log.info("DELETE /users/{} - запрос на удаление пользователя.", id);
+        userService.removeUserById(id);
+        return ResponseEntity.ok(new MessageResponse("Пользователь удален."));
+    }
+
     // добавление в друзья
     @PutMapping("/{id}/friends/{friendId}")
-    public ResponseEntity addFriend(
+    public ResponseEntity<MessageResponse> addFriend(
             @PathVariable Long id,
             @PathVariable Long friendId
 
@@ -58,7 +75,7 @@ public class UserController {
 
     // удаление из друзей
     @DeleteMapping("/{id}/friends/{friendId}")
-    public ResponseEntity removeFriend(
+    public ResponseEntity<MessageResponse> removeFriend(
             @PathVariable Long id,
             @PathVariable Long friendId
 
